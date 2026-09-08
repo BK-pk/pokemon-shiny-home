@@ -21,7 +21,7 @@
 .current-hunt-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}.hunt-chip{display:grid;grid-template-columns:68px 1fr;gap:12px;background:#0b1928;border:1px solid #5e4e25;border-radius:16px;padding:12px}
 .hunt-chip img{width:68px;height:68px;object-fit:contain}.hunt-chip .hunt-no{font-size:10px;color:#7891a8}.hunt-chip b{display:block;font-size:15px}.hunt-chip small{display:block;color:#ffd36b;margin-top:2px}
 .hunt-controls{grid-column:1/-1;display:grid;grid-template-columns:repeat(4,minmax(110px,1fr));gap:8px;margin-top:4px}.hunt-controls input,.hunt-controls select{background:#081421;border:1px solid #263c53;color:var(--text);border-radius:9px;padding:8px;font-size:11px}
-.counter-row{grid-column:1/-1;display:flex;align-items:center;gap:8px;flex-wrap:wrap}.counter-value{font-size:22px;font-weight:900;color:var(--gold);min-width:74px}.hunt-action{border:1px solid #415c77;background:#11243a;color:var(--text);border-radius:9px;padding:7px 10px;cursor:pointer;font-weight:800}.hunt-action.capture{border-color:#3c7758;background:#123123}.hunt-action.danger{border-color:#704246;background:#2b1518}
+.counter-row{grid-column:1/-1;display:flex;align-items:center;gap:8px;flex-wrap:wrap}.counter-value{font-size:22px;font-weight:900;color:var(--gold);min-width:74px}.hunt-action{border:1px solid #415c77;background:#11243a;color:var(--text);border-radius:9px;padding:7px 10px;cursor:pointer;font-weight:800}.hunt-action:active{transform:translateY(1px);opacity:.82}.hunt-action.capture{border-color:#3c7758;background:#123123}.hunt-action.danger{border-color:#704246;background:#2b1518}
 .hunt-empty{color:var(--muted);font-size:12px;padding:5px 0}.ball-select-wrap{display:flex;align-items:center;gap:6px;min-width:0}.ball-select-wrap img{width:30px;height:30px;object-fit:contain;flex:0 0 30px}.ball-select-wrap select{min-width:0;width:100%}.ball-badge{display:inline-flex;align-items:center;gap:4px;color:var(--muted);font-size:11px}.ball-badge img{width:24px!important;height:24px!important;object-fit:contain}.card-ball-row{display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-top:7px}.card-ball-row .sprite-ball{position:relative;display:inline-flex}.card-ball-row img{width:26px!important;height:26px!important;object-fit:contain;background:#081421;border-radius:50%;padding:1px;border:1px solid #263c53}.card-ball-row em{position:absolute;right:-3px;bottom:-3px;background:#07111d;border:1px solid #36516d;color:#fff;font-style:normal;font-size:8px;line-height:13px;min-width:13px;height:13px;border-radius:8px;text-align:center;padding:0 2px}.hunt-history{grid-column:1/-1;font-size:11px;color:var(--muted);padding-top:4px;border-top:1px solid #1d3045}.odds-box{grid-column:1/-1;display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:#0a1523;border:1px solid #263c53;border-radius:10px;padding:9px 10px;font-size:11px}.odds-box strong{font-size:17px;color:var(--gold)}.odds-note{color:var(--muted)}.alt-catch{grid-column:1/-1;background:#0a1523;border:1px solid #263c53;border-radius:10px;padding:10px;margin-top:2px}.alt-catch summary{cursor:pointer;font-size:12px;font-weight:700}.alt-catch-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.alt-catch-row input{min-width:210px;flex:1}.alt-results{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;max-height:160px;overflow:auto}.alt-pick{display:flex;align-items:center;gap:5px;border:1px solid #35516d;border-radius:8px;padding:6px 8px;background:#102033;color:#f3f8ff;cursor:pointer;font-weight:600}.alt-pick img{width:32px;height:32px;object-fit:contain}.alt-pick:hover{border-color:#5b7898}.alt-pick.selected{border-color:#79d8ff;box-shadow:0 0 0 2px #79d8ff inset;background:#173653;color:#fff}.alt-confirm{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px;padding-top:8px;border-top:1px solid #20354b}.alt-confirm img{width:42px;height:42px;object-fit:contain}.alt-confirm-name{font-weight:700}.alt-confirm button{margin-left:auto}
 .individual-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
 .individual-form .full{grid-column:1/-1}
@@ -788,7 +788,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
     <div class="extra-panel">
       <div class="extra-head">
         <div><h2 style="margin:0">☁️ Supabase 同期</h2>
-        <span class="section-count">PC・iPhoneで同じデータを共有 ・ build v67</span></div>
+        <span class="section-count">PC・iPhoneで同じデータを共有 ・ build v68</span></div>
       </div>
       <div class="sync-fields">
         <label>Supabase URL<input id="supabase-url" autocomplete="off" placeholder="https://xxxx.supabase.co"></label>
@@ -803,14 +803,14 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
         <button class="btn" id="cloud-check" type="button">クラウド確認</button>
       </div>
       <div id="cloud-status" class="home-help">未設定です。</div>
-      <div id="auto-sync-status" class="home-help" style="margin-top:8px">自動同期：双方向同期 v67</div>
+      <div id="auto-sync-status" class="home-help" style="margin-top:8px">自動同期：双方向同期 v68</div>
       <div class="home-help" style="margin-top:10px">初回は「設定保存」→「接続テスト」の順に確認してください。既存データがある場合、確認前にクラウドへ保存しないでください。</div>
     </div>
   </div>
 </section>
 
 <script>
-const DATA_VERSION='full-2026-09-09-v67';
+const DATA_VERSION='full-2026-09-09-v68';
 const SPECIES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species.csv';
 const NAMES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
 const MAX_DEX=1025;
@@ -1200,9 +1200,9 @@ function render(){
   renderCurrentHunt();
 }
 function huntData(id){if(!huntState[id])huntState[id]={count:0,start:'',method:'',ball:'',game:'',charm:'',outbreak:'0',sparkling:'0'};return huntState[id]}
-window.incHunt=(id,n)=>{const x=huntData(id);x.count=Math.max(0,(Number(x.count)||0)+n);save();renderCurrentHunt()};
-window.resetHuntCount=id=>{const x=huntData(id);x.count=0;save();renderCurrentHunt()};
-window.setHunt=(id,key,val)=>{huntData(id)[key]=val;save()};
+window.incHunt=(id,n)=>{const x=huntData(id);x.count=Math.max(0,(Number(x.count)||0)+n);save();requestAutoSyncAfterDataChange();renderCurrentHunt()};
+window.resetHuntCount=id=>{const x=huntData(id);x.count=0;save();requestAutoSyncAfterDataChange();renderCurrentHunt()};
+window.setHunt=(id,key,val)=>{huntData(id)[key]=val;save();requestAutoSyncAfterDataChange()};
 window.captureHunt=id=>{
   if(!individualState[id])individualState[id]=[];
   const x=huntData(id),recordMsg=captureRecordMessage(x.count);
@@ -1210,11 +1210,12 @@ window.captureHunt=id=>{
   syncOwned(id);
   targetState[id]=false;
   save();
+  requestAutoSyncAfterDataChange();
   render();
   showShinyEffect(data.find(p=>p.id===id));
   showToast(`${data.find(p=>p.id===id)?.name||'ポケモン'}を捕獲個体として登録しました.${recordMsg?` ${recordMsg}`:''}`);
 };
-window.stopHunt=id=>{targetState[id]=false;save();render()};
+window.stopHunt=id=>{targetState[id]=false;save();requestAutoSyncAfterDataChange();render()};
 
 const HUNT_GAMES=[
   ['','厳選ソフト'],['DP/Pt','DP / Pt'],['HGSS','HGSS'],['BW','BW'],['BW2','BW2'],['XY','XY'],['ORAS','ORAS'],
@@ -1243,7 +1244,7 @@ function setManualHuntCount(id,uid,val){
   const ind=arr.find(x=>x.uid===uid);
   if(!ind)return;
   ind.huntCount=Math.max(0,Number(val)||0);
-  save();render();renderExtraPanels();
+  save();requestAutoSyncAfterDataChange();render();renderExtraPanels();
 }
 function screenshotKey(id,uid){return `${id}::${uid}`}
 function individualScreenshot(id,uid){return individualScreenshots[screenshotKey(id,uid)]||''}
@@ -2846,14 +2847,14 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 // ===== v56 automatic update / cache repair =====
 (function(){
-  const APP_VERSION='v67';
+  const APP_VERSION='v68';
   const UPDATE_KEY='shinyHomeReloadedForSW_'+APP_VERSION;
 
   async function registerFreshWorker(){
     if(!('serviceWorker' in navigator) || location.protocol==='file:') return;
     try{
       const reg = await navigator.serviceWorker.register(
-        './service-worker.js?v=67',
+        './service-worker.js?v=68',
         {updateViaCache:'none'}
       );
 
