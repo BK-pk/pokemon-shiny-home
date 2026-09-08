@@ -547,7 +547,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
   </div>
 
   <div id="mobile-active-hunt" class="mobile-active-hunt" style="display:none">
-    <div id="mobile-sync-status" class="mobile-hunt-meta" style="text-align:center;margin:4px 0 8px">☁️ 端末内に保存済み ・ v75</div>
+    <div id="mobile-sync-status" class="mobile-hunt-meta" style="text-align:center;margin:4px 0 8px">☁️ 端末内に保存済み ・ v76</div>
     <div id="mobile-multi-hunt-list" class="mobile-hunt-list"></div>
     <button id="mobile-multi-add" class="btn" type="button">＋ 厳選を追加</button>
   </div>
@@ -798,7 +798,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
     <div class="extra-panel">
       <div class="extra-head">
         <div><h2 style="margin:0">☁️ Supabase 同期</h2>
-        <span class="section-count">PC・iPhoneで同じデータを共有 ・ build v75</span></div>
+        <span class="section-count">PC・iPhoneで同じデータを共有 ・ build v76</span></div>
       </div>
       <div class="sync-fields">
         <label>Supabase URL<input id="supabase-url" autocomplete="off" placeholder="https://xxxx.supabase.co"></label>
@@ -813,9 +813,9 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
         <button class="btn" id="cloud-check" type="button">クラウド確認</button>
       </div>
       <div id="cloud-status" class="home-help">未設定です。</div>
-      <div id="auto-sync-status" class="home-help" style="margin-top:8px">同期：v75 外出向け省通信</div>
+      <div id="auto-sync-status" class="home-help" style="margin-top:8px">同期：v76 外出向け省通信</div>
       <div class="home-help" style="margin-top:8px">
-        v75ではカウンター操作中は通信せず端末内へ即保存します。10秒操作がなければクラウドへ保存し、他端末は最新時刻の値だけを取り込みます。所持状況・HOME BOXなどのフルデータは上のボタンで手動同期します。
+        v76ではカウンター操作中は通信せず端末内へ即保存します。10秒操作がなければクラウドへ保存し、他端末は最新時刻の値だけを取り込みます。所持状況・HOME BOXなどのフルデータは上のボタンで手動同期します。
       </div>
       <div class="home-help" style="margin-top:10px">初回は「設定保存」→「接続テスト」の順に確認してください。既存データがある場合、確認前にクラウドへ保存しないでください。</div>
     </div>
@@ -823,7 +823,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 </section>
 
 <script>
-const DATA_VERSION='full-2026-09-09-v75';
+const DATA_VERSION='full-2026-09-09-v76';
 const SPECIES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species.csv';
 const NAMES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
 const MAX_DEX=1025;
@@ -2870,14 +2870,14 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 // ===== v56 automatic update / cache repair =====
 (function(){
-  const APP_VERSION='v75';
+  const APP_VERSION='v76';
   const UPDATE_KEY='shinyHomeReloadedForSW_'+APP_VERSION;
 
   async function registerFreshWorker(){
     if(!('serviceWorker' in navigator) || location.protocol==='file:') return;
     try{
       const reg = await navigator.serviceWorker.register(
-        './service-worker.js?v=75',
+        './service-worker.js?v=76',
         {updateViaCache:'none'}
       );
 
@@ -2924,7 +2924,7 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 
 
-// ===== v75 travel sync: local-first + newest-write-wins =====
+// ===== v76 travel sync: local-first + newest-write-wins =====
 (function(){
   const CLOUD_KEY='shinyHomeCloudSettings_v2';
   const COUNTER_TABLE='shiny_home_hunt_counters';
@@ -2935,13 +2935,16 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
   let flushTimer=null;
   let pulling=false;
   const $=id=>document.getElementById(id);
-  function cfg(){try{return JSON.parse(localStorage.getItem(CLOUD_KEY)||localStorage.getItem('shinyHomeCloudSettings_v1')||'{}')}catch{return {}}}
+  function cfg(){
+    const fallback={url:'https://litkisamojglstbjwloo.supabase.co',key:'sb_publishable_pc-8E8ETM6yZ3OcB1cNkjA_OzVjc-Rh',userId:'pokemon-shiny-home'};
+    try{return {...fallback,...(JSON.parse(localStorage.getItem(CLOUD_KEY)||localStorage.getItem('shinyHomeCloudSettings_v1')||'{}')||{})}}catch{return fallback}
+  }
   function headers(c){return {apikey:c.key,Authorization:'Bearer '+c.key,'Content-Type':'application/json'}}
   function readMap(key){try{return JSON.parse(localStorage.getItem(key)||'{}')||{}}catch{return {}}}
   function writeMap(key,obj){try{localStorage.setItem(key,JSON.stringify(obj))}catch(_){}}
   function setStatus(msg,kind){
     const e=$('auto-sync-status'); if(e){e.textContent='同期：'+msg;e.style.color=kind==='ok'?'#8fe6b0':kind==='err'?'#ff9c9c':''}
-    const m=$('mobile-sync-status'); if(m){m.textContent='☁️ '+msg+' ・ v75';m.style.color=kind==='ok'?'#8fe6b0':kind==='err'?'#ff9c9c':''}
+    const m=$('mobile-sync-status'); if(m){m.textContent='☁️ '+msg+' ・ v76';m.style.color=kind==='ok'?'#8fe6b0':kind==='err'?'#ff9c9c':''}
   }
   function localHunts(){try{return typeof huntState==='object'&&huntState?huntState:JSON.parse(localStorage.getItem('shinyHomeHunts_v1')||'{}')}catch{return {}}}
   function setLocalCounter(id,count){
@@ -3010,7 +3013,48 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')flushCounters(true);else pullCounters()});
   window.addEventListener('pagehide',()=>flushCounters(true));
   window.addEventListener('focus',()=>pullCounters());
+  window.addEventListener('pageshow',()=>pullCounters());
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+})();
+
+// ===== v76 PWA/home-screen bootstrap =====
+(function(){
+  const CLOUD_KEY='shinyHomeCloudSettings_v2';
+  const COUNTER_TABLE='shiny_home_hunt_counters';
+  const fallback={url:'https://litkisamojglstbjwloo.supabase.co',key:'sb_publishable_pc-8E8ETM6yZ3OcB1cNkjA_OzVjc-Rh',userId:'pokemon-shiny-home'};
+  function cfg(){try{return {...fallback,...(JSON.parse(localStorage.getItem(CLOUD_KEY)||localStorage.getItem('shinyHomeCloudSettings_v1')||'{}')||{})}}catch{return fallback}}
+  function headers(c){return {apikey:c.key,Authorization:'Bearer '+c.key,'Content-Type':'application/json'}}
+  function hunts(){try{return typeof huntState==='object'&&huntState?huntState:JSON.parse(localStorage.getItem('shinyHomeHunts_v1')||'{}')}catch{return {}}}
+  function targets(){try{return typeof targetState==='object'&&targetState?targetState:JSON.parse(localStorage.getItem('shinyHomeTargets_v1')||'{}')}catch{return {}}}
+  async function bootstrapHomeScreen(){
+    const c=cfg(); if(!c.url||!c.key||!c.userId)return;
+    try{
+      const r=await fetch(c.url.replace(/\/$/,'')+'/rest/v1/'+COUNTER_TABLE+'?user_id=eq.'+encodeURIComponent(c.userId)+'&select=pokemon_id,count,updated_at',{headers:headers(c),cache:'no-store'});
+      if(!r.ok)return;
+      const rows=await r.json();
+      const h=hunts(),t=targets(); let changed=false;
+      for(const row of rows){
+        const id=row.pokemon_id;
+        // If this device already knows the hunt, refresh its count immediately.
+        if(t[id] || h[id]){
+          const x=h[id]||{}; const f=('count' in x)?'count':(('huntCount' in x)?'huntCount':'count');
+          const remote=Number(row.count)||0;
+          if(Number(x[f]||0)!==remote){x[f]=remote;h[id]=x;changed=true}
+        }
+      }
+      if(changed){
+        localStorage.setItem('shinyHomeHunts_v1',JSON.stringify(h));
+        try{if(typeof save==='function')save()}catch(_){ }
+        try{if(typeof renderMobileMultiHunts==='function')renderMobileMultiHunts()}catch(_){ }
+      }
+    }catch(_){ }
+  }
+  // Home-screen apps can have a separate local storage bucket on iOS.
+  // Always refresh cloud counters when the standalone app starts/resumes.
+  function start(){bootstrapHomeScreen();setTimeout(bootstrapHomeScreen,1200)}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
+  window.addEventListener('pageshow',bootstrapHomeScreen);
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')bootstrapHomeScreen()});
 })();
 
 function requestAutoSyncAfterDataChange(){
