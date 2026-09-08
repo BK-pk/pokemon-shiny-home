@@ -486,6 +486,9 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 @media(max-width:800px){
  body:not(.mobile-counter-mode) #mobile-return-counter{display:inline-flex!important}
 }
+
+.app-tab[data-tab="sync"]{border-color:#4e87b7}
+.app-tab[data-tab="sync"].active{box-shadow:0 0 0 1px rgba(104,191,255,.22) inset}
 </style>
 </head>
 <body>
@@ -588,6 +591,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 <button class="app-tab" data-tab="gallery" onclick="switchAppTab('gallery',this)" type="button">
 <img alt="" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/235.png"/>スクショギャラリー
   </button>
+<button class="app-tab" data-tab="sync" onclick="switchAppTab('sync',this)" type="button">☁️ 同期・設定</button>
 </nav><section class="tab-page active" id="tab-collection"><section class="hero">
 <div class="summary"><div class="eyebrow">collection progress</div><div class="summary-main"><div class="big"><span id="ownedCount">0</span><small> / <span id="totalCount">0</span></small></div><div class="percent" id="percent">0.0%</div></div><div class="progress"><div class="bar" id="bar"></div></div><div class="mini"><span>未所持 <b id="missingCount">0</b></span><span>表示中 <b id="visibleCount">0</b></span><span>保存 <b>自動</b></span><span>対象 <b id="targetCount">0</b></span><span>色違い総個体数 <b id="individualCount">0</b></span></div></div>
 <div class="sidepanel"><div class="stat"><span>全国図鑑</span><strong id="normalStat">0.0%</strong><div class="statdetail" id="normalDetail">0 / 0</div></div><div class="stat"><span>リージョン</span><strong id="regionStat">0.0%</strong><div class="statdetail" id="regionDetail">0 / 0</div></div><div class="stat"><span>オス・メス違い</span><strong id="genderStat">0.0%</strong><div class="statdetail" id="genderDetail">0 / 0</div></div><div class="stat"><span>その他の姿違い</span><strong id="formStat">0.0%</strong><div class="statdetail" id="formDetail">0 / 0</div></div><div class="stat"><span>キョダイマックス</span><strong id="gmaxStat">0.0%</strong><div class="statdetail" id="gmaxDetail">0 / 0</div></div><div class="stat"><span>色違い未解禁</span><strong id="lockedStat">0</strong><div class="statdetail">％計算対象外</div></div></div>
@@ -798,8 +802,28 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 <div class="extra-head"><span class="section-count">1・10・50・100匹目、その後100匹ごとを自動抽出</span></div>
 <div class="milestone-grid" id="milestone-grid"></div>
 </details></section></div>
+
+<section id="tab-sync" class="tab-page">
+  <div class="sync-grid">
+    <div class="extra-panel">
+      <div class="extra-head"><div><h2 style="margin:0">☁️ Supabase 同期</h2><span class="section-count">PC・iPhoneで同じデータを共有</span></div></div>
+      <div class="sync-fields">
+        <label>Supabase URL<input id="supabase-url" placeholder="https://xxxx.supabase.co"></label>
+        <label>Publishable key<input id="supabase-key" placeholder="sb_publishable_..."></label>
+        <label>同期ID<input id="sync-user-id" placeholder="pokemon-shiny-home"></label>
+      </div>
+      <div class="counter-row">
+        <button class="btn" onclick="saveCloudSettings()">設定保存</button>
+        <button class="btn" onclick="cloudUpload()">クラウドへ保存</button>
+        <button class="btn" onclick="cloudDownload()">クラウドから読込</button>
+      </div>
+      <div id="cloud-status" class="home-help">未設定です。</div>
+    </div>
+  </div>
+</section>
+
 <script>
-const DATA_VERSION='full-2026-09-08-v53';
+const DATA_VERSION='full-2026-09-08-v54';
 const SPECIES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species.csv';
 const NAMES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
 const MAX_DEX=1025;
@@ -2253,7 +2277,7 @@ function saveCloudSettings(){
 }
 function renderCloudSettings(){
   const s=loadCloudSettings();if(el('supabase-url'))el('supabase-url').value=s.url||'';if(el('supabase-key'))el('supabase-key').value=s.key||'';if(el('sync-user-id'))el('sync-user-id').value=s.userId||'';
-  if(el('cloud-status'))el('cloud-status').textContent=(s.url&&s.key&&s.userId)?'設定済み。クラウド保存/読込を利用できます。':'未設定です。URL・Anon key・同期IDを保存すると使えます。';
+  if(el('cloud-status'))el('cloud-status').textContent=(s.url&&s.key&&s.userId)?'設定済み。クラウド保存/読込を利用できます。':'未設定です。URL・Publishable key・同期IDを保存すると使えます。';
 }
 async function cloudRequest(method,body){
   const s=loadCloudSettings();if(!s.url||!s.key||!s.userId)throw Error('同期設定が未入力です。');
