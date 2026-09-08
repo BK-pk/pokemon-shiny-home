@@ -537,7 +537,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
   </div>
 
   <div id="mobile-active-hunt" class="mobile-active-hunt" style="display:none">
-    <div id="mobile-sync-status" class="mobile-hunt-meta" style="text-align:center;margin:4px 0 8px">☁️ 同期状態を確認中…</div>
+    <div id="mobile-sync-status" class="mobile-hunt-meta" style="text-align:center;margin:4px 0 8px">☁️ 同期状態を確認中… ・ v69</div>
     <div id="mobile-multi-hunt-list" class="mobile-hunt-list"></div>
     <button id="mobile-multi-add" class="btn" type="button">＋ 厳選を追加</button>
   </div>
@@ -788,7 +788,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
     <div class="extra-panel">
       <div class="extra-head">
         <div><h2 style="margin:0">☁️ Supabase 同期</h2>
-        <span class="section-count">PC・iPhoneで同じデータを共有 ・ build v68</span></div>
+        <span class="section-count">PC・iPhoneで同じデータを共有 ・ build v69</span></div>
       </div>
       <div class="sync-fields">
         <label>Supabase URL<input id="supabase-url" autocomplete="off" placeholder="https://xxxx.supabase.co"></label>
@@ -803,14 +803,14 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
         <button class="btn" id="cloud-check" type="button">クラウド確認</button>
       </div>
       <div id="cloud-status" class="home-help">未設定です。</div>
-      <div id="auto-sync-status" class="home-help" style="margin-top:8px">自動同期：双方向同期 v68</div>
+      <div id="auto-sync-status" class="home-help" style="margin-top:8px">自動同期：双方向同期 v69</div>
       <div class="home-help" style="margin-top:10px">初回は「設定保存」→「接続テスト」の順に確認してください。既存データがある場合、確認前にクラウドへ保存しないでください。</div>
     </div>
   </div>
 </section>
 
 <script>
-const DATA_VERSION='full-2026-09-09-v68';
+const DATA_VERSION='full-2026-09-09-v69';
 const SPECIES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species.csv';
 const NAMES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
 const MAX_DEX=1025;
@@ -2847,14 +2847,14 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 // ===== v56 automatic update / cache repair =====
 (function(){
-  const APP_VERSION='v68';
+  const APP_VERSION='v69';
   const UPDATE_KEY='shinyHomeReloadedForSW_'+APP_VERSION;
 
   async function registerFreshWorker(){
     if(!('serviceWorker' in navigator) || location.protocol==='file:') return;
     try{
       const reg = await navigator.serviceWorker.register(
-        './service-worker.js?v=68',
+        './service-worker.js?v=69',
         {updateViaCache:'none'}
       );
 
@@ -2912,6 +2912,8 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
   let baselineCloudAt='';
   let baselineCloudHash='';
   let localDirty=false;
+  let localRevision=0;
+  let suppressPullUntil=0;
 
   const $=id=>document.getElementById(id);
 
@@ -2926,7 +2928,7 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
     }
     const m=$('mobile-sync-status');
     if(m){
-      m.textContent='☁️ '+msg;
+      m.textContent='☁️ '+msg+' ・ v69';
       m.style.color=kind==='ok'?'#8fe6b0':kind==='err'?'#ff9c9c':'';
     }
   }
@@ -2973,6 +2975,7 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
     baselineCloudAt=now;
     baselineCloudHash=hash(payload);
     localDirty=false;
+    suppressPullUntil=Math.max(suppressPullUntil,Date.now()+700);
     saveMeta();
     setStatus('同期済み '+new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit',second:'2-digit'}),'ok');
   }
@@ -3002,10 +3005,16 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
   async function pull(){
     const c=cfg();
     if(!c.url||!c.key||!c.userId){setStatus('未設定');return false}
-    if(busy||localDirty)return false;
+    if(busy||localDirty||Date.now()<suppressPullUntil)return false;
+    const startedRevision=localRevision;
     busy=true;
     try{
       const row=await readCloud(c);
+      // A local button/input was used while this network request was in flight.
+      // Never let this older cloud response overwrite that fresh local action.
+      if(localDirty || localRevision!==startedRevision || Date.now()<suppressPullUntil){
+        return false;
+      }
       if(!row){
         baselineCloudAt='';
         baselineCloudHash='';
@@ -3017,6 +3026,7 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
       if(ch!==baselineCloudHash){
         // If the actual payload is different, receive it.
         if(ch!==hash(snapshot())){
+          if(localDirty || localRevision!==startedRevision || Date.now()<suppressPullUntil)return false;
           applyRemote(row);
           setStatus('受信済み '+new Date(row.updated_at).toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit',second:'2-digit'}),'ok');
         }else{
@@ -3086,10 +3096,14 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
   window.shinyMarkDirtyAndSync=()=>{
     if(!initialized||applyingRemote)return;
+    localRevision++;
     localDirty=true;
+    // While +1 etc. are being pressed repeatedly, do not let periodic pull/render
+    // replace the controls under the user's finger/mouse.
+    suppressPullUntil=Date.now()+1800;
     saveMeta();
     setStatus('変更を保存中…');
-    schedulePush(250);
+    schedulePush(350);
   };
 
   window.shinyAutoSyncNow=async()=>{
@@ -3139,17 +3153,34 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
   window.addEventListener('online',()=>{localDirty?push():pull()});
 
   // Receiver side: near-real-time enough for PC/iPhone use.
-  setInterval(()=>{if(document.visibilityState==='visible'&&!localDirty)pull()},2000);
+  setInterval(()=>{if(document.visibilityState==='visible'&&!localDirty&&Date.now()>=suppressPullUntil)pull()},3000);
 
   // Explicit user changes outside the mobile counter also become dirty.
+  // Prevent an already-running periodic receive from fighting with rapid counter presses.
+  document.addEventListener('pointerdown',e=>{
+    const t=e.target && e.target.closest ? e.target.closest('button') : null;
+    if(!t)return;
+    const isHuntButton =
+      t.closest('#mobile-active-hunt') ||
+      t.closest('.current-hunt-card') ||
+      t.getAttribute('onclick')?.includes('incHunt') ||
+      t.getAttribute('onclick')?.includes('resetHuntCount');
+    if(isHuntButton){
+      suppressPullUntil=Date.now()+1800;
+    }
+  },true);
+
   ['change','input'].forEach(type=>{
     document.addEventListener(type,e=>{
       if(!initialized||applyingRemote)return;
       if(e.target && e.target.closest && e.target.closest('#sync-panel'))return;
       setTimeout(()=>{
         if(!applyingRemote){
+          localRevision++;
           localDirty=true;
+          suppressPullUntil=Date.now()+1800;
           saveMeta();
+          setStatus('変更を保存中…');
           schedulePush(350);
         }
       },50);
