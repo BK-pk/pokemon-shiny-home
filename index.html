@@ -537,7 +537,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
   </div>
 
   <div id="mobile-active-hunt" class="mobile-active-hunt" style="display:none">
-    <div id="mobile-sync-status" class="mobile-hunt-meta" style="text-align:center;margin:4px 0 8px">☁️ 同期状態を確認中… ・ v69</div>
+    <div id="mobile-sync-status" class="mobile-hunt-meta" style="text-align:center;margin:4px 0 8px">☁️ 同期は待機中 ・ v71</div>
     <div id="mobile-multi-hunt-list" class="mobile-hunt-list"></div>
     <button id="mobile-multi-add" class="btn" type="button">＋ 厳選を追加</button>
   </div>
@@ -788,7 +788,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
     <div class="extra-panel">
       <div class="extra-head">
         <div><h2 style="margin:0">☁️ Supabase 同期</h2>
-        <span class="section-count">PC・iPhoneで同じデータを共有 ・ build v70</span></div>
+        <span class="section-count">PC・iPhoneで同じデータを共有 ・ build v71</span></div>
       </div>
       <div class="sync-fields">
         <label>Supabase URL<input id="supabase-url" autocomplete="off" placeholder="https://xxxx.supabase.co"></label>
@@ -803,9 +803,9 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
         <button class="btn" id="cloud-check" type="button">クラウド確認</button>
       </div>
       <div id="cloud-status" class="home-help">未設定です。</div>
-      <div id="auto-sync-status" class="home-help" style="margin-top:8px">自動同期：v70 分離同期</div>
+      <div id="auto-sync-status" class="home-help" style="margin-top:8px">同期：v71 外出向け省通信</div>
       <div class="home-help" style="margin-top:8px">
-        v70では厳選カウンターだけ自動同期します。所持状況・HOME BOXなどのフルデータは、上のボタンで手動同期します。
+        v71ではカウンター操作中は通信しません。操作が落ち着いた時や画面を離れる時にまとめて保存し、PCを開いた時に取得します。所持状況・HOME BOXなどのフルデータは上のボタンで手動同期します。
       </div>
       <div class="home-help" style="margin-top:10px">初回は「設定保存」→「接続テスト」の順に確認してください。既存データがある場合、確認前にクラウドへ保存しないでください。</div>
     </div>
@@ -813,7 +813,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 </section>
 
 <script>
-const DATA_VERSION='full-2026-09-09-v70';
+const DATA_VERSION='full-2026-09-09-v71';
 const SPECIES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species.csv';
 const NAMES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
 const MAX_DEX=1025;
@@ -2850,7 +2850,7 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 // ===== v56 automatic update / cache repair =====
 (function(){
-  const APP_VERSION='v70';
+  const APP_VERSION='v71';
   const UPDATE_KEY='shinyHomeReloadedForSW_'+APP_VERSION;
 
   async function registerFreshWorker(){
@@ -2904,162 +2904,63 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 
 
-// ===== v70 split sync: counters realtime-ish, full data manual/safe =====
+// ===== v71 travel sync: local-first, delayed cloud flush =====
 (function(){
   const CLOUD_KEY='shinyHomeCloudSettings_v2';
   const COUNTER_TABLE='shiny_home_hunt_counters';
-  let pollTimer=null;
-  let pushTimers=new Map();
-  let lastSeenCounterUpdated={};
-  let applyingCounterRemote=false;
-
+  const IDLE_FLUSH_MS=30000;
+  let dirty=new Map();
+  let flushTimer=null;
+  let pulling=false;
   const $=id=>document.getElementById(id);
-
-  function cfg(){
-    try{return JSON.parse(localStorage.getItem(CLOUD_KEY)||localStorage.getItem('shinyHomeCloudSettings_v1')||'{}')}catch{return {}}
-  }
-  function headers(c){
-    return {apikey:c.key,Authorization:'Bearer '+c.key,'Content-Type':'application/json'};
-  }
+  function cfg(){try{return JSON.parse(localStorage.getItem(CLOUD_KEY)||localStorage.getItem('shinyHomeCloudSettings_v1')||'{}')}catch{return {}}}
+  function headers(c){return {apikey:c.key,Authorization:'Bearer '+c.key,'Content-Type':'application/json'}}
   function setStatus(msg,kind){
-    const e=$('auto-sync-status');
-    if(e){
-      e.textContent='自動同期：'+msg;
-      e.style.color=kind==='ok'?'#8fe6b0':kind==='err'?'#ff9c9c':'';
-    }
-    const m=$('mobile-sync-status');
-    if(m){
-      m.textContent='☁️ '+msg+' ・ v70';
-      m.style.color=kind==='ok'?'#8fe6b0':kind==='err'?'#ff9c9c':'';
-    }
+    const e=$('auto-sync-status'); if(e){e.textContent='同期：'+msg;e.style.color=kind==='ok'?'#8fe6b0':kind==='err'?'#ff9c9c':''}
+    const m=$('mobile-sync-status'); if(m){m.textContent='☁️ '+msg+' ・ v71';m.style.color=kind==='ok'?'#8fe6b0':kind==='err'?'#ff9c9c':''}
   }
-
-  async function upsertCounter(id,count){
-    const c=cfg();
-    if(!c.url||!c.key||!c.userId)return;
-    const now=new Date().toISOString();
-    const r=await fetch(c.url.replace(/\/$/,'')+'/rest/v1/'+COUNTER_TABLE,{
-      method:'POST',
-      headers:{...headers(c),Prefer:'resolution=merge-duplicates,return=minimal'},
-      body:JSON.stringify({
-        user_id:c.userId,
-        pokemon_id:id,
-        count:Number(count)||0,
-        updated_at:now
-      })
-    });
-    if(!r.ok)throw new Error(r.status+' '+await r.text());
-    lastSeenCounterUpdated[id]=now;
-    setStatus('カウンター同期済み '+new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit',second:'2-digit'}),'ok');
-  }
-
-  function scheduleCounterPush(id,count,delay=250){
-    if(pushTimers.has(id))clearTimeout(pushTimers.get(id));
-    pushTimers.set(id,setTimeout(async()=>{
-      pushTimers.delete(id);
-      try{
-        await upsertCounter(id,count);
-      }catch(e){
-        setStatus('カウンター通信待ち','err');
-      }
-    },delay));
-  }
-
-  async function fetchCounters(){
-    const c=cfg();
-    if(!c.url||!c.key||!c.userId)return [];
-    const r=await fetch(
-      c.url.replace(/\/$/,'')+'/rest/v1/'+COUNTER_TABLE+
-      '?user_id=eq.'+encodeURIComponent(c.userId)+
-      '&select=pokemon_id,count,updated_at',
-      {headers:headers(c),cache:'no-store'}
-    );
-    if(!r.ok)throw new Error(r.status+' '+await r.text());
-    return await r.json();
-  }
-
-  function localHunts(){
-    try{return typeof huntState==='object'&&huntState?huntState:JSON.parse(localStorage.getItem('shinyHomeHunts_v1')||'{}')}catch{return {}}
-  }
-
+  function localHunts(){try{return typeof huntState==='object'&&huntState?huntState:JSON.parse(localStorage.getItem('shinyHomeHunts_v1')||'{}')}catch{return {}}}
   function setLocalCounter(id,count){
-    const h=localHunts();
-    const x=h[id]||{};
-    const field=('count' in x)?'count':(('huntCount' in x)?'huntCount':(('encounters' in x)?'encounters':'count'));
-    x[field]=Math.max(0,Number(count)||0);
-    h[id]=x;
-    try{if(typeof huntState==='object')huntState=h}catch(e){}
+    const h=localHunts(),x=h[id]||{};
+    const f=('count' in x)?'count':(('huntCount' in x)?'huntCount':(('encounters' in x)?'encounters':'count'));
+    x[f]=Math.max(0,Number(count)||0);h[id]=x;
     localStorage.setItem('shinyHomeHunts_v1',JSON.stringify(h));
     if(typeof save==='function')save();
   }
-
-  async function pullCounters(){
-    if(applyingCounterRemote)return;
+  async function flushCounters(keepalive=false){
+    if(!dirty.size)return;
+    const c=cfg(); if(!c.url||!c.key||!c.userId){setStatus('端末内に保存済み');return}
+    const rows=[...dirty].map(([id,count])=>({user_id:c.userId,pokemon_id:id,count:Number(count)||0,updated_at:new Date().toISOString()}));
     try{
-      const rows=await fetchCounters();
-      if(!rows.length)return;
-      let changed=false;
-      applyingCounterRemote=true;
-      try{
-        for(const row of rows){
-          const id=row.pokemon_id;
-          const ts=row.updated_at||'';
-          if(lastSeenCounterUpdated[id]===ts)continue;
-
-          const h=localHunts();
-          const x=h[id]||{};
-          const local=Number(x.count??x.huntCount??x.encounters??0)||0;
-          const remote=Number(row.count)||0;
-
-          if(local!==remote){
-            setLocalCounter(id,remote);
-            changed=true;
-          }
-          lastSeenCounterUpdated[id]=ts;
-        }
-      }finally{
-        applyingCounterRemote=false;
-      }
-      if(changed){
-        if(typeof renderCurrentHunt==='function')renderCurrentHunt();
-        if(typeof renderMobileMultiHunts==='function')renderMobileMultiHunts();
-        if(typeof renderMobileCounter==='function')renderMobileCounter();
-      }
-      setStatus('カウンター最新','ok');
-    }catch(e){
-      setStatus('カウンター通信エラー','err');
-    }
+      const r=await fetch(c.url.replace(/\/$/,'')+'/rest/v1/'+COUNTER_TABLE,{method:'POST',headers:{...headers(c),Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify(rows),keepalive});
+      if(!r.ok)throw new Error(await r.text());
+      rows.forEach(x=>{if(dirty.get(x.pokemon_id)===x.count)dirty.delete(x.pokemon_id)});
+      setStatus('クラウド保存済み '+new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'}),'ok');
+    }catch(e){setStatus('端末内に保存済み（次回再送）','err')}
   }
-
-  // Explicit counter change hook used by PC and mobile controls.
-  window.syncHuntCounterValue=(id,count)=>{
-    if(applyingCounterRemote)return;
-    scheduleCounterPush(id,count,220);
-  };
-
-  // Full app sync remains manual/safe. It no longer runs every few seconds.
-  window.shinyAutoSyncNow=async()=>{
-    setStatus('フル同期は手動ボタンから実行');
-    if(typeof window.__legacyCloudDownload==='function')return window.__legacyCloudDownload();
-  };
-
-  function init(){
-    const c=cfg();
-    if(!c.url||!c.key||!c.userId){
-      setStatus('未設定');
-      return;
-    }
-    pullCounters();
-    pollTimer=setInterval(()=>{if(document.visibilityState==='visible')pullCounters()},2500);
+  function queue(id,count){
+    dirty.set(id,Number(count)||0);setStatus('端末内に保存済み');
+    clearTimeout(flushTimer);flushTimer=setTimeout(()=>flushCounters(false),IDLE_FLUSH_MS);
   }
-
-  document.addEventListener('visibilitychange',()=>{
-    if(document.visibilityState==='visible')pullCounters();
-  });
+  async function pullCounters(){
+    if(pulling||dirty.size)return; const c=cfg(); if(!c.url||!c.key||!c.userId)return;
+    pulling=true;
+    try{
+      const r=await fetch(c.url.replace(/\/$/,'')+'/rest/v1/'+COUNTER_TABLE+'?user_id=eq.'+encodeURIComponent(c.userId)+'&select=pokemon_id,count,updated_at',{headers:headers(c),cache:'no-store'});
+      if(!r.ok)throw new Error(await r.text()); const rows=await r.json(); let changed=false;
+      for(const row of rows){const h=localHunts(),x=h[row.pokemon_id]||{},local=Number(x.count??x.huntCount??x.encounters??0)||0,remote=Number(row.count)||0;if(local!==remote){setLocalCounter(row.pokemon_id,remote);changed=true}}
+      if(changed){if(typeof renderCurrentHunt==='function')renderCurrentHunt();if(typeof renderMobileMultiHunts==='function')renderMobileMultiHunts();if(typeof renderMobileCounter==='function')renderMobileCounter()}
+      setStatus('クラウド確認済み','ok');
+    }catch(e){setStatus('オフライン／次回確認','err')}finally{pulling=false}
+  }
+  window.syncHuntCounterValue=(id,count)=>queue(id,count);
+  window.shinyCounterSyncNow=()=>flushCounters(false);
+  window.shinyAutoSyncNow=async()=>{await flushCounters(false);setStatus('カウンター保存済み。フルデータは手動ボタンを使用')};
+  function init(){setStatus('端末内で待機中');pullCounters()}
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')flushCounters(true);else pullCounters()});
+  window.addEventListener('pagehide',()=>flushCounters(true));
   window.addEventListener('focus',()=>pullCounters());
-
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});
-  else init();
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
 
 function requestAutoSyncAfterDataChange(){
@@ -3124,8 +3025,9 @@ function requestAutoSyncAfterDataChange(){
     h[key]=hv;
     saveHunts(h);
     if(typeof syncHuntCounterValue==='function')syncHuntCounterValue(key,hv[field]);
-    renderMultiHunts();
-    if(typeof render==='function') try{render()}catch(e){}
+    const card=document.querySelector('.mobile-hunt-card[data-key="'+CSS.escape(key)+'"]');
+    const num=card&&card.querySelector('.mobile-hunt-count');
+    if(num) num.textContent=hv[field];
   }
 
   function finishHunt(key,captured){
