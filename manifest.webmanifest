@@ -1,0 +1,9 @@
+{
+  "name": "Pokémon HOME Shiny Collection",
+  "short_name": "Shiny HOME",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#07111d",
+  "theme_color": "#07111d",
+  "icons": []
+}
