@@ -787,7 +787,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
     <div class="extra-panel">
       <div class="extra-head">
         <div><h2 style="margin:0">☁️ Supabase 同期</h2>
-        <span class="section-count">PC・iPhoneで同じデータを共有 ・ build v64</span></div>
+        <span class="section-count">PC・iPhoneで同じデータを共有 ・ build v65</span></div>
       </div>
       <div class="sync-fields">
         <label>Supabase URL<input id="supabase-url" autocomplete="off" placeholder="https://xxxx.supabase.co"></label>
@@ -802,14 +802,14 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
         <button class="btn" id="cloud-check" type="button">クラウド確認</button>
       </div>
       <div id="cloud-status" class="home-help">未設定です。</div>
-      <div id="auto-sync-status" class="home-help" style="margin-top:8px">自動同期：安全同期 v61</div>
+      <div id="auto-sync-status" class="home-help" style="margin-top:8px">自動同期：双方向同期 v65</div>
       <div class="home-help" style="margin-top:10px">初回は「設定保存」→「接続テスト」の順に確認してください。既存データがある場合、確認前にクラウドへ保存しないでください。</div>
     </div>
   </div>
 </section>
 
 <script>
-const DATA_VERSION='full-2026-09-09-v64';
+const DATA_VERSION='full-2026-09-09-v65';
 const SPECIES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species.csv';
 const NAMES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
 const MAX_DEX=1025;
@@ -2845,14 +2845,14 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 // ===== v56 automatic update / cache repair =====
 (function(){
-  const APP_VERSION='v64';
+  const APP_VERSION='v65';
   const UPDATE_KEY='shinyHomeReloadedForSW_'+APP_VERSION;
 
   async function registerFreshWorker(){
     if(!('serviceWorker' in navigator) || location.protocol==='file:') return;
     try{
       const reg = await navigator.serviceWorker.register(
-        './service-worker.js?v=64',
+        './service-worker.js?v=65',
         {updateViaCache:'none'}
       );
 
@@ -3122,7 +3122,7 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
     const m=meta();
     if(m.dirty)await push('online'); else await pull('online');
   });
-  setInterval(()=>{if(document.visibilityState==='visible')pull('poll')},10000);
+  setInterval(()=>{if(document.visibilityState==='visible')pull('poll')},3000);
 
   function bindManual(){
     const up=$('cloud-upload');
@@ -3137,6 +3137,16 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
     }
   }
 
+  window.shinyMarkDirtyAndSync=()=>{
+    if(applyingRemote)return;
+    const m=meta();
+    if(!m.dirty)m.baseCloudUpdatedAt=m.lastCloudUpdatedAt||'';
+    m.dirty=true;
+    setMeta(m);
+    setStatus('変更を保存中…');
+    schedulePush(250);
+  };
+
   window.shinyAutoSyncNow=async()=>{
     const m=meta();
     if(m.dirty)return push('manual');
@@ -3150,6 +3160,15 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
   }
 })();
 
+
+
+function requestAutoSyncAfterDataChange(){
+  try{
+    if(typeof window.shinyMarkDirtyAndSync==='function'){
+      window.shinyMarkDirtyAndSync();
+    }
+  }catch(e){}
+}
 
 // ===== v59 mobile multi-hunt =====
 (function(){
@@ -3207,6 +3226,7 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
     hv[field]=Math.max(0,(Number(hv[field])||0)+delta);
     h[key]=hv;
     saveHunts(h);
+    requestAutoSyncAfterDataChange();
     renderMultiHunts();
     if(typeof render==='function') try{render()}catch(e){}
   }
@@ -3226,6 +3246,7 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
       h[key].captured=!!captured;
       saveHunts(h);
     }
+    requestAutoSyncAfterDataChange();
     renderMultiHunts();
     if(typeof render==='function') try{render()}catch(e){}
   }
@@ -3259,6 +3280,7 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
     h[p.id]=hv;
     saveHunts(h);
     if(typeof save==='function')save();
+    requestAutoSyncAfterDataChange();
     renderMultiHunts();
     if(typeof renderMobileCounter==='function')renderMobileCounter();
   }
