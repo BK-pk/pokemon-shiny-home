@@ -810,7 +810,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
     <div class="extra-panel">
       <div class="extra-head">
         <div><h2 style="margin:0">☁️ Supabase 同期</h2>
-        <span class="section-count">PC・iPhoneで同じデータを共有 ・ build v56</span></div>
+        <span class="section-count">PC・iPhoneで同じデータを共有 ・ build v57</span></div>
       </div>
       <div class="sync-fields">
         <label>Supabase URL<input id="supabase-url" autocomplete="off" placeholder="https://xxxx.supabase.co"></label>
@@ -822,6 +822,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
         <button class="btn" id="cloud-test" type="button">接続テスト</button>
         <button class="btn" id="cloud-upload" type="button">クラウドへ保存</button>
         <button class="btn" id="cloud-download" type="button">クラウドから読込</button>
+        <button class="btn" id="cloud-check" type="button">クラウド確認</button>
       </div>
       <div id="cloud-status" class="home-help">未設定です。</div>
       <div class="home-help" style="margin-top:10px">初回は「設定保存」→「接続テスト」の順に確認してください。既存データがある場合、確認前にクラウドへ保存しないでください。</div>
@@ -830,7 +831,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 </section>
 
 <script>
-const DATA_VERSION='full-2026-09-08-v56';
+const DATA_VERSION='full-2026-09-08-v57';
 const SPECIES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species.csv';
 const NAMES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
 const MAX_DEX=1025;
@@ -2710,16 +2711,40 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
         body:JSON.stringify({user_id:c.userId,payload:payload,updated_at:new Date().toISOString()})
       });
       if(!r.ok) throw new Error(r.status+' '+(await r.text()));
-      status('✅ クラウドへ保存しました。',true);
+      status('✅ クラウドへ保存しました。 '+new Date().toLocaleString('ja-JP'),true);
     }catch(e){status('❌ 保存できません: '+e.message,false)}
   }
+
+  async function checkCloud(){
+    const c=readCfg();
+    if(!c.url||!c.key||!c.userId){status('❌ 先に設定保存してください。',false);return}
+    status('クラウドデータ確認中…');
+    try{
+      const r=await fetch(c.url+'/rest/v1/shiny_home_sync?user_id=eq.'+encodeURIComponent(c.userId)+'&select=payload,updated_at',{
+        headers:{apikey:c.key,Authorization:'Bearer '+c.key}
+      });
+      if(!r.ok) throw new Error(r.status+' '+(await r.text()));
+      const rows=await r.json();
+      if(!rows.length){status('クラウドにはまだデータがありません。',false);return}
+      const p=rows[0].payload||{};
+      const inds=p.individualState||{};
+      const hunts=p.huntState||{};
+      const targets=p.targetState||{};
+      const indCount=Object.values(inds).reduce((n,a)=>n+(Array.isArray(a)?a.length:0),0);
+      const targetCount=Object.values(targets).filter(Boolean).length;
+      const huntCount=Object.keys(hunts).length;
+      const at=rows[0].updated_at?new Date(rows[0].updated_at).toLocaleString('ja-JP'):'時刻不明';
+      status(`✅ クラウド確認：個体 ${indCount}件 / 厳選中 ${targetCount}件 / 厳選データ ${huntCount}件 / 更新 ${at}`,true);
+    }catch(e){status('❌ クラウド確認できません: '+e.message,false)}
+  }
+
   async function download(){
     const c=readCfg();
     if(!c.url||!c.key||!c.userId){status('❌ 先に設定保存してください。',false);return}
     if(!confirm('クラウドのデータをこの端末へ読み込みます。現在の端末データが置き換わる場合があります。よろしいですか？'))return;
     status('クラウドから読込中…');
     try{
-      const r=await fetch(c.url+'/rest/v1/shiny_home_sync?user_id=eq.'+encodeURIComponent(c.userId)+'&select=payload',{
+      const r=await fetch(c.url+'/rest/v1/shiny_home_sync?user_id=eq.'+encodeURIComponent(c.userId)+'&select=payload,updated_at',{
         headers:{apikey:c.key,Authorization:'Bearer '+c.key}
       });
       if(!r.ok) throw new Error(r.status+' '+(await r.text()));
@@ -2727,12 +2752,16 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
       if(!rows.length) throw new Error('クラウドに保存データがありません。');
       const p=rows[0].payload||{};
       if(typeof restoreSnapshotObject==='function'){
+        backupRestoring=true;
         restoreSnapshotObject(p);
+        if(typeof ensureLegacyIndividuals==='function') ensureLegacyIndividuals();
+        if(typeof save==='function') save();
+        backupRestoring=false;
       }else{
         const map={state:'shinyHomeState_v1',boxes:'shinyHomeBoxes_v1',dates:'shinyHomeDates_v1',games:'shinyHomeGames_v1',individuals:'shinyHomeIndividuals_v1',targets:'shinyHomeTargets_v1',hunts:'shinyHomeHunts_v1',screenshots:'shinyHomeIndividualScreenshots_v1'};
         for(const [k,ls] of Object.entries(map)) if(p[k]!=null) localStorage.setItem(ls,typeof p[k]==='string'?p[k]:JSON.stringify(p[k]));
       }
-      status('✅ クラウドから読み込みました。画面を再読み込みします。',true);
+      status('✅ クラウドから読み込みました。'+(rows[0].updated_at?' 更新: '+new Date(rows[0].updated_at).toLocaleString('ja-JP'):'')+' 画面を再読み込みします。',true);
       setTimeout(()=>location.reload(),700);
     }catch(e){status('❌ 読み込めません: '+e.message,false)}
   }
@@ -2742,6 +2771,7 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
     $('cloud-test')?.addEventListener('click',testConnection);
     $('cloud-upload')?.addEventListener('click',upload);
     $('cloud-download')?.addEventListener('click',download);
+    $('cloud-check')?.addEventListener('click',checkCloud);
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',bind);
   else bind();
@@ -2751,14 +2781,14 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 // ===== v56 automatic update / cache repair =====
 (function(){
-  const APP_VERSION='v56';
+  const APP_VERSION='v57';
   const UPDATE_KEY='shinyHomeReloadedForSW_'+APP_VERSION;
 
   async function registerFreshWorker(){
     if(!('serviceWorker' in navigator) || location.protocol==='file:') return;
     try{
       const reg = await navigator.serviceWorker.register(
-        './service-worker.js?v=56',
+        './service-worker.js?v=57',
         {updateViaCache:'none'}
       );
 
