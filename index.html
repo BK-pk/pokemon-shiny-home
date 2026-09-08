@@ -810,7 +810,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
     <div class="extra-panel">
       <div class="extra-head">
         <div><h2 style="margin:0">☁️ Supabase 同期</h2>
-        <span class="section-count">PC・iPhoneで同じデータを共有 ・ build v57</span></div>
+        <span class="section-count">PC・iPhoneで同じデータを共有 ・ build v58</span></div>
       </div>
       <div class="sync-fields">
         <label>Supabase URL<input id="supabase-url" autocomplete="off" placeholder="https://xxxx.supabase.co"></label>
@@ -820,18 +820,19 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
       <div class="counter-row">
         <button class="btn" id="cloud-save-settings" type="button">設定保存</button>
         <button class="btn" id="cloud-test" type="button">接続テスト</button>
-        <button class="btn" id="cloud-upload" type="button">クラウドへ保存</button>
-        <button class="btn" id="cloud-download" type="button">クラウドから読込</button>
+        <button class="btn" id="cloud-upload" type="button">今すぐ同期</button>
+        <button class="btn" id="cloud-download" type="button">クラウドから再読込</button>
         <button class="btn" id="cloud-check" type="button">クラウド確認</button>
       </div>
       <div id="cloud-status" class="home-help">未設定です。</div>
+      <div id="auto-sync-status" class="home-help" style="margin-top:8px">自動同期：未設定</div>
       <div class="home-help" style="margin-top:10px">初回は「設定保存」→「接続テスト」の順に確認してください。既存データがある場合、確認前にクラウドへ保存しないでください。</div>
     </div>
   </div>
 </section>
 
 <script>
-const DATA_VERSION='full-2026-09-08-v57';
+const DATA_VERSION='full-2026-09-08-v58';
 const SPECIES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species.csv';
 const NAMES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
 const MAX_DEX=1025;
@@ -2781,14 +2782,14 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 // ===== v56 automatic update / cache repair =====
 (function(){
-  const APP_VERSION='v57';
+  const APP_VERSION='v58';
   const UPDATE_KEY='shinyHomeReloadedForSW_'+APP_VERSION;
 
   async function registerFreshWorker(){
     if(!('serviceWorker' in navigator) || location.protocol==='file:') return;
     try{
       const reg = await navigator.serviceWorker.register(
-        './service-worker.js?v=57',
+        './service-worker.js?v=58',
         {updateViaCache:'none'}
       );
 
@@ -2833,6 +2834,271 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
   });
 })();
 
+
+
+// ===== v58 automatic Supabase sync =====
+(function(){
+  const CLOUD_KEY='shinyHomeCloudSettings_v2';
+  const AUTO_META_KEY='shinyHomeAutoSyncMeta_v1';
+  const DEVICE_ID_KEY='shinyHomeDeviceId_v1';
+  let autoTimer=null;
+  let syncBusy=false;
+  let pendingSync=false;
+  let suppressAutoSync=false;
+  let lastLocalMutation=0;
+
+  const $=id=>document.getElementById(id);
+  const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+
+  function deviceId(){
+    let id=localStorage.getItem(DEVICE_ID_KEY);
+    if(!id){id='dev-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,10);localStorage.setItem(DEVICE_ID_KEY,id)}
+    return id;
+  }
+
+  function readCfg(){
+    try{return JSON.parse(localStorage.getItem(CLOUD_KEY)||localStorage.getItem('shinyHomeCloudSettings_v1')||'{}')}catch{return {}}
+  }
+
+  function readMeta(){
+    try{return JSON.parse(localStorage.getItem(AUTO_META_KEY)||'{}')}catch{return {}}
+  }
+  function writeMeta(x){localStorage.setItem(AUTO_META_KEY,JSON.stringify(x||{}))}
+
+  function setAutoStatus(msg,kind){
+    const el=$('auto-sync-status'); if(!el)return;
+    el.textContent='自動同期：'+msg;
+    el.style.color=kind==='ok'?'#8fe6b0':kind==='err'?'#ff9c9c':'';
+  }
+
+  function cloudHeaders(c){
+    return {apikey:c.key,Authorization:'Bearer '+c.key,'Content-Type':'application/json'};
+  }
+
+  function snapshotHash(obj){
+    try{
+      const s=JSON.stringify(obj);
+      let h=2166136261;
+      for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}
+      return (h>>>0).toString(16);
+    }catch{return String(Date.now())}
+  }
+
+  function currentSnapshot(){
+    if(typeof currentDataSnapshot==='function') return currentDataSnapshot();
+    return {
+      state:localStorage.getItem('shinyHomeState_v1'),
+      boxes:localStorage.getItem('shinyHomeBoxes_v1'),
+      dates:localStorage.getItem('shinyHomeDates_v1'),
+      games:localStorage.getItem('shinyHomeGames_v1'),
+      individuals:localStorage.getItem('shinyHomeIndividuals_v1'),
+      targets:localStorage.getItem('shinyHomeTargets_v1'),
+      hunts:localStorage.getItem('shinyHomeHunts_v1'),
+      screenshots:localStorage.getItem('shinyHomeIndividualScreenshots_v1')
+    };
+  }
+
+  async function fetchCloud(c){
+    const r=await fetch(
+      c.url.replace(/\/$/,'')+'/rest/v1/shiny_home_sync?user_id=eq.'+encodeURIComponent(c.userId)+'&select=payload,updated_at',
+      {headers:cloudHeaders(c),cache:'no-store'}
+    );
+    if(!r.ok) throw new Error(r.status+' '+await r.text());
+    const rows=await r.json();
+    return rows[0]||null;
+  }
+
+  async function pushCloud(c,snapshot){
+    const now=new Date().toISOString();
+    const r=await fetch(c.url.replace(/\/$/,'')+'/rest/v1/shiny_home_sync',{
+      method:'POST',
+      headers:{...cloudHeaders(c),Prefer:'resolution=merge-duplicates,return=minimal'},
+      body:JSON.stringify({user_id:c.userId,payload:snapshot,updated_at:now})
+    });
+    if(!r.ok) throw new Error(r.status+' '+await r.text());
+    const meta=readMeta();
+    meta.lastPushedAt=now;
+    meta.lastHash=snapshotHash(snapshot);
+    meta.deviceId=deviceId();
+    writeMeta(meta);
+    setAutoStatus('同期済み '+new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit',second:'2-digit'}),'ok');
+    return now;
+  }
+
+  function restoreCloud(payload){
+    suppressAutoSync=true;
+    try{
+      if(typeof restoreSnapshotObject==='function'){
+        window.backupRestoring=true;
+        restoreSnapshotObject(payload||{});
+        if(typeof ensureLegacyIndividuals==='function') ensureLegacyIndividuals();
+        if(typeof save==='function') save();
+        window.backupRestoring=false;
+        if(typeof render==='function') render();
+      }
+    } finally {
+      setTimeout(()=>{suppressAutoSync=false},300);
+    }
+  }
+
+  async function pullIfNewer(reason='open'){
+    const c=readCfg();
+    if(!c.url||!c.key||!c.userId) return false;
+    if(syncBusy) return false;
+    syncBusy=true;
+    try{
+      setAutoStatus('確認中…');
+      const row=await fetchCloud(c);
+      if(!row){setAutoStatus('クラウド未登録');return false}
+
+      const meta=readMeta();
+      const cloudTime=Date.parse(row.updated_at||0)||0;
+      const localTime=Number(meta.lastLocalMutation||lastLocalMutation||0);
+      const lastPulled=Date.parse(meta.lastPulledAt||0)||0;
+      const localHash=snapshotHash(currentSnapshot());
+      const cloudHash=snapshotHash(row.payload||{});
+
+      // If cloud differs and is newer than our last known local mutation, apply it.
+      if(cloudHash!==localHash && cloudTime>=localTime && cloudTime>lastPulled){
+        restoreCloud(row.payload||{});
+        meta.lastPulledAt=row.updated_at||new Date().toISOString();
+        meta.lastHash=cloudHash;
+        writeMeta(meta);
+        setAutoStatus('受信済み '+new Date(cloudTime).toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit',second:'2-digit'}),'ok');
+        return true;
+      }
+      setAutoStatus('最新です','ok');
+      return false;
+    }catch(e){
+      setAutoStatus('オフライン / 再試行待ち','err');
+      return false;
+    }finally{
+      syncBusy=false;
+      if(pendingSync){pendingSync=false;schedulePush(400)}
+    }
+  }
+
+  async function pushNow(reason='change'){
+    const c=readCfg();
+    if(!c.url||!c.key||!c.userId){setAutoStatus('未設定');return false}
+    if(syncBusy){pendingSync=true;return false}
+    syncBusy=true;
+    try{
+      setAutoStatus('送信中…');
+      const snapshot=currentSnapshot();
+
+      // Compare cloud first to avoid blindly overwriting a newer remote state.
+      let row=null;
+      try{row=await fetchCloud(c)}catch(_){}
+      const meta=readMeta();
+      const cloudTime=row?Date.parse(row.updated_at||0)||0:0;
+      const localTime=Number(meta.lastLocalMutation||lastLocalMutation||Date.now());
+
+      if(row && cloudTime>localTime && snapshotHash(row.payload||{})!==snapshotHash(snapshot)){
+        restoreCloud(row.payload||{});
+        meta.lastPulledAt=row.updated_at||new Date().toISOString();
+        meta.lastHash=snapshotHash(row.payload||{});
+        writeMeta(meta);
+        setAutoStatus('他端末の新しいデータを受信','ok');
+        return false;
+      }
+
+      await pushCloud(c,snapshot);
+      return true;
+    }catch(e){
+      pendingSync=true;
+      setAutoStatus('通信待ち（端末内には保存済み）','err');
+      return false;
+    }finally{
+      syncBusy=false;
+    }
+  }
+
+  function markLocalMutation(){
+    if(suppressAutoSync) return;
+    lastLocalMutation=Date.now();
+    const meta=readMeta();
+    meta.lastLocalMutation=lastLocalMutation;
+    writeMeta(meta);
+    schedulePush(800);
+  }
+
+  function schedulePush(delay=800){
+    if(suppressAutoSync) return;
+    clearTimeout(autoTimer);
+    autoTimer=setTimeout(()=>pushNow('debounced'),delay);
+  }
+
+  // Hook the central save() function. Most app edits eventually call this.
+  if(typeof window.save==='function'){
+    const originalSave=window.save;
+    window.save=function(){
+      const out=originalSave.apply(this,arguments);
+      markLocalMutation();
+      return out;
+    };
+  }else if(typeof save==='function'){
+    const originalSave=save;
+    save=function(){
+      const out=originalSave.apply(this,arguments);
+      markLocalMutation();
+      return out;
+    };
+  }
+
+  // Some mobile counter flows call localStorage directly or may bypass save().
+  // Listen for common UI mutations as a backup.
+  document.addEventListener('click',e=>{
+    if(e.target.closest && (
+      e.target.closest('.mobile-count-buttons') ||
+      e.target.closest('.mobile-capture-btn') ||
+      e.target.closest('#mobile-active-hunt') ||
+      e.target.closest('.hunt-focus-panel')
+    )){
+      setTimeout(markLocalMutation,30);
+    }
+  },true);
+
+  // Initial sync when opening the app.
+  async function init(){
+    const c=readCfg();
+    if(!c.url||!c.key||!c.userId){setAutoStatus('未設定');return}
+    setAutoStatus('起動時確認中…');
+    await pullIfNewer('startup');
+  }
+
+  // Refresh when returning to the app.
+  document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState==='visible') pullIfNewer('resume');
+  });
+  window.addEventListener('focus',()=>pullIfNewer('focus'));
+  window.addEventListener('online',async()=>{
+    setAutoStatus('通信復帰・同期中…');
+    await pullIfNewer('online');
+    if(pendingSync) pushNow('online');
+  });
+
+  // Poll lightly while open, so PC updates appear without manual reload.
+  setInterval(()=>{ if(document.visibilityState==='visible') pullIfNewer('poll') },15000);
+
+  // Re-purpose manual sync button as "sync now".
+  function bindManual(){
+    const up=$('cloud-upload');
+    if(up){
+      const clone=up.cloneNode(true);
+      up.replaceWith(clone);
+      clone.addEventListener('click',async()=>{
+        await pullIfNewer('manual');
+        await sleep(100);
+        await pushNow('manual');
+      });
+    }
+  }
+
+  window.shinyAutoSyncNow=async()=>{await pullIfNewer('manual');await pushNow('manual')};
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>{bindManual();init()},{once:true});
+  else {bindManual();init()}
+})();
 </script>
 <div class="shot-lightbox" id="shot-lightbox" onclick="if(event.target===this)closeShotLightbox()">
 <button class="shot-lightbox-close" onclick="closeShotLightbox()" type="button">✕</button>
