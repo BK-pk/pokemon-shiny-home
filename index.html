@@ -537,6 +537,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
   </div>
 
   <div id="mobile-active-hunt" class="mobile-active-hunt" style="display:none">
+    <div id="mobile-sync-status" class="mobile-hunt-meta" style="text-align:center;margin:4px 0 8px">☁️ 同期状態を確認中…</div>
     <div id="mobile-multi-hunt-list" class="mobile-hunt-list"></div>
     <button id="mobile-multi-add" class="btn" type="button">＋ 厳選を追加</button>
   </div>
@@ -787,7 +788,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
     <div class="extra-panel">
       <div class="extra-head">
         <div><h2 style="margin:0">☁️ Supabase 同期</h2>
-        <span class="section-count">PC・iPhoneで同じデータを共有 ・ build v66</span></div>
+        <span class="section-count">PC・iPhoneで同じデータを共有 ・ build v67</span></div>
       </div>
       <div class="sync-fields">
         <label>Supabase URL<input id="supabase-url" autocomplete="off" placeholder="https://xxxx.supabase.co"></label>
@@ -802,14 +803,14 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
         <button class="btn" id="cloud-check" type="button">クラウド確認</button>
       </div>
       <div id="cloud-status" class="home-help">未設定です。</div>
-      <div id="auto-sync-status" class="home-help" style="margin-top:8px">自動同期：双方向同期 v66</div>
+      <div id="auto-sync-status" class="home-help" style="margin-top:8px">自動同期：双方向同期 v67</div>
       <div class="home-help" style="margin-top:10px">初回は「設定保存」→「接続テスト」の順に確認してください。既存データがある場合、確認前にクラウドへ保存しないでください。</div>
     </div>
   </div>
 </section>
 
 <script>
-const DATA_VERSION='full-2026-09-09-v66';
+const DATA_VERSION='full-2026-09-09-v67';
 const SPECIES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species.csv';
 const NAMES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
 const MAX_DEX=1025;
@@ -2845,14 +2846,14 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 // ===== v56 automatic update / cache repair =====
 (function(){
-  const APP_VERSION='v66';
+  const APP_VERSION='v67';
   const UPDATE_KEY='shinyHomeReloadedForSW_'+APP_VERSION;
 
   async function registerFreshWorker(){
     if(!('serviceWorker' in navigator) || location.protocol==='file:') return;
     try{
       const reg = await navigator.serviceWorker.register(
-        './service-worker.js?v=66',
+        './service-worker.js?v=67',
         {updateViaCache:'none'}
       );
 
@@ -2917,9 +2918,16 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
     try{return JSON.parse(localStorage.getItem(CLOUD_KEY)||localStorage.getItem('shinyHomeCloudSettings_v1')||'{}')}catch{return {}}
   }
   function setStatus(msg,kind){
-    const e=$('auto-sync-status'); if(!e)return;
-    e.textContent='自動同期：'+msg;
-    e.style.color=kind==='ok'?'#8fe6b0':kind==='err'?'#ff9c9c':'';
+    const e=$('auto-sync-status');
+    if(e){
+      e.textContent='自動同期：'+msg;
+      e.style.color=kind==='ok'?'#8fe6b0':kind==='err'?'#ff9c9c':'';
+    }
+    const m=$('mobile-sync-status');
+    if(m){
+      m.textContent='☁️ '+msg;
+      m.style.color=kind==='ok'?'#8fe6b0':kind==='err'?'#ff9c9c':'';
+    }
   }
   function headers(c){
     return {apikey:c.key,Authorization:'Bearer '+c.key,'Content-Type':'application/json'};
@@ -3005,7 +3013,7 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
         return false;
       }
       const ch=hash(row.payload||{});
-      if(ch!==baselineCloudHash || row.updated_at!==baselineCloudAt){
+      if(ch!==baselineCloudHash){
         // If the actual payload is different, receive it.
         if(ch!==hash(snapshot())){
           applyRemote(row);
@@ -3018,6 +3026,9 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
         }
         return true;
       }
+      baselineCloudAt=row.updated_at||baselineCloudAt;
+      baselineCloudHash=ch;
+      saveMeta();
       setStatus('最新です','ok');
       return false;
     }catch(e){
@@ -3041,8 +3052,11 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
       if(row){
         const remoteHash=hash(row.payload||{});
         const remoteAt=row.updated_at||'';
+        // Payload hash is the authority for conflict detection.
+        // updated_at may be returned by Supabase in an equivalent but differently formatted timestamp string.
+        // Comparing timestamp strings caused v66 to stop after the first successful sync.
         const cloudChangedSinceBaseline =
-          baselineCloudHash && (remoteHash!==baselineCloudHash || remoteAt!==baselineCloudAt);
+          baselineCloudHash && remoteHash!==baselineCloudHash;
 
         if(cloudChangedSinceBaseline){
           // Never destroy either side. Keep local edit and warn; user can refresh/pull manually if needed.
