@@ -641,13 +641,13 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 <div class="home-owned-count" id="home-dex-owned-count"></div>
 </div>
 <div class="home-dex-board" id="home-dex-board"></div>
-<div class="home-help">図鑑番号順に30匹ずつ自動配置します。未所持は空き枠のまま表示され、捕獲データを登録すると自動で反映されます。</div>
+<div class="home-help">色違いコレクションと同じ順番で30枠ずつ自動配置します。①全国図鑑 → ②リージョン → ③オス・メス違い → ④その他の姿違い → ⑤キョダイマックス。区分が変わるときは、前のBOXに空きがあっても次のBOXから始まります。</div>
 </main>
 <aside class="home-box-info">
 <div class="home-info-card">
 <div class="home-side-title">表示・並び順</div>
-<label class="home-radio"><input checked="" disabled="" type="radio"/> 図鑑番号順</label>
-<div class="home-info-note">BOX 1 = No.001〜030<br/>BOX 2 = No.031〜060<br/>…のように固定配置します。</div>
+<label class="home-radio"><input checked="" disabled="" type="radio"/> コレクション順</label>
+<div class="home-info-note">① 全国図鑑（番号順）<br/>② リージョン<br/>③ オス・メス違い<br/>④ その他の姿違い<br/>⑤ キョダイマックス<br/><br/>各区分は必ず新しいBOXから開始します。</div>
 </div>
 <div class="home-info-card">
 <div class="home-side-title">BOX情報</div>
@@ -655,8 +655,8 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 </div>
 <div class="home-info-card">
 <div class="home-side-title">表示対象</div>
-<label class="home-radio"><input checked="" id="home-show-forms" onchange="renderNationalHomeBox()" type="checkbox"/> 同じNo.の姿違いも表示</label>
-<div class="home-info-note">姿違い・リージョン・性別違いは、その図鑑番号の枠に所持数としてまとめます。</div>
+<label class="home-radio"><input checked="" disabled="" type="checkbox"/> 全区分を表示</label>
+<div class="home-info-note">リージョン・性別違い・姿違いは、それぞれ独立した枠として表示します。</div>
 </div>
 </aside>
 </div>
@@ -787,7 +787,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
     <div class="extra-panel">
       <div class="extra-head">
         <div><h2 style="margin:0">☁️ Supabase 同期</h2>
-        <span class="section-count">PC・iPhoneで同じデータを共有 ・ build v60</span></div>
+        <span class="section-count">PC・iPhoneで同じデータを共有 ・ build v63</span></div>
       </div>
       <div class="sync-fields">
         <label>Supabase URL<input id="supabase-url" autocomplete="off" placeholder="https://xxxx.supabase.co"></label>
@@ -802,14 +802,14 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
         <button class="btn" id="cloud-check" type="button">クラウド確認</button>
       </div>
       <div id="cloud-status" class="home-help">未設定です。</div>
-      <div id="auto-sync-status" class="home-help" style="margin-top:8px">自動同期：未設定</div>
+      <div id="auto-sync-status" class="home-help" style="margin-top:8px">自動同期：安全同期 v61</div>
       <div class="home-help" style="margin-top:10px">初回は「設定保存」→「接続テスト」の順に確認してください。既存データがある場合、確認前にクラウドへ保存しないでください。</div>
     </div>
   </div>
 </section>
 
 <script>
-const DATA_VERSION='full-2026-09-09-v60';
+const DATA_VERSION='full-2026-09-09-v63';
 const SPECIES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species.csv';
 const NAMES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
 const MAX_DEX=1025;
@@ -1160,7 +1160,7 @@ function ownedBallIcons(id){
 
 function cardHTML(p){
   const inds=individualState[p.id]||[], count=inds.length, targeted=!!targetState[p.id];
-  return `<article class="card ${count?'owned':''}" data-id="${esc(p.id)}" style="${p.locked?'opacity:.68;':''}"><div class="sprite" onclick="showPokemonDetail('${esc(p.id)}')"><img loading="lazy" src="${spriteURL(p)}" alt="" onerror="if(!this.dataset.fallback){this.dataset.fallback='1';this.src='${baseSpriteURL(p)}'}else{this.style.display='none'}"></div><div><div class="number">No.${String(p.no).padStart(4,'0')} · GEN ${p.gen}</div><div class="name" onclick="showPokemonDetail('${esc(p.id)}')">${esc(p.name)} ${hasRecentIndividual(p.id,7)?'<span class="new-badge">NEW</span>':''}</div><div class="tags"><span class="tag ${p.locked?'form':p.baseKind==='region'?'region':p.baseKind==='gender'?'gender':p.baseKind==='gmax'?'gmax':p.baseKind==='form'?'form':''}">${kindLabel(p)}</span>${p.form!=='通常'?`<span class="tag form">${esc(p.form)}</span>`:''}${p.gender!=='共通'?`<span class="tag gender">${p.gender}</span>`:''}${targeted?'<span class="tag target-tag">🎯 次に狙う</span>':''}</div>${relatedStatusHTML(p)}${ownedBallIcons(p.id)}</div>${p.locked?'':`<div class="individual-summary"><div class="individual-head"><span class="countbadge">${count?`✓ ${count}匹所持`:'未所持'}</span><div><button class="target-btn ${targeted?'active':''}" onclick="toggleTarget('${esc(p.id)}')">🎯 ${targeted?'厳選中':'厳選する'}</button> <button class="smallbtn" onclick="addIndividual('${esc(p.id)}')">＋ 個体を追加</button>${count?` <button class="smallbtn" onclick="toggleIndividuals('${esc(p.id)}')">個体一覧</button>`:''}</div></div><div class="individuals" id="inds-${encodeURIComponent(p.id)}">${inds.map((ind,i)=>individualRowHTML(p,ind,i)).join('')}</div></div>`}${p.locked?'<div class="individual-summary"><span class="countbadge">🔒 色違い未解禁</span></div>':''}</article>`;
+  return `<article class="card ${count?'owned':''}" data-id="${esc(p.id)}" style="${p.locked?'opacity:.68;':''}"><div class="sprite" onclick="showPokemonDetail('${esc(p.id)}')"><img loading="lazy" src="${spriteURL(p)}" alt="" onerror="if(!this.dataset.fallback){this.dataset.fallback='1';this.src='${baseSpriteURL(p)}'}else{this.style.display='none'}"></div><div><div class="number">No.${String(p.no).padStart(4,'0')} · GEN ${p.gen}</div><div class="name" onclick="showPokemonDetail('${esc(p.id)}')">${esc(p.name)} ${hasRecentIndividual(p.id,7)?'<span class="new-badge">NEW</span>':''}</div>${targeted?'<div class="tags"><span class="tag target-tag">🎯 次に狙う</span></div>':''}${relatedStatusHTML(p)}${ownedBallIcons(p.id)}</div>${p.locked?'':`<div class="individual-summary"><div class="individual-head"><span class="countbadge">${count?`✓ ${count}匹所持`:'未所持'}</span><div><button class="target-btn ${targeted?'active':''}" onclick="toggleTarget('${esc(p.id)}')">🎯 ${targeted?'厳選中':'厳選する'}</button> <button class="smallbtn" onclick="addIndividual('${esc(p.id)}')">＋ 個体を追加</button>${count?` <button class="smallbtn" onclick="toggleIndividuals('${esc(p.id)}')">個体一覧</button>`:''}</div></div><div class="individuals" id="inds-${encodeURIComponent(p.id)}">${inds.map((ind,i)=>individualRowHTML(p,ind,i)).join('')}</div></div>`}${p.locked?'<div class="individual-summary"><span class="countbadge">🔒 色違い未解禁</span></div>':''}</article>`;
 }
 window.addIndividual=id=>{if(!Array.isArray(individualState[id]))individualState[id]=[];individualState[id].push(newIndividual());syncOwned(id);render();setTimeout(()=>{const d=el('inds-'+encodeURIComponent(id));if(d)d.classList.add('open')},0)};
 window.deleteIndividual=(id,i)=>{if(!individualState[id])return;individualState[id].splice(i,1);syncOwned(id);render()};
@@ -2158,46 +2158,143 @@ function setHomeOrder(v){
   document.querySelectorAll('input[name="home-order"]').forEach(x=>x.checked=x.value===v);
   activeNationalHomeBox=1; renderNationalHomeBox();
 }
+
+const HOME_SECTION_ORDER=['base','region','gender','form','gmax'];
+const HOME_SECTION_META={
+  base:{num:'①',label:'全国図鑑'},
+  region:{num:'②',label:'リージョン'},
+  gender:{num:'③',label:'オス・メス違い'},
+  form:{num:'④',label:'その他の姿違い'},
+  gmax:{num:'⑤',label:'キョダイマックス'}
+};
+
 function livingDexEntries(){
-  const order={base:0,region:1,gender:2,form:3,gmax:4};
-  return data.filter(p=>!p.locked).slice().sort((a,b)=>a.no-b.no||(order[a.section]??9)-(order[b.section]??9)||(a.form||'').localeCompare(b.form||'ja')||(a.gender||'').localeCompare(b.gender||'ja'));
+  return HOME_SECTION_ORDER.flatMap(section=>
+    data.filter(p=>!p.locked&&p.section===section).slice().sort((a,b)=>
+      a.no-b.no||
+      (a.form||'').localeCompare(b.form||'','ja')||
+      (a.gender||'').localeCompare(b.gender||'','ja')||
+      (a.name||'').localeCompare(b.name||'','ja')
+    )
+  );
 }
-function homeEntries(){
-  if(homeOrder==='national'){
-    return Array.from({length:MAX_DEX},(_,i)=>nationalBaseForNo(i+1)).filter(Boolean);
+
+function collectionHomeBoxes(){
+  const boxes=[];
+  HOME_SECTION_ORDER.forEach(section=>{
+    const meta=HOME_SECTION_META[section];
+    const entries=data.filter(p=>!p.locked&&p.section===section).slice().sort((a,b)=>
+      a.no-b.no||
+      (a.form||'').localeCompare(b.form||'','ja')||
+      (a.gender||'').localeCompare(b.gender||'','ja')||
+      (a.name||'').localeCompare(b.name||'','ja')
+    );
+    for(let i=0;i<entries.length;i+=30){
+      const slice=entries.slice(i,i+30);
+      boxes.push({
+        section,
+        sectionNo:meta.num,
+        sectionLabel:meta.label,
+        sectionBoxNo:Math.floor(i/30)+1,
+        entries:slice.concat(Array(Math.max(0,30-slice.length)).fill(null))
+      });
+    }
+  });
+  return boxes.length?boxes:[{section:'base',sectionNo:'①',sectionLabel:'全国図鑑',sectionBoxNo:1,entries:Array(30).fill(null)}];
+}
+
+function nationalHomeBoxes(){
+  const entries=Array.from({length:MAX_DEX},(_,i)=>nationalBaseForNo(i+1));
+  const boxes=[];
+  for(let i=0;i<entries.length;i+=30){
+    boxes.push({
+      section:'base',
+      sectionNo:'',
+      sectionLabel:'全国図鑑番号順',
+      sectionBoxNo:Math.floor(i/30)+1,
+      entries:entries.slice(i,i+30).concat(Array(Math.max(0,30-entries.slice(i,i+30).length)).fill(null))
+    });
   }
-  return livingDexEntries();
+  return boxes;
 }
-function homeEntryOwned(p){return (individualState[p.id]||[]).length}
+
+function homeBoxLayout(){
+  return homeOrder==='national'?nationalHomeBoxes():collectionHomeBoxes();
+}
+
+function homeEntries(){
+  return homeBoxLayout().flatMap(b=>b.entries).filter(Boolean);
+}
+
+function homeEntryOwned(p){return p?(individualState[p.id]||[]).length:0}
+
+function nationalHomeBoxCount(){
+  try{return homeBoxLayout().length}catch(e){return Math.ceil(MAX_DEX/30)}
+}
 
 function renderNationalHomeBox(){
   const list=el('home-dex-box-list'),board=el('home-dex-board'),title=el('home-dex-box-title'),range=el('home-dex-range'),count=el('home-dex-owned-count'),info=el('home-dex-box-info');
   if(!list||!board)return;
-  document.querySelectorAll('input[name="home-order"]').forEach(x=>x.checked=x.value===homeOrder);
-  const entries=homeEntries(),totalBoxes=Math.max(1,Math.ceil(entries.length/30));
+
+  // HOME BOXは色違いコレクションと同じ区分順を標準表示にする。
+  homeOrder='living';
+  localStorage.setItem('shinyHomeOrder_v1','living');
+
+  const boxes=collectionHomeBoxes(),totalBoxes=boxes.length;
   activeNationalHomeBox=Math.max(1,Math.min(activeNationalHomeBox,totalBoxes));
-  list.innerHTML=Array.from({length:totalBoxes},(_,i)=>{
-    const s=i*30,e=Math.min(entries.length,s+30),slice=entries.slice(s,e),have=slice.filter(p=>homeEntryOwned(p)>0).length;
-    return `<button class="home-dex-box-btn ${i+1===activeNationalHomeBox?'active':''}" onclick="setNationalHomeBox(${i+1})"><span>📦 BOX ${i+1}</span><small>${have}/${slice.length}</small></button>`;
+
+  list.innerHTML=boxes.map((box,i)=>{
+    const real=box.entries.filter(Boolean);
+    const have=real.filter(p=>homeEntryOwned(p)>0).length;
+    return `<button class="home-dex-box-btn ${i+1===activeNationalHomeBox?'active':''}" onclick="setNationalHomeBox(${i+1})">
+      <span>📦 BOX ${i+1}</span>
+      <small>${box.sectionNo} ${box.sectionLabel}　${have}/${real.length}</small>
+    </button>`;
   }).join('');
-  const start=(activeNationalHomeBox-1)*30, slice=entries.slice(start,start+30);
+
+  const box=boxes[activeNationalHomeBox-1];
+  const real=box.entries.filter(Boolean);
   title.textContent=`BOX ${activeNationalHomeBox}`;
-  if(range)range.textContent=homeOrder==='living'?`Living Dex ${start+1}〜${start+slice.length}`:`No.${String(slice[0]?.no||0).padStart(4,'0')}〜No.${String(slice.at(-1)?.no||0).padStart(4,'0')}`;
+  if(range){
+    const first=real[0],last=real[real.length-1];
+    const noRange=first&&last?`No.${String(first.no).padStart(4,'0')}〜No.${String(last.no).padStart(4,'0')}`:'';
+    range.textContent=`${box.sectionNo} ${box.sectionLabel} ・ 区分内BOX ${box.sectionBoxNo}${noRange?' ・ '+noRange:''}`;
+  }
+
   let have=0,inds=0;
-  board.innerHTML=Array.from({length:30},(_,i)=>{
-    const p=slice[i]; if(!p)return `<div class="home-dex-slot missing"><span class="home-dex-no">${start+i+1}</span></div>`;
-    const n=homeEntryOwned(p);if(n){have++;inds+=n}
+  board.innerHTML=box.entries.map((p,i)=>{
+    if(!p){
+      return `<div class="home-dex-slot missing"><span class="home-dex-no">—</span></div>`;
+    }
+    const n=homeEntryOwned(p);
+    if(n){have++;inds+=n}
+    const detail=[
+      p.form&&p.form!=='通常'?esc(p.form):'',
+      p.gender&&p.gender!=='共通'?esc(p.gender):''
+    ].filter(Boolean).join(' ');
     return `<div class="home-dex-slot ${n?'owned':'missing'}" ${n?`onclick="showPokemonDetail('${esc(p.id)}')"`:''}>
-      <span class="home-dex-no">${homeOrder==='living'?start+i+1:p.no}</span>
+      <span class="home-dex-no">${p.no}</span>
       <img loading="lazy" src="${spriteURL(p)}" onerror="this.src='${baseSpriteURL(p)}'">
-      ${n>1?`<span class="home-dex-count">×${n}</span>`:''}${n?'<span class="home-dex-shine">✨</span>':''}
-      <span class="home-dex-name">${esc(p.name)}${p.form&&p.form!=='通常'?`<br>${esc(p.form)}`:''}${p.gender&&p.gender!=='共通'?` ${esc(p.gender)}`:''}</span>
+      ${n>1?`<span class="home-dex-count">×${n}</span>`:''}
+      ${n?'<span class="home-dex-shine">✨</span>':''}
+      <span class="home-dex-name">${esc(p.name)}${detail?`<br>${detail}`:''}</span>
     </div>`;
   }).join('');
-  if(count)count.textContent=`${have} / ${slice.length}`;
-  if(info)info.innerHTML=`<div class="home-info-row"><span>並び</span><b>${homeOrder==='living'?'Living Dex':'全国No.'}</b></div><div class="home-info-row"><span>所持枠</span><b>${have}</b></div><div class="home-info-row"><span>未所持</span><b>${slice.length-have}</b></div><div class="home-info-row"><span>登録個体</span><b>${inds}</b></div>`;
-  const active=list.querySelector('.active');if(active)active.scrollIntoView({block:'nearest'});
+
+  if(count)count.textContent=`${have} / ${real.length}`;
+  if(info)info.innerHTML=`
+    <div class="home-info-row"><span>区分</span><b>${box.sectionNo} ${box.sectionLabel}</b></div>
+    <div class="home-info-row"><span>区分内BOX</span><b>${box.sectionBoxNo}</b></div>
+    <div class="home-info-row"><span>登録枠</span><b>${real.length} / 30</b></div>
+    <div class="home-info-row"><span>所持枠</span><b>${have}</b></div>
+    <div class="home-info-row"><span>未所持</span><b>${real.length-have}</b></div>
+    <div class="home-info-row"><span>空き枠</span><b>${30-real.length}</b></div>
+    <div class="home-info-row"><span>登録個体</span><b>${inds}</b></div>`;
+
+  const active=list.querySelector('.active');
+  if(active)active.scrollIntoView({block:'nearest'});
 }
+
 function initHomeSwipe(){
   const b=el('home-dex-board'); if(!b||b.dataset.swipeInit)return;b.dataset.swipeInit='1';let x0=null;
   b.addEventListener('touchstart',e=>x0=e.touches[0].clientX,{passive:true});
@@ -2748,14 +2845,14 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 // ===== v56 automatic update / cache repair =====
 (function(){
-  const APP_VERSION='v60';
+  const APP_VERSION='v63';
   const UPDATE_KEY='shinyHomeReloadedForSW_'+APP_VERSION;
 
   async function registerFreshWorker(){
     if(!('serviceWorker' in navigator) || location.protocol==='file:') return;
     try{
       const reg = await navigator.serviceWorker.register(
-        './service-worker.js?v=60',
+        './service-worker.js?v=63',
         {updateViaCache:'none'}
       );
 
@@ -2802,268 +2899,255 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 
 
-// ===== v58 automatic Supabase sync =====
+// ===== v61 safe automatic Supabase sync =====
 (function(){
   const CLOUD_KEY='shinyHomeCloudSettings_v2';
-  const AUTO_META_KEY='shinyHomeAutoSyncMeta_v1';
-  const DEVICE_ID_KEY='shinyHomeDeviceId_v1';
-  let autoTimer=null;
-  let syncBusy=false;
-  let pendingSync=false;
-  let suppressAutoSync=false;
-  let lastLocalMutation=0;
+  const META_KEY='shinyHomeAutoSyncMeta_v2';
+  let timer=null, busy=false, initialized=false, applyingRemote=false;
+  let baselineHash='';
 
   const $=id=>document.getElementById(id);
-  const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 
-  function deviceId(){
-    let id=localStorage.getItem(DEVICE_ID_KEY);
-    if(!id){id='dev-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,10);localStorage.setItem(DEVICE_ID_KEY,id)}
-    return id;
-  }
-
-  function readCfg(){
+  function cfg(){
     try{return JSON.parse(localStorage.getItem(CLOUD_KEY)||localStorage.getItem('shinyHomeCloudSettings_v1')||'{}')}catch{return {}}
   }
-
-  function readMeta(){
-    try{return JSON.parse(localStorage.getItem(AUTO_META_KEY)||'{}')}catch{return {}}
+  function meta(){
+    try{return JSON.parse(localStorage.getItem(META_KEY)||'{}')}catch{return {}}
   }
-  function writeMeta(x){localStorage.setItem(AUTO_META_KEY,JSON.stringify(x||{}))}
-
-  function setAutoStatus(msg,kind){
-    const el=$('auto-sync-status'); if(!el)return;
-    el.textContent='自動同期：'+msg;
-    el.style.color=kind==='ok'?'#8fe6b0':kind==='err'?'#ff9c9c':'';
+  function setMeta(v){localStorage.setItem(META_KEY,JSON.stringify(v||{}))}
+  function setStatus(msg,kind){
+    const e=$('auto-sync-status'); if(!e)return;
+    e.textContent='自動同期：'+msg;
+    e.style.color=kind==='ok'?'#8fe6b0':kind==='err'?'#ff9c9c':'';
   }
+  function headers(c){return {apikey:c.key,Authorization:'Bearer '+c.key,'Content-Type':'application/json'}}
 
-  function cloudHeaders(c){
-    return {apikey:c.key,Authorization:'Bearer '+c.key,'Content-Type':'application/json'};
+  function snap(){
+    return typeof currentDataSnapshot==='function' ? currentDataSnapshot() : {};
   }
-
-  function snapshotHash(obj){
-    try{
-      const s=JSON.stringify(obj);
-      let h=2166136261;
-      for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}
-      return (h>>>0).toString(16);
-    }catch{return String(Date.now())}
+  function hash(obj){
+    const s=JSON.stringify(obj||{});
+    let h=2166136261;
+    for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}
+    return (h>>>0).toString(16);
   }
 
-  function currentSnapshot(){
-    if(typeof currentDataSnapshot==='function') return currentDataSnapshot();
-    return {
-      state:localStorage.getItem('shinyHomeState_v1'),
-      boxes:localStorage.getItem('shinyHomeBoxes_v1'),
-      dates:localStorage.getItem('shinyHomeDates_v1'),
-      games:localStorage.getItem('shinyHomeGames_v1'),
-      individuals:localStorage.getItem('shinyHomeIndividuals_v1'),
-      targets:localStorage.getItem('shinyHomeTargets_v1'),
-      hunts:localStorage.getItem('shinyHomeHunts_v1'),
-      screenshots:localStorage.getItem('shinyHomeIndividualScreenshots_v1')
-    };
-  }
-
-  async function fetchCloud(c){
-    const r=await fetch(
-      c.url.replace(/\/$/,'')+'/rest/v1/shiny_home_sync?user_id=eq.'+encodeURIComponent(c.userId)+'&select=payload,updated_at',
-      {headers:cloudHeaders(c),cache:'no-store'}
-    );
-    if(!r.ok) throw new Error(r.status+' '+await r.text());
+  async function readCloud(c){
+    const r=await fetch(c.url.replace(/\/$/,'')+'/rest/v1/shiny_home_sync?user_id=eq.'+encodeURIComponent(c.userId)+'&select=payload,updated_at',{
+      headers:headers(c),cache:'no-store'
+    });
+    if(!r.ok)throw new Error(r.status+' '+await r.text());
     const rows=await r.json();
     return rows[0]||null;
   }
 
-  async function pushCloud(c,snapshot){
+  async function writeCloud(c,payload){
     const now=new Date().toISOString();
     const r=await fetch(c.url.replace(/\/$/,'')+'/rest/v1/shiny_home_sync',{
       method:'POST',
-      headers:{...cloudHeaders(c),Prefer:'resolution=merge-duplicates,return=minimal'},
-      body:JSON.stringify({user_id:c.userId,payload:snapshot,updated_at:now})
+      headers:{...headers(c),Prefer:'resolution=merge-duplicates,return=minimal'},
+      body:JSON.stringify({user_id:c.userId,payload,updated_at:now})
     });
-    if(!r.ok) throw new Error(r.status+' '+await r.text());
-    const meta=readMeta();
-    meta.lastPushedAt=now;
-    meta.lastHash=snapshotHash(snapshot);
-    meta.deviceId=deviceId();
-    writeMeta(meta);
-    setAutoStatus('同期済み '+new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit',second:'2-digit'}),'ok');
-    return now;
+    if(!r.ok)throw new Error(r.status+' '+await r.text());
+    const m=meta();
+    m.lastCloudUpdatedAt=now;
+    m.lastCloudHash=hash(payload);
+    m.dirty=false;
+    m.baseCloudUpdatedAt=now;
+    setMeta(m);
+    baselineHash=hash(payload);
+    setStatus('同期済み '+new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit',second:'2-digit'}),'ok');
   }
 
-  function restoreCloud(payload){
-    suppressAutoSync=true;
+  function applyRemote(row){
+    applyingRemote=true;
     try{
-      if(typeof restoreSnapshotObject==='function'){
-        window.backupRestoring=true;
-        restoreSnapshotObject(payload||{});
-        if(typeof ensureLegacyIndividuals==='function') ensureLegacyIndividuals();
-        if(typeof save==='function') save();
-        window.backupRestoring=false;
-        if(typeof render==='function') render();
-      }
-    } finally {
-      setTimeout(()=>{suppressAutoSync=false},300);
-    }
-  }
-
-  async function pullIfNewer(reason='open'){
-    const c=readCfg();
-    if(!c.url||!c.key||!c.userId) return false;
-    if(syncBusy) return false;
-    syncBusy=true;
-    try{
-      setAutoStatus('確認中…');
-      const row=await fetchCloud(c);
-      if(!row){setAutoStatus('クラウド未登録');return false}
-
-      const meta=readMeta();
-      const cloudTime=Date.parse(row.updated_at||0)||0;
-      const localTime=Number(meta.lastLocalMutation||lastLocalMutation||0);
-      const lastPulled=Date.parse(meta.lastPulledAt||0)||0;
-      const localHash=snapshotHash(currentSnapshot());
-      const cloudHash=snapshotHash(row.payload||{});
-
-      // If cloud differs and is newer than our last known local mutation, apply it.
-      if(cloudHash!==localHash && cloudTime>=localTime && cloudTime>lastPulled){
-        restoreCloud(row.payload||{});
-        meta.lastPulledAt=row.updated_at||new Date().toISOString();
-        meta.lastHash=cloudHash;
-        writeMeta(meta);
-        setAutoStatus('受信済み '+new Date(cloudTime).toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit',second:'2-digit'}),'ok');
-        return true;
-      }
-      setAutoStatus('最新です','ok');
-      return false;
-    }catch(e){
-      setAutoStatus('オフライン / 再試行待ち','err');
-      return false;
+      backupRestoring=true;
+      restoreSnapshotObject(row.payload||{});
+      ensureLegacyIndividuals();
+      save();
+      backupRestoring=false;
+      render();
+      if(typeof renderMobileCounter==='function')renderMobileCounter();
+      baselineHash=hash(snap());
+      const m=meta();
+      m.lastCloudUpdatedAt=row.updated_at||new Date().toISOString();
+      m.lastCloudHash=hash(row.payload||{});
+      m.baseCloudUpdatedAt=m.lastCloudUpdatedAt;
+      m.dirty=false;
+      setMeta(m);
     }finally{
-      syncBusy=false;
-      if(pendingSync){pendingSync=false;schedulePush(400)}
+      backupRestoring=false;
+      setTimeout(()=>{applyingRemote=false},250);
     }
   }
 
-  async function pushNow(reason='change'){
-    const c=readCfg();
-    if(!c.url||!c.key||!c.userId){setAutoStatus('未設定');return false}
-    if(syncBusy){pendingSync=true;return false}
-    syncBusy=true;
+  async function pull(reason='poll'){
+    const c=cfg();
+    if(!c.url||!c.key||!c.userId){setStatus('未設定');return false}
+    if(busy)return false;
+    busy=true;
     try{
-      setAutoStatus('送信中…');
-      const snapshot=currentSnapshot();
-
-      // Compare cloud first to avoid blindly overwriting a newer remote state.
-      let row=null;
-      try{row=await fetchCloud(c)}catch(_){}
-      const meta=readMeta();
-      const cloudTime=row?Date.parse(row.updated_at||0)||0:0;
-      const localTime=Number(meta.lastLocalMutation||lastLocalMutation||Date.now());
-
-      if(row && cloudTime>localTime && snapshotHash(row.payload||{})!==snapshotHash(snapshot)){
-        restoreCloud(row.payload||{});
-        meta.lastPulledAt=row.updated_at||new Date().toISOString();
-        meta.lastHash=snapshotHash(row.payload||{});
-        writeMeta(meta);
-        setAutoStatus('他端末の新しいデータを受信','ok');
+      const row=await readCloud(c);
+      if(!row){
+        // First device: upload only if there is actual local data.
+        const local=snap();
+        baselineHash=hash(local);
+        setStatus('クラウド未登録');
         return false;
       }
 
-      await pushCloud(c,snapshot);
-      return true;
+      const m=meta();
+      const local=snap();
+      const localHash=hash(local);
+      const cloudHash=hash(row.payload||{});
+
+      // Never overwrite unsynced local edits just because the page was refreshed.
+      if(m.dirty){
+        const base=Date.parse(m.baseCloudUpdatedAt||0)||0;
+        const remote=Date.parse(row.updated_at||0)||0;
+        if(remote>base && cloudHash!==m.lastCloudHash){
+          setStatus('競合あり：今すぐ同期で確認してください','err');
+          return false;
+        }
+        return false;
+      }
+
+      if(localHash!==cloudHash){
+        applyRemote(row);
+        setStatus('受信済み '+new Date(row.updated_at).toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit',second:'2-digit'}),'ok');
+        return true;
+      }
+
+      baselineHash=localHash;
+      m.lastCloudUpdatedAt=row.updated_at||m.lastCloudUpdatedAt||'';
+      m.lastCloudHash=cloudHash;
+      m.baseCloudUpdatedAt=m.lastCloudUpdatedAt;
+      m.dirty=false;
+      setMeta(m);
+      setStatus('最新です','ok');
+      return false;
     }catch(e){
-      pendingSync=true;
-      setAutoStatus('通信待ち（端末内には保存済み）','err');
+      setStatus('オフライン / 再試行待ち','err');
       return false;
     }finally{
-      syncBusy=false;
+      busy=false;
     }
   }
 
-  function markLocalMutation(){
-    if(suppressAutoSync) return;
-    lastLocalMutation=Date.now();
-    const meta=readMeta();
-    meta.lastLocalMutation=lastLocalMutation;
-    writeMeta(meta);
-    schedulePush(800);
-  }
+  async function push(reason='change'){
+    const c=cfg();
+    if(!c.url||!c.key||!c.userId){setStatus('未設定');return false}
+    if(busy){schedulePush(500);return false}
+    busy=true;
+    try{
+      const local=snap(), localHash=hash(local), m=meta();
+      if(localHash===baselineHash && !m.dirty){
+        setStatus('最新です','ok');
+        return true;
+      }
 
-  function schedulePush(delay=800){
-    if(suppressAutoSync) return;
-    clearTimeout(autoTimer);
-    autoTimer=setTimeout(()=>pushNow('debounced'),delay);
-  }
+      let row=null;
+      try{row=await readCloud(c)}catch(e){}
+      if(row){
+        const remoteTime=Date.parse(row.updated_at||0)||0;
+        const baseTime=Date.parse(m.baseCloudUpdatedAt||m.lastCloudUpdatedAt||0)||0;
+        const cloudHash=hash(row.payload||{});
 
-  // Hook the central save() function. Most app edits eventually call this.
-  if(typeof window.save==='function'){
-    const originalSave=window.save;
-    window.save=function(){
-      const out=originalSave.apply(this,arguments);
-      markLocalMutation();
-      return out;
-    };
-  }else if(typeof save==='function'){
-    const originalSave=save;
-    save=function(){
-      const out=originalSave.apply(this,arguments);
-      markLocalMutation();
-      return out;
-    };
-  }
+        // Another device changed the cloud after this device's last known version.
+        // Do not destroy either side automatically.
+        if(remoteTime>baseTime && cloudHash!==m.lastCloudHash){
+          setStatus('競合あり：他端末の変更を保護しました','err');
+          return false;
+        }
+      }
 
-  // Some mobile counter flows call localStorage directly or may bypass save().
-  // Listen for common UI mutations as a backup.
-  document.addEventListener('click',e=>{
-    if(e.target.closest && (
-      e.target.closest('.mobile-count-buttons') ||
-      e.target.closest('.mobile-capture-btn') ||
-      e.target.closest('#mobile-active-hunt') ||
-      e.target.closest('.hunt-focus-panel')
-    )){
-      setTimeout(markLocalMutation,30);
+      await writeCloud(c,local);
+      return true;
+    }catch(e){
+      const m=meta();m.dirty=true;setMeta(m);
+      setStatus('通信待ち（端末内には保存済み）','err');
+      return false;
+    }finally{
+      busy=false;
     }
-  },true);
+  }
 
-  // Initial sync when opening the app.
+  function markUserChange(){
+    if(!initialized||applyingRemote)return;
+    setTimeout(()=>{
+      if(applyingRemote)return;
+      const h=hash(snap());
+      if(h===baselineHash)return;
+      const m=meta();
+      if(!m.dirty){
+        m.baseCloudUpdatedAt=m.lastCloudUpdatedAt||'';
+      }
+      m.dirty=true;
+      setMeta(m);
+      setStatus('変更を保存中…');
+      schedulePush(800);
+    },80);
+  }
+
+  function schedulePush(ms=800){
+    clearTimeout(timer);
+    timer=setTimeout(()=>push('auto'),ms);
+  }
+
+  // Only genuine user operations mark the device dirty.
+  // This avoids page load/render/save() from uploading stale data.
+  ['click','change','input'].forEach(type=>{
+    document.addEventListener(type,e=>{
+      if(e.target && e.target.closest && e.target.closest('#sync-panel'))return;
+      markUserChange();
+    },true);
+  });
+
   async function init(){
-    const c=readCfg();
-    if(!c.url||!c.key||!c.userId){setAutoStatus('未設定');return}
-    setAutoStatus('起動時確認中…');
-    await pullIfNewer('startup');
+    const c=cfg();
+    if(!c.url||!c.key||!c.userId){setStatus('未設定');initialized=true;baselineHash=hash(snap());return}
+    setStatus('起動時確認中…');
+    await pull('startup');
+    baselineHash=hash(snap());
+    initialized=true;
   }
 
-  // Refresh when returning to the app.
   document.addEventListener('visibilitychange',()=>{
-    if(document.visibilityState==='visible') pullIfNewer('resume');
+    if(document.visibilityState==='visible')pull('resume');
   });
-  window.addEventListener('focus',()=>pullIfNewer('focus'));
+  window.addEventListener('focus',()=>pull('focus'));
   window.addEventListener('online',async()=>{
-    setAutoStatus('通信復帰・同期中…');
-    await pullIfNewer('online');
-    if(pendingSync) pushNow('online');
+    setStatus('通信復帰・確認中…');
+    const m=meta();
+    if(m.dirty)await push('online'); else await pull('online');
   });
+  setInterval(()=>{if(document.visibilityState==='visible')pull('poll')},10000);
 
-  // Poll lightly while open, so PC updates appear without manual reload.
-  setInterval(()=>{ if(document.visibilityState==='visible') pullIfNewer('poll') },15000);
-
-  // Re-purpose manual sync button as "sync now".
   function bindManual(){
     const up=$('cloud-upload');
     if(up){
       const clone=up.cloneNode(true);
       up.replaceWith(clone);
       clone.addEventListener('click',async()=>{
-        await pullIfNewer('manual');
-        await sleep(100);
-        await pushNow('manual');
+        const m=meta();
+        if(m.dirty) await push('manual');
+        else await pull('manual');
       });
     }
   }
 
-  window.shinyAutoSyncNow=async()=>{await pullIfNewer('manual');await pushNow('manual')};
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>{bindManual();init()},{once:true});
-  else {bindManual();init()}
+  window.shinyAutoSyncNow=async()=>{
+    const m=meta();
+    if(m.dirty)return push('manual');
+    return pull('manual');
+  };
+
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',()=>{bindManual();init()},{once:true});
+  }else{
+    bindManual();init();
+  }
 })();
 
 
