@@ -503,6 +503,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
   .mobile-hunt-thumb{width:64px;height:64px;object-fit:contain;flex:0 0 64px}
   .mobile-hunt-name{font-weight:800;font-size:18px;line-height:1.2}
   .mobile-hunt-meta{font-size:12px;opacity:.75;margin-top:3px}
+  .mobile-hunt-settings{font-size:12px;opacity:.82;margin-top:7px;display:flex;gap:8px;flex-wrap:wrap}
   .mobile-hunt-count{font-size:32px;font-weight:900;margin-left:auto;min-width:72px;text-align:right}
   .mobile-hunt-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
   .mobile-hunt-actions button{min-height:42px;border-radius:10px}
@@ -536,56 +537,8 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
   </div>
 
   <div id="mobile-active-hunt" class="mobile-active-hunt" style="display:none">
-    <div class="mobile-pokemon-card">
-      <img id="mobile-hunt-img" alt="">
-      <div class="mobile-pokemon-name" id="mobile-hunt-name"></div>
-      <div class="mobile-pokemon-sub" id="mobile-hunt-sub"></div>
-<div id="mobile-multi-hunt-list" class="mobile-hunt-list"></div>
-<button id="mobile-multi-add" class="btn" type="button">＋ 厳選を追加</button>
-
-    </div>
-
-    <div class="mobile-count-card">
-      <div class="mobile-count-label">現在の回数</div>
-      <div id="mobile-hunt-count" class="mobile-hunt-count">0</div>
-      <div class="mobile-count-buttons">
-        <button onclick="mobileChangeCount(1)">+1</button>
-        <button onclick="mobileChangeCount(5)">+5</button>
-        <button onclick="mobileChangeCount(10)">+10</button>
-        <button onclick="mobileChangeCount(-1)">-1</button>
-      </div>
-      <button class="mobile-reset-btn" onclick="mobileResetCount()">0に戻す</button>
-    </div>
-
-    <div class="mobile-meta-card">
-      <div class="mobile-meta-row"><span>ゲーム</span><strong id="mobile-hunt-game">—</strong></div>
-      <div class="mobile-meta-row"><span>厳選方法</span><strong id="mobile-hunt-method">—</strong></div>
-      <div class="mobile-meta-row"><span>開始</span><strong id="mobile-hunt-days">—</strong></div>
-      <div class="mobile-meta-row"><span>ひかるおまもり</span><strong id="mobile-hunt-charm">—</strong></div>
-      <div class="mobile-probability">
-        <small>ここまでに1匹以上出る概算確率</small>
-        <strong id="mobile-hunt-prob">0.0%</strong>
-        <span id="mobile-hunt-odds"></span>
-      </div>
-    </div>
-
-    <div class="mobile-main-actions">
-      <button class="mobile-capture-btn" onclick="mobileCaptureCurrent()">✨ 捕獲した</button>
-      <button class="mobile-alt-btn" onclick="mobileOpenAlternate()">別のポケモンが光った</button>
-    </div>
-
-    <div class="mobile-journal-card">
-      <div class="mobile-journal-head">
-        <strong>厳選日記</strong>
-        <button onclick="mobileAddJournal()">＋ 記録</button>
-      </div>
-      <div id="mobile-journal-list"></div>
-    </div>
-
-    <div class="mobile-bottom-actions">
-      <button onclick="mobileEditHunt()">厳選設定を変更</button>
-      <button class="danger" onclick="mobileStopHunt()">厳選終了</button>
-    </div>
+    <div id="mobile-multi-hunt-list" class="mobile-hunt-list"></div>
+    <button id="mobile-multi-add" class="btn" type="button">＋ 厳選を追加</button>
   </div>
 </div>
 
@@ -834,7 +787,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
     <div class="extra-panel">
       <div class="extra-head">
         <div><h2 style="margin:0">☁️ Supabase 同期</h2>
-        <span class="section-count">PC・iPhoneで同じデータを共有 ・ build v59</span></div>
+        <span class="section-count">PC・iPhoneで同じデータを共有 ・ build v60</span></div>
       </div>
       <div class="sync-fields">
         <label>Supabase URL<input id="supabase-url" autocomplete="off" placeholder="https://xxxx.supabase.co"></label>
@@ -856,7 +809,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 </section>
 
 <script>
-const DATA_VERSION='full-2026-09-09-v59';
+const DATA_VERSION='full-2026-09-09-v60';
 const SPECIES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species.csv';
 const NAMES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
 const MAX_DEX=1025;
@@ -2356,24 +2309,13 @@ function currentMobileHuntId(){
   return Object.keys(targetState).find(id=>targetState[id])||null;
 }
 function renderMobileCounter(){
-  const id=currentMobileHuntId(),no=el('mobile-no-hunt'),active=el('mobile-active-hunt');
+  const hasTargets=Object.keys(targetState).some(id=>targetState[id]);
+  const no=el('mobile-no-hunt'),active=el('mobile-active-hunt');
   if(!no||!active)return;
-  if(!id){no.style.display='block';active.style.display='none';renderMobileHuntSearch();return}
-  const p=data.find(x=>x.id===id);if(!p){no.style.display='block';active.style.display='none';return}
-  no.style.display='none';active.style.display='block';
-  const x=huntData(id),count=Number(x.count)||0,odds=estimatedOdds(x),prob=probabilityAtLeastOne(odds,count);
-  el('mobile-hunt-img').src=spriteURL(p);el('mobile-hunt-img').onerror=()=>el('mobile-hunt-img').src=baseSpriteURL(p);
-  el('mobile-hunt-name').textContent=p.name;
-  el('mobile-hunt-sub').textContent=`No.${String(p.no).padStart(4,'0')} ${p.form&&p.form!=='通常'?p.form:''} ${p.gender&&p.gender!=='共通'?p.gender:''}`.trim();
-  el('mobile-hunt-count').textContent=count.toLocaleString();
-  el('mobile-hunt-game').textContent=x.game||'未設定';
-  el('mobile-hunt-method').textContent=x.method||'未設定';
-  el('mobile-hunt-days').textContent=huntElapsedDays(x.start)||'未設定';
-  el('mobile-hunt-charm').textContent=x.charm||'未設定';
-  el('mobile-hunt-prob').textContent=prob.toFixed(1)+'%';
-  el('mobile-hunt-odds').textContent=`目安 1/${Math.round(odds).toLocaleString()}`;
-  const journal=Array.isArray(x.journal)?x.journal:[];
-  el('mobile-journal-list').innerHTML=journal.length?journal.slice().reverse().map(j=>`<div class="mobile-journal-entry">${new Date(j.at).toLocaleString('ja-JP')}　${Number(j.count)||0}回<br>${esc(j.text||'')}</div>`).join(''):'<div class="mobile-journal-entry">まだ記録はありません。</div>';
+  no.style.display=hasTargets?'none':'block';
+  active.style.display=hasTargets?'block':'none';
+  if(!hasTargets)renderMobileHuntSearch();
+  if(typeof renderMobileMultiHunts==='function')renderMobileMultiHunts();
 }
 function mobileChangeCount(delta){
   const id=currentMobileHuntId();if(!id)return;
@@ -2806,14 +2748,14 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 // ===== v56 automatic update / cache repair =====
 (function(){
-  const APP_VERSION='v59';
+  const APP_VERSION='v60';
   const UPDATE_KEY='shinyHomeReloadedForSW_'+APP_VERSION;
 
   async function registerFreshWorker(){
     if(!('serviceWorker' in navigator) || location.protocol==='file:') return;
     try{
       const reg = await navigator.serviceWorker.register(
-        './service-worker.js?v=59',
+        './service-worker.js?v=60',
         {updateViaCache:'none'}
       );
 
@@ -3156,31 +3098,22 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
   }
 
   function getTargetEntries(){
-    const t=allTargets();
-    const h=allHunts();
-    const entries=[];
-    Object.entries(t).forEach(([k,v])=>{
-      if(!v) return;
-      const hv=h[k]||{};
-      const no = Number(hv.no||hv.dex||hv.speciesNo||v.no||v.dex||v.speciesNo||k.replace(/\D/g,''))||0;
-      const name = hv.name||hv.targetName||v.name||v.targetName||('No.'+String(no).padStart(4,'0'));
-      const count = Number(hv.count??hv.huntCount??hv.encounters??0)||0;
-      entries.push({key:k,no,name,count,hunt:hv,target:v});
-    });
-    // Include hunts that may not have a target flag but are clearly active.
-    Object.entries(h).forEach(([k,hv])=>{
-      if(entries.some(e=>e.key===k)) return;
-      if(!(hv && (hv.active===true || hv.status==='active' || hv.inProgress===true))) return;
-      const no=Number(hv.no||hv.dex||hv.speciesNo||k.replace(/\D/g,''))||0;
-      const name=hv.name||hv.targetName||('No.'+String(no).padStart(4,'0'));
+    const t=allTargets(),h=allHunts(),entries=[];
+    Object.keys(t).forEach(key=>{
+      if(!t[key])return;
+      const p=(typeof data!=='undefined'?data.find(x=>x.id===key):null);
+      if(!p)return;
+      const hv=h[key]||{};
       const count=Number(hv.count??hv.huntCount??hv.encounters??0)||0;
-      entries.push({key:k,no,name,count,hunt:hv,target:null});
+      entries.push({key,p,count,hunt:hv});
     });
     return entries;
   }
 
-  function sprite(no){
-    return no ? 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/'+no+'.png' : '';
+  function pokemonSprite(p){
+    if(!p)return '';
+    try{if(typeof spriteURL==='function')return spriteURL(p)}catch(e){}
+    return 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/'+p.no+'.png';
   }
 
   function mutateCount(key,delta){
@@ -3195,6 +3128,9 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
   }
 
   function finishHunt(key,captured){
+    const p=(typeof data!=='undefined'?data.find(x=>x.id===key):null);
+    const label=p?.name||'このポケモン';
+    if(!confirm(captured?`${label}を「捕獲した」として終了しますか？`:`${label}の厳選を終了しますか？`))return;
     const t=allTargets();
     if(key in t) delete t[key];
     saveTargets(t);
@@ -3221,21 +3157,26 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
   }
 
   function addHunt(){
-    // Reuse the app's existing mobile search/new-hunt UI by focusing the search box.
-    const selectors=[
-      '#mobile-search-input',
-      '#mobile-pokemon-search',
-      'input[placeholder*="ポケモン"]',
-      'input[placeholder*="検索"]'
-    ];
-    for(const s of selectors){
-      const el=document.querySelector(s);
-      if(el){el.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(()=>el.focus(),250);return}
+    const q=prompt('追加するポケモン名または図鑑No.を入力してください。');
+    if(!q)return;
+    const s=q.trim().toLowerCase();
+    const rows=(typeof data!=='undefined'?data:[]).filter(p=>!p.locked&&(p.name.toLowerCase().includes(s)||String(p.no)===s)).slice(0,12);
+    if(!rows.length){alert('見つかりませんでした。');return}
+    let p=rows[0];
+    if(rows.length>1){
+      const msg=rows.map((x,i)=>`${i+1}. No.${String(x.no).padStart(4,'0')} ${x.name}${x.form&&x.form!=='通常'?' '+x.form:''}`).join('\n');
+      const n=Number(prompt(msg+'\n\n追加する番号を入力してください。'))-1;
+      if(!rows[n])return;
+      p=rows[n];
     }
-    // As a fallback, switch to the existing target/search tab or button if present.
-    const btn=document.querySelector('[data-tab="target"],[data-tab="hunts"],#add-target,.add-target');
-    if(btn){btn.click();return}
-    alert('下の検索欄からポケモンを選んで厳選を開始してください。');
+    if(typeof targetState==='object')targetState[p.id]=true;
+    const h=allHunts(),hv=h[p.id]||{};
+    if(!hv.start)hv.start=new Date().toISOString().slice(0,10);
+    h[p.id]=hv;
+    saveHunts(h);
+    if(typeof save==='function')save();
+    renderMultiHunts();
+    if(typeof renderMobileCounter==='function')renderMobileCounter();
   }
 
   function renderMultiHunts(){
@@ -3254,10 +3195,15 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
       card.dataset.key=e.key;
       card.innerHTML=`
         <div class="mobile-hunt-card-top">
-          <img class="mobile-hunt-thumb" src="${sprite(e.no)}" alt="">
+          <img class="mobile-hunt-thumb" src="${pokemonSprite(e.p)}" alt="" onerror="if(typeof baseSpriteURL==='function')this.src=baseSpriteURL(e.p)">
           <div style="min-width:0">
-            <div class="mobile-hunt-name">${e.name}</div>
-            <div class="mobile-hunt-meta">${e.no?'No.'+String(e.no).padStart(4,'0'):''}</div>
+            <div class="mobile-hunt-name">${e.p.name}</div>
+            <div class="mobile-hunt-meta">No.${String(e.p.no).padStart(4,'0')}${e.p.form&&e.p.form!=='通常'?' ・ '+e.p.form:''}</div>
+            <div class="mobile-hunt-settings">
+              ${e.hunt.game?`<span>${e.hunt.game}</span>`:''}
+              ${e.hunt.method?`<span>${e.hunt.method}</span>`:''}
+              ${e.hunt.charm?`<span>ひかるおまもり：${e.hunt.charm}</span>`:''}
+            </div>
           </div>
           <div class="mobile-hunt-count">${e.count}</div>
         </div>
@@ -3286,19 +3232,12 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
     });
   }
 
-  function hideLegacySingleCard(){
-    // Keep the original elements available for compatibility, but avoid showing a duplicate single hunt block on mobile.
-    const old=$('mobile-active-hunt');
-    if(old) old.style.display='none';
-  }
-
   function init(){
     const add=$('mobile-multi-add');
     if(add && !add.dataset.boundV59){
       add.dataset.boundV59='1';
       add.addEventListener('click',addHunt);
     }
-    hideLegacySingleCard();
     renderMultiHunts();
 
     // Watch for other app renders changing hunt state.
