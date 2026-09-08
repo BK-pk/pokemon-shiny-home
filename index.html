@@ -492,7 +492,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 
 #cloud-status{font-weight:800;padding:10px 12px;border-radius:10px}
 
-/* v73: counter cards must remain stable while rapidly clicking/tapping */
+/* v74: counter cards must remain stable while rapidly clicking/tapping */
 .mobile-hunt-card,.mobile-hunt-card button,.mobile-hunt-actions,.mobile-hunt-bottom{
   -webkit-user-select:none;user-select:none;
 }
@@ -547,7 +547,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
   </div>
 
   <div id="mobile-active-hunt" class="mobile-active-hunt" style="display:none">
-    <div id="mobile-sync-status" class="mobile-hunt-meta" style="text-align:center;margin:4px 0 8px">☁️ 同期は待機中 ・ v73</div>
+    <div id="mobile-sync-status" class="mobile-hunt-meta" style="text-align:center;margin:4px 0 8px">☁️ 同期は待機中 ・ v74</div>
     <div id="mobile-multi-hunt-list" class="mobile-hunt-list"></div>
     <button id="mobile-multi-add" class="btn" type="button">＋ 厳選を追加</button>
   </div>
@@ -798,7 +798,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
     <div class="extra-panel">
       <div class="extra-head">
         <div><h2 style="margin:0">☁️ Supabase 同期</h2>
-        <span class="section-count">PC・iPhoneで同じデータを共有 ・ build v73</span></div>
+        <span class="section-count">PC・iPhoneで同じデータを共有 ・ build v74</span></div>
       </div>
       <div class="sync-fields">
         <label>Supabase URL<input id="supabase-url" autocomplete="off" placeholder="https://xxxx.supabase.co"></label>
@@ -813,9 +813,9 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
         <button class="btn" id="cloud-check" type="button">クラウド確認</button>
       </div>
       <div id="cloud-status" class="home-help">未設定です。</div>
-      <div id="auto-sync-status" class="home-help" style="margin-top:8px">同期：v73 外出向け省通信</div>
+      <div id="auto-sync-status" class="home-help" style="margin-top:8px">同期：v74 外出向け省通信</div>
       <div class="home-help" style="margin-top:8px">
-        v73ではカウンター操作中は通信しません。操作が落ち着いた時や画面を離れる時にまとめて保存し、PCを開いた時に取得します。所持状況・HOME BOXなどのフルデータは上のボタンで手動同期します。
+        v74ではカウンター操作中は通信しません。操作が落ち着いた時や画面を離れる時にまとめて保存し、PCを開いた時に取得します。所持状況・HOME BOXなどのフルデータは上のボタンで手動同期します。
       </div>
       <div class="home-help" style="margin-top:10px">初回は「設定保存」→「接続テスト」の順に確認してください。既存データがある場合、確認前にクラウドへ保存しないでください。</div>
     </div>
@@ -823,7 +823,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 </section>
 
 <script>
-const DATA_VERSION='full-2026-09-09-v73';
+const DATA_VERSION='full-2026-09-09-v74';
 const SPECIES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species.csv';
 const NAMES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
 const MAX_DEX=1025;
@@ -2400,9 +2400,15 @@ async function cloudDownload(){
 
 
 let forceFullMobile=localStorage.getItem('shinyHomeForceFullMobile_v1')==='1';
-function isMobileCounterDevice(){return window.matchMedia('(max-width:800px)').matches}
-function applyMobileMode(){
-  if(isMobileCounterDevice()&&!forceFullMobile){
+const mobileCounterMedia=window.matchMedia('(max-width:800px)');
+let lastMobileCounterMode=null;
+function isMobileCounterDevice(){return mobileCounterMedia.matches}
+function applyMobileMode(forceRender=false){
+  const shouldUseMobile=isMobileCounterDevice()&&!forceFullMobile;
+  // v74: do not rebuild mobile cards on every resize event.
+  if(lastMobileCounterMode===shouldUseMobile && !forceRender)return;
+  lastMobileCounterMode=shouldUseMobile;
+  if(shouldUseMobile){
     document.body.classList.add('mobile-counter-mode');
     renderMobileCounter();
   }else{
@@ -2411,11 +2417,13 @@ function applyMobileMode(){
 }
 function showFullAppOnMobile(){
   forceFullMobile=true;localStorage.setItem('shinyHomeForceFullMobile_v1','1');
+  lastMobileCounterMode=false;
   document.body.classList.remove('mobile-counter-mode');
 }
 function returnToMobileCounter(){
   forceFullMobile=false;localStorage.removeItem('shinyHomeForceFullMobile_v1');
-  applyMobileMode();
+  lastMobileCounterMode=null;
+  applyMobileMode(true);
 }
 function currentMobileHuntId(){
   return Object.keys(targetState).find(id=>targetState[id])||null;
@@ -2501,7 +2509,7 @@ function restoreAppTab(){
   if(btn)switchAppTab(btn.dataset.tab,btn);
 }
 
-function renderExtraPanels(){renderMonthlyShinies();renderCaptureHistory();renderHuntStats();renderYearSummary();renderHuntRankings();renderCaptureCalendar();populateGameImageSelect();renderDexView();renderShotGallery();renderBallStats();renderMethodStats();renderHomeBoxes();renderHomeBoxBoard();renderIndividualSearch();renderCollectionTrend();populateYearImageSelect();renderCollectionGoals();renderHallOfFame();renderCaptureTimeline();renderDataQuality();populateDexExtraFilters();renderDexHeatmap();renderYearAlbum();renderMilestones();renderNationalHomeBox();renderHuntFocus();renderBestRecords();renderRoadmap();renderCloudSettings();renderNationalHomeBox();initHomeSwipe();if(isMobileCounterDevice())renderMobileCounter();}
+function renderExtraPanels(){renderMonthlyShinies();renderCaptureHistory();renderHuntStats();renderYearSummary();renderHuntRankings();renderCaptureCalendar();populateGameImageSelect();renderDexView();renderShotGallery();renderBallStats();renderMethodStats();renderHomeBoxes();renderHomeBoxBoard();renderIndividualSearch();renderCollectionTrend();populateYearImageSelect();renderCollectionGoals();renderHallOfFame();renderCaptureTimeline();renderDataQuality();populateDexExtraFilters();renderDexHeatmap();renderYearAlbum();renderMilestones();renderNationalHomeBox();renderHuntFocus();renderBestRecords();renderRoadmap();renderCloudSettings();renderNationalHomeBox();initHomeSwipe();if(isMobileCounterDevice()&&!document.querySelector('#mobile-multi-hunt-list .mobile-hunt-card'))renderMobileCounter();}
 function shinyOdds(game,method,charm,hunt={}){
   const c=charm==='あり';
   if(!game)return {text:'—',note:'厳選ソフトを選択してください'};
@@ -2717,7 +2725,9 @@ for(const g of gameOptions.filter(Boolean)){const o=document.createElement('opti
 
 
 
-window.addEventListener('resize',applyMobileMode);
+// v74: switch UI only when crossing the 800px breakpoint, not on every resize.
+if(mobileCounterMedia.addEventListener)mobileCounterMedia.addEventListener('change',()=>{lastMobileCounterMode=null;applyMobileMode(true)});
+else if(mobileCounterMedia.addListener)mobileCounterMedia.addListener(()=>{lastMobileCounterMode=null;applyMobileMode(true)});
 window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 // ===== v55 robust Supabase sync UI =====
@@ -2860,7 +2870,7 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 // ===== v56 automatic update / cache repair =====
 (function(){
-  const APP_VERSION='v73';
+  const APP_VERSION='v74';
   const UPDATE_KEY='shinyHomeReloadedForSW_'+APP_VERSION;
 
   async function registerFreshWorker(){
@@ -2927,7 +2937,7 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
   function headers(c){return {apikey:c.key,Authorization:'Bearer '+c.key,'Content-Type':'application/json'}}
   function setStatus(msg,kind){
     const e=$('auto-sync-status'); if(e){e.textContent='同期：'+msg;e.style.color=kind==='ok'?'#8fe6b0':kind==='err'?'#ff9c9c':''}
-    const m=$('mobile-sync-status'); if(m){m.textContent='☁️ '+msg+' ・ v73';m.style.color=kind==='ok'?'#8fe6b0':kind==='err'?'#ff9c9c':''}
+    const m=$('mobile-sync-status'); if(m){m.textContent='☁️ '+msg+' ・ v74';m.style.color=kind==='ok'?'#8fe6b0':kind==='err'?'#ff9c9c':''}
   }
   function localHunts(){try{return typeof huntState==='object'&&huntState?huntState:JSON.parse(localStorage.getItem('shinyHomeHunts_v1')||'{}')}catch{return {}}}
   function setLocalCounter(id,count){
