@@ -1,4 +1,4 @@
-const CACHE_NAME='shiny-home-v76';
+const CACHE_NAME='shiny-home-v77';
 const APP_SHELL=['./','./index.html','./manifest.webmanifest'];
 
 self.addEventListener('install', event => {
