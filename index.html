@@ -489,6 +489,8 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 
 .app-tab[data-tab="sync"]{border-color:#4e87b7}
 .app-tab[data-tab="sync"].active{box-shadow:0 0 0 1px rgba(104,191,255,.22) inset}
+
+#cloud-status{font-weight:800;padding:10px 12px;border-radius:10px}
 </style>
 </head>
 <body>
@@ -806,24 +808,29 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 <section id="tab-sync" class="tab-page">
   <div class="sync-grid">
     <div class="extra-panel">
-      <div class="extra-head"><div><h2 style="margin:0">☁️ Supabase 同期</h2><span class="section-count">PC・iPhoneで同じデータを共有</span></div></div>
+      <div class="extra-head">
+        <div><h2 style="margin:0">☁️ Supabase 同期</h2>
+        <span class="section-count">PC・iPhoneで同じデータを共有</span></div>
+      </div>
       <div class="sync-fields">
-        <label>Supabase URL<input id="supabase-url" placeholder="https://xxxx.supabase.co"></label>
-        <label>Publishable key<input id="supabase-key" placeholder="sb_publishable_..."></label>
-        <label>同期ID<input id="sync-user-id" placeholder="pokemon-shiny-home"></label>
+        <label>Supabase URL<input id="supabase-url" autocomplete="off" placeholder="https://xxxx.supabase.co"></label>
+        <label>Publishable key<input id="supabase-key" autocomplete="off" placeholder="sb_publishable_..."></label>
+        <label>同期ID<input id="sync-user-id" autocomplete="off" placeholder="pokemon-shiny-home"></label>
       </div>
       <div class="counter-row">
-        <button class="btn" onclick="saveCloudSettings()">設定保存</button>
-        <button class="btn" onclick="cloudUpload()">クラウドへ保存</button>
-        <button class="btn" onclick="cloudDownload()">クラウドから読込</button>
+        <button class="btn" id="cloud-save-settings" type="button">設定保存</button>
+        <button class="btn" id="cloud-test" type="button">接続テスト</button>
+        <button class="btn" id="cloud-upload" type="button">クラウドへ保存</button>
+        <button class="btn" id="cloud-download" type="button">クラウドから読込</button>
       </div>
       <div id="cloud-status" class="home-help">未設定です。</div>
+      <div class="home-help" style="margin-top:10px">初回は「設定保存」→「接続テスト」の順に確認してください。既存データがある場合、確認前にクラウドへ保存しないでください。</div>
     </div>
   </div>
 </section>
 
 <script>
-const DATA_VERSION='full-2026-09-08-v54';
+const DATA_VERSION='full-2026-09-08-v55';
 const SPECIES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species.csv';
 const NAMES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
 const MAX_DEX=1025;
@@ -2634,6 +2641,115 @@ if('serviceWorker' in navigator && location.protocol!=='file:'){
 
 window.addEventListener('resize',applyMobileMode);
 window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
+
+// ===== v55 robust Supabase sync UI =====
+(function(){
+  const KEY='shinyHomeCloudSettings_v2';
+  const $=id=>document.getElementById(id);
+  function readCfg(){
+    try{return JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){return {}}
+  }
+  function cfgFromInputs(){
+    return {
+      url:($('supabase-url')?.value||'').trim().replace(/\/rest\/v1\/?$/,'').replace(/\/+$/,''),
+      key:($('supabase-key')?.value||'').trim(),
+      userId:($('sync-user-id')?.value||'').trim()
+    };
+  }
+  function status(msg,ok){
+    const x=$('cloud-status'); if(!x)return;
+    x.textContent=msg;
+    x.style.color=ok===true?'#8fe6b0':ok===false?'#ff9c9c':'';
+  }
+  function fill(){
+    const c=readCfg();
+    if($('supabase-url') && !$('supabase-url').value) $('supabase-url').value=c.url||'';
+    if($('supabase-key') && !$('supabase-key').value) $('supabase-key').value=c.key||'';
+    if($('sync-user-id') && !$('sync-user-id').value) $('sync-user-id').value=c.userId||'pokemon-shiny-home';
+    if(c.url&&c.key&&c.userId) status('✅ 設定済みです。次に「接続テスト」を押してください。',true);
+  }
+  function saveSettings(){
+    const c=cfgFromInputs();
+    if(!c.url||!c.key||!c.userId){status('❌ URL・Publishable key・同期IDをすべて入力してください。',false);return}
+    try{
+      localStorage.setItem(KEY,JSON.stringify(c));
+      // Also mirror to older key names if an earlier build uses them.
+      localStorage.setItem('shinyHomeCloudSettings_v1',JSON.stringify(c));
+      status('✅ 設定を保存しました。次に「接続テスト」を押してください。',true);
+    }catch(e){status('❌ 設定を保存できませんでした: '+e.message,false)}
+  }
+  async function testConnection(){
+    saveSettings();
+    const c=readCfg(); if(!c.url||!c.key||!c.userId)return;
+    status('接続テスト中…');
+    try{
+      const r=await fetch(c.url+'/rest/v1/shiny_home_sync?select=user_id&limit=1',{
+        headers:{apikey:c.key,Authorization:'Bearer '+c.key}
+      });
+      if(!r.ok) throw new Error(r.status+' '+(await r.text()));
+      status('✅ Supabaseへの接続に成功しました。',true);
+    }catch(e){status('❌ 接続できません: '+e.message,false)}
+  }
+  async function upload(){
+    const c=readCfg();
+    if(!c.url||!c.key||!c.userId){status('❌ 先に設定保存してください。',false);return}
+    if(!confirm('現在この端末にあるデータをクラウドへ保存します。よろしいですか？'))return;
+    status('クラウドへ保存中…');
+    try{
+      const payload=(typeof currentDataSnapshot==='function')?currentDataSnapshot():{
+        state:localStorage.getItem('shinyHomeState_v1'),
+        boxes:localStorage.getItem('shinyHomeBoxes_v1'),
+        dates:localStorage.getItem('shinyHomeDates_v1'),
+        games:localStorage.getItem('shinyHomeGames_v1'),
+        individuals:localStorage.getItem('shinyHomeIndividuals_v1'),
+        targets:localStorage.getItem('shinyHomeTargets_v1'),
+        hunts:localStorage.getItem('shinyHomeHunts_v1'),
+        screenshots:localStorage.getItem('shinyHomeIndividualScreenshots_v1')
+      };
+      const r=await fetch(c.url+'/rest/v1/shiny_home_sync',{
+        method:'POST',
+        headers:{apikey:c.key,Authorization:'Bearer '+c.key,'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=minimal'},
+        body:JSON.stringify({user_id:c.userId,payload:payload,updated_at:new Date().toISOString()})
+      });
+      if(!r.ok) throw new Error(r.status+' '+(await r.text()));
+      status('✅ クラウドへ保存しました。',true);
+    }catch(e){status('❌ 保存できません: '+e.message,false)}
+  }
+  async function download(){
+    const c=readCfg();
+    if(!c.url||!c.key||!c.userId){status('❌ 先に設定保存してください。',false);return}
+    if(!confirm('クラウドのデータをこの端末へ読み込みます。現在の端末データが置き換わる場合があります。よろしいですか？'))return;
+    status('クラウドから読込中…');
+    try{
+      const r=await fetch(c.url+'/rest/v1/shiny_home_sync?user_id=eq.'+encodeURIComponent(c.userId)+'&select=payload',{
+        headers:{apikey:c.key,Authorization:'Bearer '+c.key}
+      });
+      if(!r.ok) throw new Error(r.status+' '+(await r.text()));
+      const rows=await r.json();
+      if(!rows.length) throw new Error('クラウドに保存データがありません。');
+      const p=rows[0].payload||{};
+      if(typeof restoreSnapshotObject==='function'){
+        restoreSnapshotObject(p);
+      }else{
+        const map={state:'shinyHomeState_v1',boxes:'shinyHomeBoxes_v1',dates:'shinyHomeDates_v1',games:'shinyHomeGames_v1',individuals:'shinyHomeIndividuals_v1',targets:'shinyHomeTargets_v1',hunts:'shinyHomeHunts_v1',screenshots:'shinyHomeIndividualScreenshots_v1'};
+        for(const [k,ls] of Object.entries(map)) if(p[k]!=null) localStorage.setItem(ls,typeof p[k]==='string'?p[k]:JSON.stringify(p[k]));
+      }
+      status('✅ クラウドから読み込みました。画面を再読み込みします。',true);
+      setTimeout(()=>location.reload(),700);
+    }catch(e){status('❌ 読み込めません: '+e.message,false)}
+  }
+  function bind(){
+    fill();
+    $('cloud-save-settings')?.addEventListener('click',saveSettings);
+    $('cloud-test')?.addEventListener('click',testConnection);
+    $('cloud-upload')?.addEventListener('click',upload);
+    $('cloud-download')?.addEventListener('click',download);
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',bind);
+  else bind();
+  window.renderCloudSettingsV55=fill;
+})();
+
 </script>
 <div class="shot-lightbox" id="shot-lightbox" onclick="if(event.target===this)closeShotLightbox()">
 <button class="shot-lightbox-close" onclick="closeShotLightbox()" type="button">✕</button>
