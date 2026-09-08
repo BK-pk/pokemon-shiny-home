@@ -787,7 +787,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
     <div class="extra-panel">
       <div class="extra-head">
         <div><h2 style="margin:0">☁️ Supabase 同期</h2>
-        <span class="section-count">PC・iPhoneで同じデータを共有 ・ build v65</span></div>
+        <span class="section-count">PC・iPhoneで同じデータを共有 ・ build v66</span></div>
       </div>
       <div class="sync-fields">
         <label>Supabase URL<input id="supabase-url" autocomplete="off" placeholder="https://xxxx.supabase.co"></label>
@@ -802,14 +802,14 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
         <button class="btn" id="cloud-check" type="button">クラウド確認</button>
       </div>
       <div id="cloud-status" class="home-help">未設定です。</div>
-      <div id="auto-sync-status" class="home-help" style="margin-top:8px">自動同期：双方向同期 v65</div>
+      <div id="auto-sync-status" class="home-help" style="margin-top:8px">自動同期：双方向同期 v66</div>
       <div class="home-help" style="margin-top:10px">初回は「設定保存」→「接続テスト」の順に確認してください。既存データがある場合、確認前にクラウドへ保存しないでください。</div>
     </div>
   </div>
 </section>
 
 <script>
-const DATA_VERSION='full-2026-09-09-v65';
+const DATA_VERSION='full-2026-09-09-v66';
 const SPECIES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species.csv';
 const NAMES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
 const MAX_DEX=1025;
@@ -2845,14 +2845,14 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 // ===== v56 automatic update / cache repair =====
 (function(){
-  const APP_VERSION='v65';
+  const APP_VERSION='v66';
   const UPDATE_KEY='shinyHomeReloadedForSW_'+APP_VERSION;
 
   async function registerFreshWorker(){
     if(!('serviceWorker' in navigator) || location.protocol==='file:') return;
     try{
       const reg = await navigator.serviceWorker.register(
-        './service-worker.js?v=65',
+        './service-worker.js?v=66',
         {updateViaCache:'none'}
       );
 
@@ -2899,30 +2899,32 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 
 
-// ===== v61 safe automatic Supabase sync =====
+// ===== v66 baseline-safe bidirectional Supabase sync =====
 (function(){
   const CLOUD_KEY='shinyHomeCloudSettings_v2';
-  const META_KEY='shinyHomeAutoSyncMeta_v2';
-  let timer=null, busy=false, initialized=false, applyingRemote=false;
-  let baselineHash='';
+  const META_KEY='shinyHomeAutoSyncMeta_v3'; // new key: discard stale v61/v65 dirty/conflict state
+  let timer=null;
+  let busy=false;
+  let initialized=false;
+  let applyingRemote=false;
+  let baselineCloudAt='';
+  let baselineCloudHash='';
+  let localDirty=false;
 
   const $=id=>document.getElementById(id);
 
   function cfg(){
     try{return JSON.parse(localStorage.getItem(CLOUD_KEY)||localStorage.getItem('shinyHomeCloudSettings_v1')||'{}')}catch{return {}}
   }
-  function meta(){
-    try{return JSON.parse(localStorage.getItem(META_KEY)||'{}')}catch{return {}}
-  }
-  function setMeta(v){localStorage.setItem(META_KEY,JSON.stringify(v||{}))}
   function setStatus(msg,kind){
     const e=$('auto-sync-status'); if(!e)return;
     e.textContent='自動同期：'+msg;
     e.style.color=kind==='ok'?'#8fe6b0':kind==='err'?'#ff9c9c':'';
   }
-  function headers(c){return {apikey:c.key,Authorization:'Bearer '+c.key,'Content-Type':'application/json'}}
-
-  function snap(){
+  function headers(c){
+    return {apikey:c.key,Authorization:'Bearer '+c.key,'Content-Type':'application/json'};
+  }
+  function snapshot(){
     return typeof currentDataSnapshot==='function' ? currentDataSnapshot() : {};
   }
   function hash(obj){
@@ -2931,11 +2933,21 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
     for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}
     return (h>>>0).toString(16);
   }
+  function saveMeta(){
+    try{
+      localStorage.setItem(META_KEY,JSON.stringify({
+        baselineCloudAt,baselineCloudHash,localDirty,
+        savedAt:new Date().toISOString()
+      }));
+    }catch(e){}
+  }
 
   async function readCloud(c){
-    const r=await fetch(c.url.replace(/\/$/,'')+'/rest/v1/shiny_home_sync?user_id=eq.'+encodeURIComponent(c.userId)+'&select=payload,updated_at',{
-      headers:headers(c),cache:'no-store'
-    });
+    const r=await fetch(
+      c.url.replace(/\/$/,'')+'/rest/v1/shiny_home_sync?user_id=eq.'+
+      encodeURIComponent(c.userId)+'&select=payload,updated_at',
+      {headers:headers(c),cache:'no-store'}
+    );
     if(!r.ok)throw new Error(r.status+' '+await r.text());
     const rows=await r.json();
     return rows[0]||null;
@@ -2949,13 +2961,10 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
       body:JSON.stringify({user_id:c.userId,payload,updated_at:now})
     });
     if(!r.ok)throw new Error(r.status+' '+await r.text());
-    const m=meta();
-    m.lastCloudUpdatedAt=now;
-    m.lastCloudHash=hash(payload);
-    m.dirty=false;
-    m.baseCloudUpdatedAt=now;
-    setMeta(m);
-    baselineHash=hash(payload);
+    baselineCloudAt=now;
+    baselineCloudHash=hash(payload);
+    localDirty=false;
+    saveMeta();
     setStatus('同期済み '+new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit',second:'2-digit'}),'ok');
   }
 
@@ -2969,103 +2978,85 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
       backupRestoring=false;
       render();
       if(typeof renderMobileCounter==='function')renderMobileCounter();
-      baselineHash=hash(snap());
-      const m=meta();
-      m.lastCloudUpdatedAt=row.updated_at||new Date().toISOString();
-      m.lastCloudHash=hash(row.payload||{});
-      m.baseCloudUpdatedAt=m.lastCloudUpdatedAt;
-      m.dirty=false;
-      setMeta(m);
+      if(typeof renderMobileMultiHunts==='function')renderMobileMultiHunts();
+
+      baselineCloudAt=row.updated_at||'';
+      baselineCloudHash=hash(row.payload||{});
+      localDirty=false;
+      saveMeta();
     }finally{
       backupRestoring=false;
       setTimeout(()=>{applyingRemote=false},250);
     }
   }
 
-  async function pull(reason='poll'){
+  async function pull(){
     const c=cfg();
     if(!c.url||!c.key||!c.userId){setStatus('未設定');return false}
-    if(busy)return false;
+    if(busy||localDirty)return false;
     busy=true;
     try{
       const row=await readCloud(c);
       if(!row){
-        // First device: upload only if there is actual local data.
-        const local=snap();
-        baselineHash=hash(local);
+        baselineCloudAt='';
+        baselineCloudHash='';
+        saveMeta();
         setStatus('クラウド未登録');
         return false;
       }
-
-      const m=meta();
-      const local=snap();
-      const localHash=hash(local);
-      const cloudHash=hash(row.payload||{});
-
-      // Never overwrite unsynced local edits just because the page was refreshed.
-      if(m.dirty){
-        const base=Date.parse(m.baseCloudUpdatedAt||0)||0;
-        const remote=Date.parse(row.updated_at||0)||0;
-        if(remote>base && cloudHash!==m.lastCloudHash){
-          setStatus('競合あり：今すぐ同期で確認してください','err');
-          return false;
+      const ch=hash(row.payload||{});
+      if(ch!==baselineCloudHash || row.updated_at!==baselineCloudAt){
+        // If the actual payload is different, receive it.
+        if(ch!==hash(snapshot())){
+          applyRemote(row);
+          setStatus('受信済み '+new Date(row.updated_at).toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit',second:'2-digit'}),'ok');
+        }else{
+          baselineCloudAt=row.updated_at||'';
+          baselineCloudHash=ch;
+          saveMeta();
+          setStatus('最新です','ok');
         }
-        return false;
-      }
-
-      if(localHash!==cloudHash){
-        applyRemote(row);
-        setStatus('受信済み '+new Date(row.updated_at).toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit',second:'2-digit'}),'ok');
         return true;
       }
-
-      baselineHash=localHash;
-      m.lastCloudUpdatedAt=row.updated_at||m.lastCloudUpdatedAt||'';
-      m.lastCloudHash=cloudHash;
-      m.baseCloudUpdatedAt=m.lastCloudUpdatedAt;
-      m.dirty=false;
-      setMeta(m);
       setStatus('最新です','ok');
       return false;
     }catch(e){
-      setStatus('オフライン / 再試行待ち','err');
+      setStatus('通信エラー / 再試行待ち','err');
       return false;
     }finally{
       busy=false;
     }
   }
 
-  async function push(reason='change'){
+  async function push(){
     const c=cfg();
     if(!c.url||!c.key||!c.userId){setStatus('未設定');return false}
-    if(busy){schedulePush(500);return false}
+    if(busy){schedulePush(400);return false}
+    if(!localDirty)return pull();
     busy=true;
     try{
-      const local=snap(), localHash=hash(local), m=meta();
-      if(localHash===baselineHash && !m.dirty){
-        setStatus('最新です','ok');
-        return true;
-      }
+      const row=await readCloud(c);
 
-      let row=null;
-      try{row=await readCloud(c)}catch(e){}
+      // Baseline check: another device changed cloud after this device last received/sent.
       if(row){
-        const remoteTime=Date.parse(row.updated_at||0)||0;
-        const baseTime=Date.parse(m.baseCloudUpdatedAt||m.lastCloudUpdatedAt||0)||0;
-        const cloudHash=hash(row.payload||{});
+        const remoteHash=hash(row.payload||{});
+        const remoteAt=row.updated_at||'';
+        const cloudChangedSinceBaseline =
+          baselineCloudHash && (remoteHash!==baselineCloudHash || remoteAt!==baselineCloudAt);
 
-        // Another device changed the cloud after this device's last known version.
-        // Do not destroy either side automatically.
-        if(remoteTime>baseTime && cloudHash!==m.lastCloudHash){
-          setStatus('競合あり：他端末の変更を保護しました','err');
+        if(cloudChangedSinceBaseline){
+          // Never destroy either side. Keep local edit and warn; user can refresh/pull manually if needed.
+          setStatus('他端末の更新を検出。自動上書きを停止しました','err');
           return false;
         }
+      }else if(baselineCloudHash){
+        setStatus('クラウド状態が変わったため自動保存を停止しました','err');
+        return false;
       }
 
-      await writeCloud(c,local);
+      await writeCloud(c,snapshot());
       return true;
     }catch(e){
-      const m=meta();m.dirty=true;setMeta(m);
       setStatus('通信待ち（端末内には保存済み）','err');
       return false;
     }finally{
@@ -3073,85 +3064,91 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
     }
   }
 
-  function markUserChange(){
-    if(!initialized||applyingRemote)return;
-    setTimeout(()=>{
-      if(applyingRemote)return;
-      const h=hash(snap());
-      if(h===baselineHash)return;
-      const m=meta();
-      if(!m.dirty){
-        m.baseCloudUpdatedAt=m.lastCloudUpdatedAt||'';
-      }
-      m.dirty=true;
-      setMeta(m);
-      setStatus('変更を保存中…');
-      schedulePush(800);
-    },80);
-  }
-
-  function schedulePush(ms=800){
+  function schedulePush(ms=250){
     clearTimeout(timer);
-    timer=setTimeout(()=>push('auto'),ms);
+    timer=setTimeout(()=>push(),ms);
   }
 
-  // Only genuine user operations mark the device dirty.
-  // This avoids page load/render/save() from uploading stale data.
-  ['click','change','input'].forEach(type=>{
-    document.addEventListener(type,e=>{
-      if(e.target && e.target.closest && e.target.closest('#sync-panel'))return;
-      markUserChange();
-    },true);
-  });
+  window.shinyMarkDirtyAndSync=()=>{
+    if(!initialized||applyingRemote)return;
+    localDirty=true;
+    saveMeta();
+    setStatus('変更を保存中…');
+    schedulePush(250);
+  };
+
+  window.shinyAutoSyncNow=async()=>{
+    if(localDirty)return push();
+    return pull();
+  };
 
   async function init(){
     const c=cfg();
-    if(!c.url||!c.key||!c.userId){setStatus('未設定');initialized=true;baselineHash=hash(snap());return}
-    setStatus('起動時確認中…');
-    await pull('startup');
-    baselineHash=hash(snap());
+    if(!c.url||!c.key||!c.userId){
+      initialized=true;
+      setStatus('未設定');
+      return;
+    }
+    setStatus('起動時にクラウド確認中…');
+    try{
+      const row=await readCloud(c);
+      if(row){
+        const localHash=hash(snapshot());
+        const cloudHash=hash(row.payload||{});
+        // On page load, cloud is authoritative. This prevents an old phone refresh from uploading stale data.
+        if(localHash!==cloudHash)applyRemote(row);
+        else{
+          baselineCloudAt=row.updated_at||'';
+          baselineCloudHash=cloudHash;
+          localDirty=false;
+          saveMeta();
+        }
+        setStatus('最新です','ok');
+      }else{
+        baselineCloudAt='';
+        baselineCloudHash='';
+        localDirty=false;
+        saveMeta();
+        setStatus('クラウド未登録');
+      }
+    }catch(e){
+      setStatus('起動時のクラウド確認に失敗','err');
+    }
     initialized=true;
   }
 
   document.addEventListener('visibilitychange',()=>{
-    if(document.visibilityState==='visible')pull('resume');
+    if(document.visibilityState==='visible'&&!localDirty)pull();
   });
-  window.addEventListener('focus',()=>pull('focus'));
-  window.addEventListener('online',async()=>{
-    setStatus('通信復帰・確認中…');
-    const m=meta();
-    if(m.dirty)await push('online'); else await pull('online');
+  window.addEventListener('focus',()=>{if(!localDirty)pull()});
+  window.addEventListener('online',()=>{localDirty?push():pull()});
+
+  // Receiver side: near-real-time enough for PC/iPhone use.
+  setInterval(()=>{if(document.visibilityState==='visible'&&!localDirty)pull()},2000);
+
+  // Explicit user changes outside the mobile counter also become dirty.
+  ['change','input'].forEach(type=>{
+    document.addEventListener(type,e=>{
+      if(!initialized||applyingRemote)return;
+      if(e.target && e.target.closest && e.target.closest('#sync-panel'))return;
+      setTimeout(()=>{
+        if(!applyingRemote){
+          localDirty=true;
+          saveMeta();
+          schedulePush(350);
+        }
+      },50);
+    },true);
   });
-  setInterval(()=>{if(document.visibilityState==='visible')pull('poll')},3000);
 
   function bindManual(){
     const up=$('cloud-upload');
     if(up){
       const clone=up.cloneNode(true);
       up.replaceWith(clone);
-      clone.addEventListener('click',async()=>{
-        const m=meta();
-        if(m.dirty) await push('manual');
-        else await pull('manual');
-      });
+      clone.addEventListener('click',()=>window.shinyAutoSyncNow());
     }
   }
-
-  window.shinyMarkDirtyAndSync=()=>{
-    if(applyingRemote)return;
-    const m=meta();
-    if(!m.dirty)m.baseCloudUpdatedAt=m.lastCloudUpdatedAt||'';
-    m.dirty=true;
-    setMeta(m);
-    setStatus('変更を保存中…');
-    schedulePush(250);
-  };
-
-  window.shinyAutoSyncNow=async()=>{
-    const m=meta();
-    if(m.dirty)return push('manual');
-    return pull('manual');
-  };
 
   if(document.readyState==='loading'){
     document.addEventListener('DOMContentLoaded',()=>{bindManual();init()},{once:true});
@@ -3159,8 +3156,6 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
     bindManual();init();
   }
 })();
-
-
 
 function requestAutoSyncAfterDataChange(){
   try{
