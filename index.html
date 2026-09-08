@@ -810,7 +810,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
     <div class="extra-panel">
       <div class="extra-head">
         <div><h2 style="margin:0">☁️ Supabase 同期</h2>
-        <span class="section-count">PC・iPhoneで同じデータを共有</span></div>
+        <span class="section-count">PC・iPhoneで同じデータを共有 ・ build v56</span></div>
       </div>
       <div class="sync-fields">
         <label>Supabase URL<input id="supabase-url" autocomplete="off" placeholder="https://xxxx.supabase.co"></label>
@@ -830,7 +830,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 </section>
 
 <script>
-const DATA_VERSION='full-2026-09-08-v55';
+const DATA_VERSION='full-2026-09-08-v56';
 const SPECIES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species.csv';
 const NAMES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
 const MAX_DEX=1025;
@@ -2635,9 +2635,7 @@ for(const g of gameOptions.filter(Boolean)){const o=document.createElement('opti
 })();
 
 
-if('serviceWorker' in navigator && location.protocol!=='file:'){
-  window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js').catch(console.warn));
-}
+
 
 window.addEventListener('resize',applyMobileMode);
 window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
@@ -2748,6 +2746,61 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',bind);
   else bind();
   window.renderCloudSettingsV55=fill;
+})();
+
+
+// ===== v56 automatic update / cache repair =====
+(function(){
+  const APP_VERSION='v56';
+  const UPDATE_KEY='shinyHomeReloadedForSW_'+APP_VERSION;
+
+  async function registerFreshWorker(){
+    if(!('serviceWorker' in navigator) || location.protocol==='file:') return;
+    try{
+      const reg = await navigator.serviceWorker.register(
+        './service-worker.js?v=56',
+        {updateViaCache:'none'}
+      );
+
+      // Always ask GitHub Pages for a fresh SW script.
+      try{ await reg.update(); }catch(_){}
+
+      // If a new worker is already waiting, activate it now.
+      if(reg.waiting) reg.waiting.postMessage({type:'SKIP_WAITING'});
+
+      reg.addEventListener('updatefound',()=>{
+        const nw=reg.installing;
+        if(!nw) return;
+        nw.addEventListener('statechange',()=>{
+          if(nw.state==='installed' && navigator.serviceWorker.controller){
+            nw.postMessage({type:'SKIP_WAITING'});
+          }
+        });
+      });
+
+      navigator.serviceWorker.addEventListener('controllerchange',()=>{
+        if(sessionStorage.getItem(UPDATE_KEY)) return;
+        sessionStorage.setItem(UPDATE_KEY,'1');
+        location.reload();
+      });
+    }catch(e){
+      console.warn('Service Worker update failed',e);
+    }
+  }
+
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',registerFreshWorker,{once:true});
+  }else{
+    registerFreshWorker();
+  }
+
+  // When returning to the app after it has been in the background,
+  // ask for updates again. Useful for iPhone home-screen/PWA usage.
+  document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState==='visible' && 'serviceWorker' in navigator){
+      navigator.serviceWorker.getRegistration().then(r=>r?.update()).catch(()=>{});
+    }
+  });
 })();
 
 </script>
