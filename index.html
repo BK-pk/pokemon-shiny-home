@@ -503,7 +503,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
   -webkit-tap-highlight-color:transparent;
 }
 
-/* ===== v78 hunt UX / dashboard / drag / offline ===== */
+/* ===== v80 hunt UX / dashboard / drag / offline ===== */
 .hunt-progress-strip{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:2px}
 .hunt-mini-stat{background:#091522;border:1px solid #263c53;border-radius:10px;padding:8px 10px}.hunt-mini-stat span{display:block;color:var(--muted);font-size:9px;margin-bottom:2px}.hunt-mini-stat strong{font-size:13px;color:#eef7ff}.hunt-mini-stat.prob strong{color:var(--gold)}
 .drag-handle{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border:1px solid #36516d;border-radius:9px;color:#9db5c9;cursor:grab;user-select:none;touch-action:none;background:#0b1b2b;font-size:17px}.drag-handle:active{cursor:grabbing}.hunt-chip.dragging,.mobile-hunt-card.dragging{opacity:.62;outline:2px solid var(--cyan);transform:scale(.99)}
@@ -559,7 +559,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
   </div>
 
   <div id="mobile-active-hunt" class="mobile-active-hunt" style="display:none">
-    <div id="mobile-sync-status" class="mobile-hunt-meta" style="text-align:center;margin:4px 0 8px">☁️ 端末内に保存済み ・ v78</div>
+    <div id="mobile-sync-status" class="mobile-hunt-meta" style="text-align:center;margin:4px 0 8px">☁️ 端末内に保存済み ・ v80</div>
     <div id="mobile-multi-hunt-list" class="mobile-hunt-list"></div>
     <button id="mobile-multi-add" class="btn" type="button">＋ 厳選を追加</button>
   </div>
@@ -600,11 +600,6 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 <div class="sidepanel"><div class="stat"><span>全国図鑑</span><strong id="normalStat">0.0%</strong><div class="statdetail" id="normalDetail">0 / 0</div></div><div class="stat"><span>リージョン</span><strong id="regionStat">0.0%</strong><div class="statdetail" id="regionDetail">0 / 0</div></div><div class="stat"><span>オス・メス違い</span><strong id="genderStat">0.0%</strong><div class="statdetail" id="genderDetail">0 / 0</div></div><div class="stat"><span>その他の姿違い</span><strong id="formStat">0.0%</strong><div class="statdetail" id="formDetail">0 / 0</div></div><div class="stat"><span>キョダイマックス</span><strong id="gmaxStat">0.0%</strong><div class="statdetail" id="gmaxDetail">0 / 0</div></div><div class="stat"><span>色違い未解禁</span><strong id="lockedStat">0</strong><div class="statdetail">％計算対象外</div></div></div>
 </section><div class="collection-goals" id="collection-goals"></div><div class="genpanel"><div class="genstat"><span>第1世代</span><strong id="gen1Stat">0.0%</strong><small id="gen1Detail">0 / 0</small></div><div class="genstat"><span>第2世代</span><strong id="gen2Stat">0.0%</strong><small id="gen2Detail">0 / 0</small></div><div class="genstat"><span>第3世代</span><strong id="gen3Stat">0.0%</strong><small id="gen3Detail">0 / 0</small></div><div class="genstat"><span>第4世代</span><strong id="gen4Stat">0.0%</strong><small id="gen4Detail">0 / 0</small></div><div class="genstat"><span>第5世代</span><strong id="gen5Stat">0.0%</strong><small id="gen5Detail">0 / 0</small></div><div class="genstat"><span>第6世代</span><strong id="gen6Stat">0.0%</strong><small id="gen6Detail">0 / 0</small></div><div class="genstat"><span>第7世代</span><strong id="gen7Stat">0.0%</strong><small id="gen7Detail">0 / 0</small></div><div class="genstat"><span>第8世代</span><strong id="gen8Stat">0.0%</strong><small id="gen8Detail">0 / 0</small></div><div class="genstat"><span>第9世代</span><strong id="gen9Stat">0.0%</strong><small id="gen9Detail">0 / 0</small></div></div><div class="dashboard-title"><h3>📊 進捗ダッシュボード</h3><span>カテゴリ別の所持率をひと目で確認</span></div><div class="dashboard2"><div class="dashcard"><span>全国図鑑</span><strong id="dashBase">0.0%</strong><div class="statdetail" id="dashBaseDetail">0 / 0</div></div><div class="dashcard"><span>リージョン</span><strong id="dashRegion">0.0%</strong><div class="statdetail" id="dashRegionDetail">0 / 0</div></div><div class="dashcard"><span>オス・メス違い</span><strong id="dashGender">0.0%</strong><div class="statdetail" id="dashGenderDetail">0 / 0</div></div><div class="dashcard"><span>その他の姿違い</span><strong id="dashForms">0.0%</strong><div class="statdetail" id="dashFormsDetail">0 / 0</div></div><div class="dashcard"><span>色違い総個体数</span><strong id="dashIndividuals">0</strong><div class="statdetail">重複個体を含む</div></div></div><div class="current-hunt"><div class="current-hunt-head"><h3>🎯 今厳選しているポケモン</h3><span>カードの「次に狙う」で登録</span></div><div class="current-hunt-list" id="currentHunt"></div></div><div class="software-panel"><div class="software-head"><h3>入手ソフト別 色違い個体数</h3><span class="section-count">登録済み個体のみ集計</span></div><div class="software-grid" id="softwareStats"></div></div>
 <div class="toolbar"><input id="search" placeholder="🔎 ポケモン名 / No. / フォルムを検索"/><select id="generation"><option value="all">全世代</option><option value="1">第1世代</option><option value="2">第2世代</option><option value="3">第3世代</option><option value="4">第4世代</option><option value="5">第5世代</option><option value="6">第6世代</option><option value="7">第7世代</option><option value="8">第8世代</option><option value="9">第9世代</option></select><select id="typeFilter"><option value="all">すべての種類</option><option value="normal">基本個体</option><option value="region">リージョン</option><option value="gender">オス・メス違い</option><option value="form">その他の姿違い</option><option value="gmax">キョダイマックス</option><option value="locked">色違い未解禁</option></select><select id="sort"><option value="no">全国図鑑順</option><option value="missing">未所持優先</option><option value="owned">所持済み優先</option></select><label class="toggle"><input id="missingOnly" style="width:auto" type="checkbox"/>未所持のみ</label></div><div class="filter2"><select id="regionFormFilter"><option value="all">全地方フォーム</option><option value="アローラ">アローラ</option><option value="ガラル">ガラル</option><option value="ヒスイ">ヒスイ</option><option value="パルデア">パルデア</option></select><select id="gameFilter"><option value="all">全入手ソフト</option></select><select id="sourceFilter"><option value="all">全入手区分</option><option value="自己産">自己産</option><option value="交換">交換</option><option value="配布">配布</option><option value="その他">その他</option></select><select id="ballFilter"><option value="all">全ボール</option></select><label class="toggle"><input id="targetOnly" style="width:auto" type="checkbox"/>🎯 次に狙うのみ</label></div><div class="section-title"><h2>色違いコレクション</h2></div><div class="empty" id="loading" style="padding:34px">全ポケモンデータを読み込んでいます…</div><main id="grid"></main><details class="extra-panel" open="">
-<summary><img alt="" class="panel-poke-icon" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/137.png"/> HOME BOX一覧</summary>
-<div class="extra-head"><span class="section-count">登録したHOME BOXごとの個体数</span></div>
-<div class="box-grid" id="home-box-grid"></div>
-<div class="calendar-detail" id="home-box-detail" style="display:none"></div>
-</details><details class="extra-panel" open="">
 <summary><img alt="" class="panel-poke-icon" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/83.png"/> 個体検索</summary>
 <div class="extra-head"><span class="section-count">ポケモン名・ゲーム・ボール・厳選方法・メモ・回数で検索</span></div>
 <div class="game-image-controls">
@@ -817,7 +812,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
     <div class="extra-panel">
       <div class="extra-head">
         <div><h2 style="margin:0">☁️ Supabase 同期</h2>
-        <span class="section-count">PC・iPhoneで同じデータを共有 ・ build v78</span></div>
+        <span class="section-count">PC・iPhoneで同じデータを共有 ・ build v80</span></div>
       </div>
       <div class="sync-fields">
         <label>Supabase URL<input id="supabase-url" autocomplete="off" placeholder="https://xxxx.supabase.co"></label>
@@ -832,9 +827,9 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
         <button class="btn" id="cloud-check" type="button">クラウド確認</button>
       </div>
       <div id="cloud-status" class="home-help">未設定です。</div>
-      <div id="auto-sync-status" class="home-help" style="margin-top:8px">同期：v78 外出向け省通信</div><div id="network-status" class="net-pill">● 通信状態を確認中</div>
+      <div id="auto-sync-status" class="home-help" style="margin-top:8px">同期：v80 外出向け省通信</div><div id="network-status" class="net-pill">● 通信状態を確認中</div>
       <div class="home-help" style="margin-top:8px">
-        v78ではカウンター操作中は通信せず端末内へ即保存します。10秒操作がなければクラウドへ保存し、他端末は最新時刻の値だけを取り込みます。所持状況・HOME BOXなどのフルデータは上のボタンで手動同期します。
+        v80ではカウンター操作中は通信せず端末内へ即保存します。10秒操作がなければクラウドへ保存し、他端末は最新時刻の値だけを取り込みます。所持状況・HOME BOXなどのフルデータは上のボタンで手動同期します。
       </div>
       <div class="home-help" style="margin-top:10px">初回は「設定保存」→「接続テスト」の順に確認してください。既存データがある場合、確認前にクラウドへ保存しないでください。</div>
     </div>
@@ -842,7 +837,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 </section>
 
 <script>
-const DATA_VERSION='full-2026-09-09-v78';
+const DATA_VERSION='full-2026-09-09-v80';
 const SPECIES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species.csv';
 const NAMES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
 const MAX_DEX=1025;
@@ -1151,6 +1146,29 @@ function individualBadges(id,uid){
   }
   return badges;
 }
+// v80: keep individual editors open across collection rerenders.
+// This prevents the newly added editor from disappearing after saving fields
+// or after another panel/stat refresh.
+const openIndividualPanels=new Set();
+let pendingIndividualFocus=null;
+function restoreOpenIndividualPanels(){
+  for(const id of [...openIndividualPanels]){
+    const d=el('inds-'+encodeURIComponent(id));
+    if(d)d.classList.add('open');
+  }
+  if(pendingIndividualFocus){
+    const {id,uid}=pendingIndividualFocus;
+    const d=el('inds-'+encodeURIComponent(id));
+    if(d){
+      d.classList.add('open');
+      requestAnimationFrame(()=>{
+        const target=d.querySelector(`[data-individual-uid="${window.CSS&&CSS.escape?CSS.escape(uid):uid}"]`);
+        if(target)target.scrollIntoView({block:'nearest',behavior:'smooth'});
+      });
+    }
+    pendingIndividualFocus=null;
+  }
+}
 function individualRowHTML(p,ind,i){
   const ord=duplicateOrdinal(p.id,ind.uid);
   return `<div class="detail-card" data-individual-uid="${esc(ind.uid)}">
@@ -1195,15 +1213,15 @@ function cardHTML(p){
   const inds=individualState[p.id]||[], count=inds.length, targeted=!!targetState[p.id];
   return `<article class="card ${count?'owned':''}" data-id="${esc(p.id)}" style="${p.locked?'opacity:.68;':''}"><div class="sprite" onclick="showPokemonDetail('${esc(p.id)}')"><img loading="lazy" src="${spriteURL(p)}" alt="" onerror="if(!this.dataset.fallback){this.dataset.fallback='1';this.src='${baseSpriteURL(p)}'}else{this.style.display='none'}"></div><div><div class="number">No.${String(p.no).padStart(4,'0')} · GEN ${p.gen}</div><div class="name" onclick="showPokemonDetail('${esc(p.id)}')">${esc(p.name)} ${hasRecentIndividual(p.id,7)?'<span class="new-badge">NEW</span>':''}</div>${targeted?'<div class="tags"><span class="tag target-tag">🎯 次に狙う</span></div>':''}${ownedBallIcons(p.id)}</div>${p.locked?'':`<div class="individual-summary"><div class="individual-head"><span class="countbadge">${count?`✓ ${count}匹所持`:'未所持'}</span><div><button class="target-btn ${targeted?'active':''}" onclick="toggleTarget('${esc(p.id)}')">🎯 ${targeted?'厳選中':'厳選する'}</button> <button class="smallbtn" onclick="addIndividual('${esc(p.id)}')">＋ 個体を追加</button>${count?` <button class="smallbtn" onclick="toggleIndividuals('${esc(p.id)}')">個体一覧</button>`:''}</div></div><div class="individuals" id="inds-${encodeURIComponent(p.id)}">${inds.map((ind,i)=>individualRowHTML(p,ind,i)).join('')}</div></div>`}${p.locked?'<div class="individual-summary"><span class="countbadge">🔒 色違い未解禁</span></div>':''}</article>`;
 }
-window.addIndividual=id=>{if(!Array.isArray(individualState[id]))individualState[id]=[];individualState[id].push(newIndividual());syncOwned(id);render();setTimeout(()=>{const d=el('inds-'+encodeURIComponent(id));if(d)d.classList.add('open')},0)};
-window.deleteIndividual=(id,i)=>{if(!individualState[id])return;individualState[id].splice(i,1);syncOwned(id);render()};
-window.setIndividual=(id,i,key,val)=>{if(!individualState[id]||!individualState[id][i])return;individualState[id][i][key]=val;syncOwned(id);renderExtraPanels()};
+window.addIndividual=id=>{if(!Array.isArray(individualState[id]))individualState[id]=[];const ind=newIndividual();individualState[id].push(ind);openIndividualPanels.add(id);pendingIndividualFocus={id,uid:ind.uid};syncOwned(id);render()};
+window.deleteIndividual=(id,i)=>{if(!individualState[id])return;individualState[id].splice(i,1);if(!individualState[id].length)openIndividualPanels.delete(id);syncOwned(id);render()};
+window.setIndividual=(id,i,key,val)=>{if(!individualState[id]||!individualState[id][i])return;individualState[id][i][key]=val;openIndividualPanels.add(id);syncOwned(id);renderExtraPanels()};
 window.toggleTarget=id=>{
   targetState[id]=!targetState[id];
   if(targetState[id]&&!huntState[id]) huntState[id]={count:0,start:new Date().toISOString().slice(0,10),method:'',ball:'',game:'',charm:'',outbreak:'0',sparkling:'0',daily:{}}; else if(targetState[id]&&!huntState[id].start) huntState[id].start=new Date().toISOString().slice(0,10);
   save();requestAutoSyncAfterDataChange();render();
 };
-window.toggleIndividuals=id=>{const d=el('inds-'+encodeURIComponent(id));if(d)d.classList.toggle('open')};
+window.toggleIndividuals=id=>{const d=el('inds-'+encodeURIComponent(id));if(!d)return;const willOpen=!d.classList.contains('open');d.classList.toggle('open',willOpen);if(willOpen)openIndividualPanels.add(id);else openIndividualPanels.delete(id)};
 function render(){
   const q=el('search').value.trim().toLowerCase(),g=el('generation').value,k=el('typeFilter').value,miss=el('missingOnly').checked,sort=el('sort').value,regionForm=el('regionFormFilter')?.value||'all',game=el('gameFilter').value,source=el('sourceFilter').value,ball=el('ballFilter').value,target=el('targetOnly').checked;
   let rows=data.filter(p=>{const inds=individualState[p.id]||[];return (!q||`${p.no} ${p.name} ${p.en} ${p.form} ${p.gender}`.toLowerCase().includes(q))&&(g==='all'||String(p.gen)===g)&&(k==='all'||(k==='locked'?p.locked:(k==='normal'?p.section==='base':p.baseKind===k)))&&(regionForm==='all'||(p.form||'').includes(regionForm))&&(!miss||(!p.locked&&!ownedCountFor(p.id)))&&(game==='all'||inds.some(x=>x.game===game))&&(source==='all'||inds.some(x=>x.source===source))&&(ball==='all'||inds.some(x=>x.ball===ball))&&(!target||!!targetState[p.id]);});
@@ -1228,6 +1246,7 @@ function render(){
     return `<section class="collection-section"><div class="section-title"><div><h2>${title}</h2><span>${desc}</span></div><span class="section-count">${(()=>{const all=data.filter(p=>!p.locked&&p.section===key),have=all.filter(p=>ownedCountFor(p.id)>0).length,left=all.length-have;return left===0&&all.length?`${have}/${all.length} <span class="complete-chip">COMPLETE ✨</span>`:`${have}/${all.length} ・ あと${left}匹`})()}</span></div><div class="grid">${group.map(cardHTML).join('')}</div></section>`;
   }).join('');
   el('grid').innerHTML=html||'<div class="empty">条件に一致するポケモンがいません</div>';
+  restoreOpenIndividualPanels();
   updateStats(rows.length);
   renderCurrentHunt();
 }
@@ -1276,7 +1295,8 @@ function setManualHuntCount(id,uid,val){
   const ind=arr.find(x=>x.uid===uid);
   if(!ind)return;
   ind.huntCount=Math.max(0,Number(val)||0);
-  save();requestAutoSyncAfterDataChange();render();renderExtraPanels();
+  openIndividualPanels.add(id);
+  save();requestAutoSyncAfterDataChange();renderExtraPanels();
 }
 function screenshotKey(id,uid){return `${id}::${uid}`}
 function individualScreenshot(id,uid){return individualScreenshots[screenshotKey(id,uid)]||''}
@@ -2877,7 +2897,7 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 // ===== v56 automatic update / cache repair =====
 (function(){
-  const APP_VERSION='v78';
+  const APP_VERSION='v80';
   const UPDATE_KEY='shinyHomeReloadedForSW_'+APP_VERSION;
 
   async function registerFreshWorker(){
@@ -2931,7 +2951,7 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 
 
-// ===== v78 travel sync: local-first + hunt-session cloud sync =====
+// ===== v80 travel sync: local-first + hunt-session cloud sync =====
 (function(){
   const CLOUD_KEY='shinyHomeCloudSettings_v2', COUNTER_TABLE='shiny_home_hunt_counters';
   const EDIT_KEY='shinyHomeCounterLocalEdits_v1', SYNC_KEY='shinyHomeCounterLastSync_v1';
@@ -2940,7 +2960,7 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
   function cfg(){const fallback={url:'https://litkisamojglstbjwloo.supabase.co',key:'sb_publishable_pc-8E8ETM6yZ3OcB1cNkjA_OzVjc-Rh',userId:'pokemon-shiny-home'};try{return {...fallback,...(JSON.parse(localStorage.getItem(CLOUD_KEY)||localStorage.getItem('shinyHomeCloudSettings_v1')||'{}')||{})}}catch{return fallback}}
   function headers(c){return {apikey:c.key,Authorization:'Bearer '+c.key,'Content-Type':'application/json'}}
   function readMap(k){try{return JSON.parse(localStorage.getItem(k)||'{}')||{}}catch{return {}}} function writeMap(k,o){try{localStorage.setItem(k,JSON.stringify(o))}catch(_){}}
-  function setStatus(msg,kind){const e=$('auto-sync-status');if(e){e.textContent='同期：'+msg;e.style.color=kind==='ok'?'#8fe6b0':kind==='err'?'#ff9c9c':''}const m=$('mobile-sync-status');if(m){m.textContent='☁️ '+msg+' ・ v78';m.style.color=kind==='ok'?'#8fe6b0':kind==='err'?'#ff9c9c':''}}
+  function setStatus(msg,kind){const e=$('auto-sync-status');if(e){e.textContent='同期：'+msg;e.style.color=kind==='ok'?'#8fe6b0':kind==='err'?'#ff9c9c':''}const m=$('mobile-sync-status');if(m){m.textContent='☁️ '+msg+' ・ v80';m.style.color=kind==='ok'?'#8fe6b0':kind==='err'?'#ff9c9c':''}}
   function hunts(){try{return typeof huntState==='object'&&huntState?huntState:JSON.parse(localStorage.getItem('shinyHomeHunts_v1')||'{}')}catch{return {}}} function targets(){try{return typeof targetState==='object'&&targetState?targetState:JSON.parse(localStorage.getItem('shinyHomeTargets_v1')||'{}')}catch{return {}}}
   function persist(h,t){localStorage.setItem('shinyHomeHunts_v1',JSON.stringify(h));localStorage.setItem('shinyHomeTargets_v1',JSON.stringify(t));try{if(typeof save==='function')save()}catch(_){}}
   function markEdit(id,at){const m=readMap(EDIT_KEY);m[id]=at;writeMap(EDIT_KEY,m)} function editAt(id){return Number(readMap(EDIT_KEY)[id]||0)||0} function markSync(id,at){const m=readMap(SYNC_KEY);m[id]=at;writeMap(SYNC_KEY,m)}
