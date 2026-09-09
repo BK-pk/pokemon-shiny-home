@@ -851,7 +851,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 </section>
 
 <script>
-const DATA_VERSION='full-2026-09-09-v101';
+const DATA_VERSION='full-2026-09-09-v102';
 const SPECIES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species.csv';
 const NAMES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
 const MAX_DEX=1025;
@@ -1222,11 +1222,11 @@ function individualRowHTML(p,ind,i){
     </div>
     <div class="detail-fields">
       <div class="detail-field"><label>捕獲日</label><input type="date" value="${esc(ind.date||'')}" oninput="setIndividualLive('${esc(p.id)}',${i},'date',this.value)" onchange="setIndividual('${esc(p.id)}',${i},'date',this.value)"></div>
-      <div class="detail-field"><label>ゲーム</label><select onchange="setIndividual('${esc(p.id)}',${i},'game',this.value)">${gameOptionsHTML(ind.game||'')}</select></div>
-      <div class="detail-field"><label>ボール</label><div class="ball-select-wrap"><img id="ball-${encodeURIComponent(p.id)}-${i}" src="${ballIcon(ind.ball)}" alt=""><select onchange="setIndividual('${esc(p.id)}',${i},'ball',this.value);document.getElementById('ball-${encodeURIComponent(p.id)}-${i}').src=ballIcon(this.value)">${ballOptions(ind.ball)}</select></div></div>
-      <div class="detail-field"><label>厳選方法</label><select onchange="setIndividual('${esc(p.id)}',${i},'huntMethod',this.value)">${huntMethodOptions(ind.huntMethod||'')}</select></div>
+      <div class="detail-field"><label>ゲーム</label><select oninput="setIndividualLive('${esc(p.id)}',${i},'game',this.value)" onchange="setIndividual('${esc(p.id)}',${i},'game',this.value)">${gameOptionsHTML(ind.game||'')}</select></div>
+      <div class="detail-field"><label>ボール</label><div class="ball-select-wrap"><img id="ball-${encodeURIComponent(p.id)}-${i}" src="${ballIcon(ind.ball)}" alt=""><select oninput="setIndividualLive('${esc(p.id)}',${i},'ball',this.value);document.getElementById('ball-${encodeURIComponent(p.id)}-${i}').src=ballIcon(this.value)" onchange="setIndividual('${esc(p.id)}',${i},'ball',this.value);document.getElementById('ball-${encodeURIComponent(p.id)}-${i}').src=ballIcon(this.value)">${ballOptions(ind.ball)}</select></div></div>
+      <div class="detail-field"><label>厳選方法</label><select oninput="setIndividualLive('${esc(p.id)}',${i},'huntMethod',this.value)" onchange="setIndividual('${esc(p.id)}',${i},'huntMethod',this.value)">${huntMethodOptions(ind.huntMethod||'')}</select></div>
       <div class="detail-field"><label>${esc(counterLabel(ind.huntMethod||''))}</label><input type="number" min="0" value="${Number(ind.huntCount||0)}" oninput="setManualHuntCountLive('${esc(p.id)}','${esc(ind.uid)}',this.value)" onchange="setManualHuntCount('${esc(p.id)}','${esc(ind.uid)}',this.value)"></div>
-      <div class="detail-field"><label>入手区分</label><select onchange="setIndividual('${esc(p.id)}',${i},'source',this.value)"><option value="">入手区分</option><option ${ind.source==='自己産'?'selected':''}>自己産</option><option ${ind.source==='交換'?'selected':''}>交換</option><option ${ind.source==='配布'?'selected':''}>配布</option><option ${ind.source==='その他'?'selected':''}>その他</option></select></div>
+      <div class="detail-field"><label>入手区分</label><select oninput="setIndividualLive('${esc(p.id)}',${i},'source',this.value)" onchange="setIndividual('${esc(p.id)}',${i},'source',this.value)"><option value="">入手区分</option><option ${ind.source==='自己産'?'selected':''}>自己産</option><option ${ind.source==='交換'?'selected':''}>交換</option><option ${ind.source==='配布'?'selected':''}>配布</option><option ${ind.source==='その他'?'selected':''}>その他</option></select></div>
       <div class="detail-field"><label>開始日</label><input type="date" value="${esc(ind.huntStart||'')}" oninput="setIndividualLive('${esc(p.id)}',${i},'huntStart',this.value)" onchange="setIndividual('${esc(p.id)}',${i},'huntStart',this.value)"></div>
     </div>
     <div class="ind-shot-wrap">
@@ -1309,7 +1309,7 @@ window.setManualHuntCountLive=(id,uid,val)=>{
   ind.huntCount=Math.max(0,Number(val)||0);openIndividualPanels.add(id);
   safeLocalSet('shinyHomeIndividuals_v1',JSON.stringify(individualState));
 };
-window.addEventListener('beforeunload',()=>{
+function persistLiveFieldsNow(){
   try{
     safeLocalSet('shinyHomeState_v1',JSON.stringify(state));
     safeLocalSet('shinyHomeBoxes_v1',JSON.stringify(boxState));
@@ -1319,7 +1319,10 @@ window.addEventListener('beforeunload',()=>{
     safeLocalSet('shinyHomeTargets_v1',JSON.stringify(targetState));
     safeLocalSet('shinyHomeHunts_v1',JSON.stringify(huntState));
   }catch(_){ }
-});
+}
+window.addEventListener('beforeunload',persistLiveFieldsNow);
+window.addEventListener('pagehide',persistLiveFieldsNow);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')persistLiveFieldsNow()});
 
 window.toggleTarget=id=>{
   targetState[id]=!targetState[id];
@@ -3111,7 +3114,7 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 // ===== v56 automatic update / cache repair =====
 (function(){
-  const APP_VERSION='v101';
+  const APP_VERSION='v102';
   const UPDATE_KEY='shinyHomeReloadedForSW_'+APP_VERSION;
 
   async function registerFreshWorker(){

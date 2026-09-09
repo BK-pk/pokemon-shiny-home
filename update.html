@@ -1,4 +1,4 @@
-<!doctype html><html lang="ja"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Shiny HOME 更新 v101</title><style>body{font-family:system-ui;background:#07111d;color:#eef7ff;display:grid;place-items:center;min-height:100vh;margin:0}div{max-width:600px;padding:24px;text-align:center}button{font-size:18px;padding:14px 22px;border:0;border-radius:12px;background:#2388d8;color:white;font-weight:800;cursor:pointer}button:disabled{opacity:.55;cursor:wait}.sub{font-size:13px;color:#9bb2c7;line-height:1.7}</style><div><h1>Shiny HOME 更新 v101</h1><p id="msg">更新する前に、現在のデータを履歴へバックアップします。</p><p class="sub">最大10世代分の「更新直前」をブラウザ内に保存します。バックアップ作成後にキャッシュだけを更新し、コレクションデータは削除しません。</p><button id="go">更新する</button></div><script>
+<!doctype html><html lang="ja"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Shiny HOME 更新 v102</title><style>body{font-family:system-ui;background:#07111d;color:#eef7ff;display:grid;place-items:center;min-height:100vh;margin:0}div{max-width:600px;padding:24px;text-align:center}button{font-size:18px;padding:14px 22px;border:0;border-radius:12px;background:#2388d8;color:white;font-weight:800;cursor:pointer}button:disabled{opacity:.55;cursor:wait}.sub{font-size:13px;color:#9bb2c7;line-height:1.7}</style><div><h1>Shiny HOME 更新 v102</h1><p id="msg">更新する前に、現在のデータを履歴へバックアップします。</p><p class="sub">最大10世代分の「更新直前」をブラウザ内に保存します。バックアップ作成後にキャッシュだけを更新し、コレクションデータは削除しません。</p><button id="go">更新する</button></div><script>
 const BACKUP_KEY='shinyHomePreUpdateBackup_v1';
 const HISTORY_KEY='shinyHomePreUpdateHistory_v1';
 const CORE_KEYS=['shinyHomeState_v1','shinyHomeBoxes_v1','shinyHomeDates_v1','shinyHomeGames_v1','shinyHomeIndividuals_v1','shinyHomeTargets_v1','shinyHomeHunts_v1','shinyHomeNationalBox_v1','shinyHomeOrder_v1','shinyHomeActiveTab_v1','shinyHomeMobileFocusedHunt_v1'];
@@ -16,10 +16,10 @@ function pushHistory(entry){
 }
 function savePreUpdateBackup(){
   const createdAt=new Date().toISOString(),allKeys=[...CORE_KEYS,...IMAGE_KEYS];
-  const full={schema:2,createdAt,sourceVersion:'v100',targetVersion:'v101',partial:false,values:collect(allKeys)};
+  const full={schema:2,createdAt,sourceVersion:'v100',targetVersion:'v102',partial:false,values:collect(allKeys)};
   try{localStorage.setItem(BACKUP_KEY,JSON.stringify(full));pushHistory(full);return {ok:true,partial:false,count:Object.keys(full.values).length}}
   catch(e){
-    const core={schema:2,createdAt,sourceVersion:'v100',targetVersion:'v101',partial:true,values:collect(CORE_KEYS)};
+    const core={schema:2,createdAt,sourceVersion:'v100',targetVersion:'v102',partial:true,values:collect(CORE_KEYS)};
     try{localStorage.setItem(BACKUP_KEY,JSON.stringify(core));pushHistory(core);return {ok:true,partial:true,count:Object.keys(core.values).length}}
     catch(e2){return {ok:false,error:e2}}
   }
@@ -32,7 +32,7 @@ document.getElementById('go').onclick=async()=>{
   try{
     if('serviceWorker'in navigator){const regs=await navigator.serviceWorker.getRegistrations();await Promise.all(regs.map(x=>x.unregister()))}
     if('caches'in window){const ks=await caches.keys();await Promise.all(ks.map(k=>caches.delete(k)))}
-    m.textContent='更新完了。v101を開きます。';location.replace('./?fresh='+Date.now())
+    m.textContent='更新完了。v102を開きます。';location.replace('./?fresh='+Date.now())
   }catch(e){m.textContent='バックアップは保存済みです。更新処理だけ失敗しました: '+e.message;btn.disabled=false}
 };
 </script></html>
