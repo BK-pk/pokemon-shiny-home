@@ -827,9 +827,9 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
         <button class="btn" id="cloud-check" type="button">クラウド確認</button>
       </div>
       <div id="cloud-status" class="home-help">未設定です。</div>
-      <div id="auto-sync-status" class="home-help" style="margin-top:8px">同期：v84 外出向け省通信</div><div id="network-status" class="net-pill">● 通信状態を確認中</div>
+      <div id="auto-sync-status" class="home-help" style="margin-top:8px">同期：v85 外出向け省通信</div><div id="network-status" class="net-pill">● 通信状態を確認中</div>
       <div class="home-help" style="margin-top:8px">
-        v84では日本語名を専用キャッシュと複数の軽量データ源から復元します。カウンター操作中は通信せず端末内へ即保存し、10秒操作がなければクラウドへ保存します。
+        v85では日本語名を自動再取得し、通信復帰後は画面を開いたまま名前を復元します。カウンター操作中は通信せず端末内へ即保存し、10秒操作がなければクラウドへ保存します。
       </div>
       <div class="home-help" style="margin-top:10px">初回は「設定保存」→「接続テスト」の順に確認してください。既存データがある場合、確認前にクラウドへ保存しないでください。</div>
     </div>
@@ -837,7 +837,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 </section>
 
 <script>
-const DATA_VERSION='full-2026-09-09-v84';
+const DATA_VERSION='full-2026-09-09-v85';
 const SPECIES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species.csv';
 const NAMES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
 const MAX_DEX=1025;
@@ -1012,7 +1012,7 @@ function offlineSpeciesFallback(){
   });
 }
 async function loadSpecies(){
-  // v84: Japanese names are treated as durable app data and cached separately.
+  // v85: Japanese names are treated as durable app data and cached separately.
   // A build update or a temporary PokeAPI failure must never downgrade names to No.0001 etc.
   const stableKey='shinyHomeSpeciesCache_stable_v1';
   const namesKey='shinyHomeJapaneseNames_stable_v1';
@@ -2809,6 +2809,41 @@ el('imageBackupInput').onchange=e=>{
 el('exportBtn').onclick=()=>{const blob=new Blob([JSON.stringify({version:DATA_VERSION,state,boxState,dateState,gameState,individualState,targetState,huntState,monthImages,individualScreenshots},null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='shiny-home-backup.json';a.click();URL.revokeObjectURL(a.href)};
 el('importBtn').onclick=()=>el('fileInput').click();el('fileInput').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);Object.assign(state,d.state||{});Object.assign(boxState,d.boxState||{});Object.assign(dateState,d.dateState||{});Object.assign(gameState,d.gameState||{});if(d.individualState)Object.assign(individualState,d.individualState);if(d.targetState)Object.assign(targetState,d.targetState);if(d.huntState)Object.assign(huntState,d.huntState);if(d.monthImages)Object.assign(monthImages,d.monthImages);if(d.individualScreenshots)Object.assign(individualScreenshots,d.individualScreenshots);ensureLegacyIndividuals();save();render()}catch{alert('バックアップファイルを読み込めませんでした')}};r.readAsText(f)};
 for(const g of gameOptions.filter(Boolean)){const o=document.createElement('option');o.value=g;o.textContent=g;el('gameFilter').appendChild(o);}for(const [slug,name] of BALLS){const o=document.createElement('option');o.value=slug;o.textContent=name;el('ballFilter').appendChild(o);}
+
+let japaneseNameRetryTimer=null;
+let japaneseNameRetryBusy=false;
+function hasJapaneseSpeciesNames(species){
+  return Array.isArray(species)&&species.length>=MAX_DEX&&species.filter(s=>s&&s.name&&!/^No\.\d{4}$/.test(String(s.name))).length>900;
+}
+async function retryJapaneseNames(showMessage=false){
+  if(japaneseNameRetryBusy)return false;
+  japaneseNameRetryBusy=true;
+  const loading=el('loading');
+  if(showMessage&&loading){loading.style.display='block';loading.innerHTML='🔄 ポケモン名を再取得しています…';}
+  try{
+    // Bad placeholder caches are never trusted by loadSpecies(), so simply retry all mirrors.
+    const species=await loadSpecies();
+    if(!hasJapaneseSpeciesNames(species))return false;
+    data=buildData(species);
+    ensureLegacyIndividuals();
+    render();
+    renderExtraPanels();
+    restoreAppTab();
+    if(loading)loading.style.display='none';
+    if(japaneseNameRetryTimer){clearInterval(japaneseNameRetryTimer);japaneseNameRetryTimer=null;}
+    if(showMessage)showToast('ポケモン名を復元しました。');
+    return true;
+  }catch(e){console.warn('日本語名の再取得に失敗',e);return false;}
+  finally{japaneseNameRetryBusy=false;}
+}
+function startJapaneseNameRetry(){
+  if(japaneseNameRetryTimer)return;
+  japaneseNameRetryTimer=setInterval(()=>{if(document.visibilityState==='visible')retryJapaneseNames(false)},12000);
+}
+window.retryJapaneseNames=retryJapaneseNames;
+window.addEventListener('online',()=>setTimeout(()=>retryJapaneseNames(false),500));
+window.addEventListener('focus',()=>{if(data.some(s=>/^No\.\d{4}$/.test(s.name||'')))retryJapaneseNames(false)});
+
 (async()=>{
   try{
     const species=await loadSpecies();
@@ -2819,9 +2854,10 @@ for(const g of gameOptions.filter(Boolean)){const o=document.createElement('opti
     if(loading){
       const offline=species.some(s=>/^No\.\d{4}$/.test(s.name||''));
       if(offline){
-        loading.innerHTML='📱 オフライン表示で起動しました。<br><small>保存済みデータ・HOME BOX・統計は利用できます。ポケモン名と画像は、外部通信できるブラウザで開くと自動表示されます。</small>';
+        loading.innerHTML='📱 ポケモン名データを取得できませんでした。<br><small>画面はそのまま使えます。通信でき次第、自動で日本語名を復元します。</small><br><button class="btn" type="button" style="margin-top:10px" onclick="retryJapaneseNames(true)">🔄 名前データを再取得</button>';
         loading.style.display='block';
         loading.style.marginBottom='18px';
+        startJapaneseNameRetry();
       }else{
         loading.style.display='none';
       }
@@ -2834,7 +2870,7 @@ for(const g of gameOptions.filter(Boolean)){const o=document.createElement('opti
     ensureLegacyIndividuals();
     render();
     const loading=el('loading');
-    if(loading)loading.innerHTML='📱 オフライン表示で起動しました。';
+    if(loading){loading.style.display='block';loading.innerHTML='📱 ポケモン名データを取得できませんでした。<br><button class="btn" type="button" style="margin-top:10px" onclick="retryJapaneseNames(true)">🔄 名前データを再取得</button>';} startJapaneseNameRetry();
   }
 })();
 
