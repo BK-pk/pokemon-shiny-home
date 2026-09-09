@@ -1,28 +1,38 @@
-<!doctype html><html lang="ja"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Shiny HOME 更新 v100</title><style>body{font-family:system-ui;background:#07111d;color:#eef7ff;display:grid;place-items:center;min-height:100vh;margin:0}div{max-width:600px;padding:24px;text-align:center}button{font-size:18px;padding:14px 22px;border:0;border-radius:12px;background:#2388d8;color:white;font-weight:800;cursor:pointer}button:disabled{opacity:.55;cursor:wait}.sub{font-size:13px;color:#9bb2c7;line-height:1.7}</style><div><h1>Shiny HOME 更新 v100</h1><p id="msg">更新する前に、現在のデータを自動で退避します。</p><p class="sub">バックアップ作成後にキャッシュだけを更新します。現在のコレクションデータは削除しません。</p><button id="go">更新する</button></div><script>
+<!doctype html><html lang="ja"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Shiny HOME 更新 v101</title><style>body{font-family:system-ui;background:#07111d;color:#eef7ff;display:grid;place-items:center;min-height:100vh;margin:0}div{max-width:600px;padding:24px;text-align:center}button{font-size:18px;padding:14px 22px;border:0;border-radius:12px;background:#2388d8;color:white;font-weight:800;cursor:pointer}button:disabled{opacity:.55;cursor:wait}.sub{font-size:13px;color:#9bb2c7;line-height:1.7}</style><div><h1>Shiny HOME 更新 v101</h1><p id="msg">更新する前に、現在のデータを履歴へバックアップします。</p><p class="sub">最大10世代分の「更新直前」をブラウザ内に保存します。バックアップ作成後にキャッシュだけを更新し、コレクションデータは削除しません。</p><button id="go">更新する</button></div><script>
 const BACKUP_KEY='shinyHomePreUpdateBackup_v1';
+const HISTORY_KEY='shinyHomePreUpdateHistory_v1';
 const CORE_KEYS=['shinyHomeState_v1','shinyHomeBoxes_v1','shinyHomeDates_v1','shinyHomeGames_v1','shinyHomeIndividuals_v1','shinyHomeTargets_v1','shinyHomeHunts_v1','shinyHomeNationalBox_v1','shinyHomeOrder_v1','shinyHomeActiveTab_v1','shinyHomeMobileFocusedHunt_v1'];
 const IMAGE_KEYS=['shinyHomeMonthImages_v1','shinyHomeIndividualScreenshots_v1'];
 function collect(keys){const values={};for(const k of keys){const v=localStorage.getItem(k);if(v!==null)values[k]=v}return values}
+function getHistory(){try{const a=JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]');return Array.isArray(a)?a:[]}catch(e){return []}}
+function pushHistory(entry){
+  const arr=getHistory();
+  const old=(()=>{try{return JSON.parse(localStorage.getItem(BACKUP_KEY)||'null')}catch(e){return null}})();
+  if(old&&old.values&&!arr.some(x=>x.createdAt===old.createdAt&&x.sourceVersion===old.sourceVersion))arr.push(old);
+  arr.push(entry);
+  const seen=new Set(),dedup=[];
+  for(const x of arr.sort((a,b)=>String(b.createdAt||'').localeCompare(String(a.createdAt||'')))){const k=(x.createdAt||'')+'|'+(x.sourceVersion||'');if(!seen.has(k)){seen.add(k);dedup.push(x)}}
+  localStorage.setItem(HISTORY_KEY,JSON.stringify(dedup.slice(0,10)));
+}
 function savePreUpdateBackup(){
-  const createdAt=new Date().toISOString();
-  const allKeys=[...CORE_KEYS,...IMAGE_KEYS];
-  const full={schema:1,createdAt,sourceVersion:'v99',targetVersion:'v100',partial:false,values:collect(allKeys)};
-  try{localStorage.setItem(BACKUP_KEY,JSON.stringify(full));return {ok:true,partial:false,count:Object.keys(full.values).length}}
+  const createdAt=new Date().toISOString(),allKeys=[...CORE_KEYS,...IMAGE_KEYS];
+  const full={schema:2,createdAt,sourceVersion:'v100',targetVersion:'v101',partial:false,values:collect(allKeys)};
+  try{localStorage.setItem(BACKUP_KEY,JSON.stringify(full));pushHistory(full);return {ok:true,partial:false,count:Object.keys(full.values).length}}
   catch(e){
-    const core={schema:1,createdAt,sourceVersion:'v99',targetVersion:'v100',partial:true,values:collect(CORE_KEYS)};
-    try{localStorage.setItem(BACKUP_KEY,JSON.stringify(core));return {ok:true,partial:true,count:Object.keys(core.values).length}}
+    const core={schema:2,createdAt,sourceVersion:'v100',targetVersion:'v101',partial:true,values:collect(CORE_KEYS)};
+    try{localStorage.setItem(BACKUP_KEY,JSON.stringify(core));pushHistory(core);return {ok:true,partial:true,count:Object.keys(core.values).length}}
     catch(e2){return {ok:false,error:e2}}
   }
 }
 document.getElementById('go').onclick=async()=>{
-  const btn=document.getElementById('go'),m=document.getElementById('msg');btn.disabled=true;m.textContent='更新前バックアップを作成中…';
+  const btn=document.getElementById('go'),m=document.getElementById('msg');btn.disabled=true;m.textContent='v100更新直前バックアップを作成中…';
   const r=savePreUpdateBackup();
   if(!r.ok){m.textContent='バックアップを作成できなかったため、更新を中止しました。空き容量を確認してください。';btn.disabled=false;return}
-  m.textContent=r.partial?'更新前バックアップを作成しました（画像を除く）。更新中…':'更新前バックアップを作成しました。更新中…';
+  m.textContent=r.partial?'履歴へ保存しました（画像を除く）。更新中…':'履歴へ保存しました。更新中…';
   try{
     if('serviceWorker'in navigator){const regs=await navigator.serviceWorker.getRegistrations();await Promise.all(regs.map(x=>x.unregister()))}
     if('caches'in window){const ks=await caches.keys();await Promise.all(ks.map(k=>caches.delete(k)))}
-    m.textContent='更新完了。v100を開きます。';location.replace('./?fresh='+Date.now())
+    m.textContent='更新完了。v101を開きます。';location.replace('./?fresh='+Date.now())
   }catch(e){m.textContent='バックアップは保存済みです。更新処理だけ失敗しました: '+e.message;btn.disabled=false}
 };
 </script></html>

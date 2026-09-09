@@ -577,12 +577,19 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 <button class="btn" id="exportImagesBtn">画像だけ保存</button>
 <button class="btn" id="importImagesBtn">画像だけ読込</button>
 <button class="btn" id="restorePreUpdateBtn" type="button" onclick="restorePreUpdateBackup()">🛟 更新前に戻す</button>
+<button class="btn" id="backupHistoryBtn" type="button" onclick="openBackupHistory()">🗂 履歴</button>
 <input accept="application/json" hidden="" id="fileInput" type="file"/>
 <input accept="application/json" hidden="" id="imageBackupInput" type="file"/>
 </div><div class="undo-bar">
 <button onclick="undoLastChange()" type="button">↶ 1つ前に戻す</button>
 <button onclick="showBackupInfo()" type="button">自動バックアップ</button>
 </div></div>
+<div id="backupHistoryModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.72);padding:20px;overflow:auto" onclick="if(event.target===this)closeBackupHistory()">
+  <div style="max-width:760px;margin:5vh auto;background:#0c1726;border:1px solid #29445d;border-radius:18px;padding:20px;box-shadow:0 20px 70px rgba(0,0,0,.5)">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px"><div><strong style="font-size:20px">🗂 更新前バックアップ履歴</strong><div style="font-size:12px;color:#87a0b8;margin-top:4px">復元したい時点を選べます。復元するまで現在のデータは変更されません。</div></div><button class="btn" type="button" onclick="closeBackupHistory()">閉じる</button></div>
+    <div id="backupHistoryList"></div>
+  </div>
+</div>
 <nav aria-label="画面切り替え" class="app-tabs">
 <button class="app-tab active" data-tab="collection" onclick="switchAppTab('collection',this)" type="button">
 <img alt="" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/25.png"/>色違いコレクション
@@ -844,7 +851,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 </section>
 
 <script>
-const DATA_VERSION='full-2026-09-09-v100';
+const DATA_VERSION='full-2026-09-09-v101';
 const SPECIES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species.csv';
 const NAMES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
 const MAX_DEX=1025;
@@ -2171,6 +2178,39 @@ function captureRecordMessage(count){
 
 
 const PREUPDATE_BACKUP_KEY='shinyHomePreUpdateBackup_v1';
+const PREUPDATE_HISTORY_KEY='shinyHomePreUpdateHistory_v1';
+function getPreUpdateHistory(){
+  try{const a=JSON.parse(localStorage.getItem(PREUPDATE_HISTORY_KEY)||'[]');return Array.isArray(a)?a:[]}catch(e){return []}
+}
+function backupOwnedCount(b){
+  try{const st=JSON.parse((b.values||{}).shinyHomeState_v1||'{}');return Object.values(st).filter(Boolean).length}catch(e){return 0}
+}
+function backupIndividualCount(b){
+  try{const d=JSON.parse((b.values||{}).shinyHomeIndividuals_v1||'{}');return Object.values(d).reduce((n,a)=>n+(Array.isArray(a)?a.length:0),0)}catch(e){return 0}
+}
+function openBackupHistory(){
+  const modal=document.getElementById('backupHistoryModal'),box=document.getElementById('backupHistoryList');if(!modal||!box)return;
+  const arr=getPreUpdateHistory();
+  box.innerHTML=arr.length?arr.map((b,i)=>{
+    const when=b.createdAt?new Date(b.createdAt).toLocaleString('ja-JP'):'日時不明';
+    const owned=backupOwnedCount(b),inds=backupIndividualCount(b);
+    return `<div style="border:1px solid #20364e;background:#091522;border-radius:13px;padding:13px;margin:9px 0;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><div><strong>${esc(b.sourceVersion||'更新前')} 更新直前</strong><div style="font-size:12px;color:#87a0b8;margin-top:4px">${esc(when)} ・ 所持 ${owned} ・ 個体 ${inds}${b.partial?' ・ 画像なし':''}</div></div><button class="btn" type="button" onclick="restoreHistoryBackup(${i})">この時点へ復元</button></div>`;
+  }).join(''):'<div style="padding:28px;text-align:center;color:#87a0b8">更新前バックアップ履歴はまだありません。</div>';
+  modal.style.display='block';
+}
+function closeBackupHistory(){const m=document.getElementById('backupHistoryModal');if(m)m.style.display='none'}
+function restoreHistoryBackup(i){
+  const b=getPreUpdateHistory()[i];if(!b||!b.values){showToast('バックアップを読み込めません。');return}
+  const when=b.createdAt?new Date(b.createdAt).toLocaleString('ja-JP'):'日時不明';
+  if(!confirm(`${b.sourceVersion||'更新前'} 更新直前（${when}）へ戻しますか？\n\n現在のデータはこの操作で置き換わります。`))return;
+  try{
+    backupRestoring=true;
+    const managed=['shinyHomeState_v1','shinyHomeBoxes_v1','shinyHomeDates_v1','shinyHomeGames_v1','shinyHomeIndividuals_v1','shinyHomeTargets_v1','shinyHomeHunts_v1','shinyHomeMonthImages_v1','shinyHomeIndividualScreenshots_v1','shinyHomeNationalBox_v1','shinyHomeOrder_v1','shinyHomeActiveTab_v1','shinyHomeMobileFocusedHunt_v1'];
+    for(const key of managed){if(Object.prototype.hasOwnProperty.call(b.values,key))localStorage.setItem(key,b.values[key]);else if(!b.partial)localStorage.removeItem(key)}
+    backupRestoring=false;location.reload();
+  }catch(e){backupRestoring=false;alert('バックアップを復元できませんでした: '+e.message)}
+}
+
 function getPreUpdateBackup(){
   try{return JSON.parse(localStorage.getItem(PREUPDATE_BACKUP_KEY)||'null')}catch(e){return null}
 }
@@ -3071,7 +3111,7 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 // ===== v56 automatic update / cache repair =====
 (function(){
-  const APP_VERSION='v100';
+  const APP_VERSION='v101';
   const UPDATE_KEY='shinyHomeReloadedForSW_'+APP_VERSION;
 
   async function registerFreshWorker(){
