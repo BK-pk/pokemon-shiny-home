@@ -503,7 +503,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
   -webkit-tap-highlight-color:transparent;
 }
 
-/* ===== v93 hunt UX / dashboard / drag / offline ===== */
+/* ===== v94 hunt UX / dashboard / drag / offline ===== */
 .hunt-progress-strip{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:2px}
 .hunt-mini-stat{background:#091522;border:1px solid #263c53;border-radius:10px;padding:8px 10px}.hunt-mini-stat span{display:block;color:var(--muted);font-size:9px;margin-bottom:2px}.hunt-mini-stat strong{font-size:13px;color:#eef7ff}.hunt-mini-stat.prob strong{color:var(--gold)}
 .drag-handle{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border:1px solid #36516d;border-radius:9px;color:#9db5c9;cursor:grab;user-select:none;touch-action:none;background:#0b1b2b;font-size:17px}.drag-handle:active{cursor:grabbing}.hunt-chip.dragging,.mobile-hunt-card.dragging{opacity:.62;outline:2px solid var(--cyan);transform:scale(.99)}
@@ -559,7 +559,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
   </div>
 
   <div id="mobile-active-hunt" class="mobile-active-hunt" style="display:none">
-    <div id="mobile-sync-status" class="mobile-hunt-meta" style="text-align:center;margin:4px 0 8px">☁️ 端末内に保存済み ・ v93</div>
+    <div id="mobile-sync-status" class="mobile-hunt-meta" style="text-align:center;margin:4px 0 8px">☁️ 端末内に保存済み ・ v94</div>
     <div id="mobile-multi-hunt-list" class="mobile-hunt-list"></div>
     <button id="mobile-multi-add" class="btn" type="button">＋ 厳選を追加</button>
   </div>
@@ -812,7 +812,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
     <div class="extra-panel">
       <div class="extra-head">
         <div><h2 style="margin:0">☁️ Supabase 同期</h2>
-        <span class="section-count">PC・iPhoneで同じデータを共有 ・ build v93</span></div>
+        <span class="section-count">PC・iPhoneで同じデータを共有 ・ build v94</span></div>
       </div>
       <div class="sync-fields">
         <label>Supabase URL<input id="supabase-url" autocomplete="off" placeholder="https://xxxx.supabase.co"></label>
@@ -827,9 +827,9 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
         <button class="btn" id="cloud-check" type="button">クラウド確認</button>
       </div>
       <div id="cloud-status" class="home-help">未設定です。</div>
-      <div id="auto-sync-status" class="home-help" style="margin-top:8px">同期：v93 外出向け省通信</div><div id="network-status" class="net-pill">● 通信状態を確認中</div>
+      <div id="auto-sync-status" class="home-help" style="margin-top:8px">同期：v94 外出向け省通信</div><div id="network-status" class="net-pill">● 通信状態を確認中</div>
       <div class="home-help" style="margin-top:8px">
-        v93ではカウンター操作中は通信せず端末内へ即保存します。10秒操作がなければクラウドへ保存し、他端末は最新時刻の値だけを取り込みます。所持状況・HOME BOXなどのフルデータは上のボタンで手動同期します。
+        v94ではカウンター操作中は通信せず端末内へ即保存します。10秒操作がなければクラウドへ保存し、他端末は最新時刻の値だけを取り込みます。所持状況・HOME BOXなどのフルデータは上のボタンで手動同期します。
       </div>
       <div class="home-help" style="margin-top:10px">初回は「設定保存」→「接続テスト」の順に確認してください。既存データがある場合、確認前にクラウドへ保存しないでください。</div>
     </div>
@@ -837,7 +837,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 </section>
 
 <script>
-const DATA_VERSION='full-2026-09-09-v93';
+const DATA_VERSION='full-2026-09-09-v94';
 const SPECIES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species.csv';
 const NAMES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
 const MAX_DEX=1025;
@@ -854,11 +854,11 @@ const monthImages=JSON.parse(localStorage.getItem('shinyHomeMonthImages_v1')||'{
 const individualScreenshots=JSON.parse(localStorage.getItem('shinyHomeIndividualScreenshots_v1')||'{}');
 const el=id=>document.getElementById(id);
 
-const BALLS=[['','ボール未設定'],['poke-ball','モンスターボール'],['great-ball','スーパーボール'],['ultra-ball','ハイパーボール'],['master-ball','マスターボール'],['premier-ball','プレミアボール'],['luxury-ball','ゴージャスボール'],['heal-ball','ヒールボール'],['net-ball','ネットボール'],['nest-ball','ネストボール'],['dive-ball','ダイブボール'],['dusk-ball','ダークボール'],['quick-ball','クイックボール'],['timer-ball','タイマーボール'],['repeat-ball','リピートボール'],['level-ball','レベルボール'],['lure-ball','ルアーボール'],['moon-ball','ムーンボール'],['friend-ball','フレンドボール'],['love-ball','ラブラブボール'],['heavy-ball','ヘビーボール'],['fast-ball','スピードボール'],['dream-ball','ドリームボール'],['beast-ball','ウルトラボール'],['safari-ball','サファリボール'],['sport-ball','コンペボール'],['park-ball','パークボール'],['cherish-ball','プレシャスボール'],['strange-ball','ストレンジボール']];
+const BALLS=[['','ボール未設定'],['poke-ball','モンスターボール'],['great-ball','スーパーボール'],['ultra-ball','ハイパーボール'],['master-ball','マスターボール'],['premier-ball','プレミアボール'],['luxury-ball','ゴージャスボール'],['heal-ball','ヒールボール'],['net-ball','ネットボール'],['nest-ball','ネストボール'],['dive-ball','ダイブボール'],['dusk-ball','ダークボール'],['quick-ball','クイックボール'],['timer-ball','タイマーボール'],['repeat-ball','リピートボール'],['level-ball','レベルボール'],['lure-ball','ルアーボール'],['moon-ball','ムーンボール'],['friend-ball','フレンドボール'],['love-ball','ラブラブボール'],['heavy-ball','ヘビーボール'],['fast-ball','スピードボール'],['dream-ball','ドリームボール'],['beast-ball','ウルトラボール'],['safari-ball','サファリボール'],['sport-ball','コンペボール'],['park-ball','パークボール'],['cherish-ball','プレシャスボール'],['strange-ball','ストレンジボール'],['la-poke-ball','モンスターボール（ヒスイ）'],['la-great-ball','スーパーボール（ヒスイ）'],['la-ultra-ball','ハイパーボール（ヒスイ）'],['feather-ball','フェザーボール'],['wing-ball','ウイングボール'],['jet-ball','ジェットボール'],['la-heavy-ball','ヘビーボール（ヒスイ）'],['leaden-ball','メガトンボール'],['gigaton-ball','ギガトンボール'],['origin-ball','オリジンボール']];
 const BALL_NAME=Object.fromEntries(BALLS);
 function ballSlugFromValue(v){if(!v)return '';const hit=BALLS.find(([s,n])=>v===s||v===n);return hit?hit[0]:v}
 function ballName(v){const s=ballSlugFromValue(v);return BALL_NAME[s]||v||''}
-function ballIcon(v){const s=ballSlugFromValue(v);return s?`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/${s}.png`:''}
+function ballIcon(v){const s=ballSlugFromValue(v);if(!s)return '';const map={'la-poke-ball':'poke-ball','la-great-ball':'great-ball','la-ultra-ball':'ultra-ball','la-heavy-ball':'heavy-ball'};const icon=map[s]||s;return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/${icon}.png`}
 function ballOptions(v){const s=ballSlugFromValue(v);return BALLS.map(([x,n])=>`<option value="${x}" ${s===x?'selected':''}>${n}</option>`).join('')}
 function ballBadge(v){const s=ballSlugFromValue(v);return s?`<span class="ball-badge"><img src="${ballIcon(s)}" alt="">${esc(ballName(s))}</span>`:''}
 
@@ -1073,7 +1073,7 @@ function safeLocalSet(key,value){
   catch(e){console.warn('localStorage save skipped:',key,e);return false}
 }
 function save(){
-  // v93: 保存容量不足が起きても、ボタン操作や画面更新を止めない。
+  // v94: 保存容量不足が起きても、ボタン操作や画面更新を止めない。
   // 画像(base64)を自動バックアップへ複製すると容量を急激に消費するため、バックアップ対象から除外する。
   if(!backupRestoring){
     try{
@@ -1164,7 +1164,7 @@ function individualBadges(id,uid){
   }
   return badges;
 }
-// v93: keep individual editors open across collection rerenders.
+// v94: keep individual editors open across collection rerenders.
 // This prevents the newly added editor from disappearing after saving fields
 // or after another panel/stat refresh.
 const openIndividualPanels=new Set();
@@ -1248,7 +1248,7 @@ window.addIndividual=id=>{
   if(!Array.isArray(individualState[id]))individualState[id]=[];
   const ind=newIndividual(); individualState[id].push(ind); openIndividualPanels.add(id);
   syncOwned(id);
-  // v93: do not rebuild the whole collection. Rebuilding was making the click appear to do nothing.
+  // v94: do not rebuild the whole collection. Rebuilding was making the click appear to do nothing.
   if(!refreshSingleCollectionCard(id,{openIndividuals:true,focusUid:ind.uid})){
     pendingIndividualFocus={id,uid:ind.uid}; try{render()}catch(e){console.error('individual render',e)}
   }
@@ -1264,7 +1264,7 @@ window.toggleTarget=id=>{
   if(targetState[id]&&!huntState[id]) huntState[id]={count:0,start:new Date().toISOString().slice(0,10),method:'',ball:'',game:'',charm:'',outbreak:'0',sparkling:'0',daily:{}};
   else if(targetState[id]&&!huntState[id].start) huntState[id].start=new Date().toISOString().slice(0,10);
   save(); if(typeof requestAutoSyncAfterDataChange==='function')requestAutoSyncAfterDataChange();
-  // v93: update only the clicked card and hunt panel so the button always responds.
+  // v94: update only the clicked card and hunt panel so the button always responds.
   refreshSingleCollectionCard(id,{openIndividuals:openIndividualPanels.has(id)});
   try{renderCurrentHunt()}catch(e){console.error('hunt render',e)}
 };
@@ -2965,7 +2965,7 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 // ===== v56 automatic update / cache repair =====
 (function(){
-  const APP_VERSION='v93';
+  const APP_VERSION='v94';
   const UPDATE_KEY='shinyHomeReloadedForSW_'+APP_VERSION;
 
   async function registerFreshWorker(){
@@ -3019,7 +3019,7 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 
 
-// ===== v93 travel sync: local-first + hunt-session cloud sync =====
+// ===== v94 travel sync: local-first + hunt-session cloud sync =====
 (function(){
   const CLOUD_KEY='shinyHomeCloudSettings_v2', COUNTER_TABLE='shiny_home_hunt_counters';
   const EDIT_KEY='shinyHomeCounterLocalEdits_v1', SYNC_KEY='shinyHomeCounterLastSync_v1';
@@ -3028,7 +3028,7 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
   function cfg(){const fallback={url:'https://litkisamojglstbjwloo.supabase.co',key:'sb_publishable_pc-8E8ETM6yZ3OcB1cNkjA_OzVjc-Rh',userId:'pokemon-shiny-home'};try{return {...fallback,...(JSON.parse(localStorage.getItem(CLOUD_KEY)||localStorage.getItem('shinyHomeCloudSettings_v1')||'{}')||{})}}catch{return fallback}}
   function headers(c){return {apikey:c.key,Authorization:'Bearer '+c.key,'Content-Type':'application/json'}}
   function readMap(k){try{return JSON.parse(localStorage.getItem(k)||'{}')||{}}catch{return {}}} function writeMap(k,o){try{localStorage.setItem(k,JSON.stringify(o))}catch(_){}}
-  function setStatus(msg,kind){const e=$('auto-sync-status');if(e){e.textContent='同期：'+msg;e.style.color=kind==='ok'?'#8fe6b0':kind==='err'?'#ff9c9c':''}const m=$('mobile-sync-status');if(m){m.textContent='☁️ '+msg+' ・ v93';m.style.color=kind==='ok'?'#8fe6b0':kind==='err'?'#ff9c9c':''}}
+  function setStatus(msg,kind){const e=$('auto-sync-status');if(e){e.textContent='同期：'+msg;e.style.color=kind==='ok'?'#8fe6b0':kind==='err'?'#ff9c9c':''}const m=$('mobile-sync-status');if(m){m.textContent='☁️ '+msg+' ・ v94';m.style.color=kind==='ok'?'#8fe6b0':kind==='err'?'#ff9c9c':''}}
   function hunts(){try{return typeof huntState==='object'&&huntState?huntState:JSON.parse(localStorage.getItem('shinyHomeHunts_v1')||'{}')}catch{return {}}} function targets(){try{return typeof targetState==='object'&&targetState?targetState:JSON.parse(localStorage.getItem('shinyHomeTargets_v1')||'{}')}catch{return {}}}
   function persist(h,t){localStorage.setItem('shinyHomeHunts_v1',JSON.stringify(h));localStorage.setItem('shinyHomeTargets_v1',JSON.stringify(t));try{if(typeof save==='function')save()}catch(_){}}
   function markEdit(id,at){const m=readMap(EDIT_KEY);m[id]=at;writeMap(EDIT_KEY,m)} function editAt(id){return Number(readMap(EDIT_KEY)[id]||0)||0} function markSync(id,at){const m=readMap(SYNC_KEY);m[id]=at;writeMap(SYNC_KEY,m)}
