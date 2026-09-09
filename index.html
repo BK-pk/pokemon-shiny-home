@@ -827,9 +827,9 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
         <button class="btn" id="cloud-check" type="button">クラウド確認</button>
       </div>
       <div id="cloud-status" class="home-help">未設定です。</div>
-      <div id="auto-sync-status" class="home-help" style="margin-top:8px">同期：v83 外出向け省通信</div><div id="network-status" class="net-pill">● 通信状態を確認中</div>
+      <div id="auto-sync-status" class="home-help" style="margin-top:8px">同期：v84 外出向け省通信</div><div id="network-status" class="net-pill">● 通信状態を確認中</div>
       <div class="home-help" style="margin-top:8px">
-        v83ではカウンター操作中は通信せず端末内へ即保存します。10秒操作がなければクラウドへ保存し、他端末は最新時刻の値だけを取り込みます。所持状況・HOME BOXなどのフルデータは上のボタンで手動同期します。
+        v84では日本語名を専用キャッシュと複数の軽量データ源から復元します。カウンター操作中は通信せず端末内へ即保存し、10秒操作がなければクラウドへ保存します。
       </div>
       <div class="home-help" style="margin-top:10px">初回は「設定保存」→「接続テスト」の順に確認してください。既存データがある場合、確認前にクラウドへ保存しないでください。</div>
     </div>
@@ -837,7 +837,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 </section>
 
 <script>
-const DATA_VERSION='full-2026-09-09-v83';
+const DATA_VERSION='full-2026-09-09-v84';
 const SPECIES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species.csv';
 const NAMES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
 const MAX_DEX=1025;
@@ -1012,9 +1012,10 @@ function offlineSpeciesFallback(){
   });
 }
 async function loadSpecies(){
-  // v83: species/name data is shared across app builds. A version bump must not
-  // throw away the last successfully downloaded Japanese names.
+  // v84: Japanese names are treated as durable app data and cached separately.
+  // A build update or a temporary PokeAPI failure must never downgrade names to No.0001 etc.
   const stableKey='shinyHomeSpeciesCache_stable_v1';
+  const namesKey='shinyHomeJapaneseNames_stable_v1';
   const cacheKeys=[stableKey,'shinyHomeSpeciesCache_'+DATA_VERSION];
   try{
     for(let i=0;i<localStorage.length;i++){
@@ -1022,62 +1023,113 @@ async function loadSpecies(){
       if(k&&k.startsWith('shinyHomeSpeciesCache_')&&!cacheKeys.includes(k))cacheKeys.push(k);
     }
   }catch{}
+
+  // 1) Prefer any previously successful full species cache.
   for(const key of cacheKeys){
     const cached=localStorage.getItem(key);
-    if(cached){
-      try{
-        const parsed=JSON.parse(cached);
-        const hasRealNames=Array.isArray(parsed)&&parsed.length>=MAX_DEX&&parsed.some(x=>x&&x.name&&!/^No\.\d+$/.test(String(x.name)));
-        if(hasRealNames){
-          try{localStorage.setItem(stableKey,JSON.stringify(parsed));}catch{}
-          return parsed;
-        }
-      }catch{}
-    }
+    if(!cached)continue;
+    try{
+      const parsed=JSON.parse(cached);
+      const hasRealNames=Array.isArray(parsed)&&parsed.length>=MAX_DEX&&parsed.filter(x=>x&&x.name&&!/^No\.\d+$/.test(String(x.name))).length>900;
+      if(hasRealNames){
+        try{
+          localStorage.setItem(stableKey,JSON.stringify(parsed));
+          localStorage.setItem(namesKey,JSON.stringify(parsed.slice(0,MAX_DEX).map(x=>x&&x.name||'')));
+        }catch{}
+        return parsed;
+      }
+    }catch{}
   }
 
-  // 外部取得は最大4秒。取れなければ待たずにオフラインデータで起動。
+  // 2) Recover Japanese names from the dedicated durable cache.
+  let savedNames=[];
   try{
-    const fetchText=async urls=>{
-      let lastErr;
-      for(const url of urls){
-        try{
-          const r=await fetch(url,{cache:'force-cache'});
-          if(!r.ok)throw Error('fetch '+r.status);
-          return await r.text();
-        }catch(e){lastErr=e;}
+    const x=JSON.parse(localStorage.getItem(namesKey)||'[]');
+    if(Array.isArray(x)&&x.length>=MAX_DEX&&x.filter(Boolean).length>900)savedNames=x;
+  }catch{}
+
+  const fetchJSON=async urls=>{
+    let lastErr;
+    for(const url of urls){
+      try{
+        const r=await fetch(url,{cache:'no-store'});
+        if(!r.ok)throw Error('fetch '+r.status);
+        const j=await r.json();
+        if(Array.isArray(j)&&j.length>=MAX_DEX)return j;
+        throw Error('bad json');
+      }catch(e){lastErr=e;}
+    }
+    throw lastErr||Error('fetch');
+  };
+  const fetchText=async urls=>{
+    let lastErr;
+    for(const url of urls){
+      try{
+        const r=await fetch(url,{cache:'no-store'});
+        if(!r.ok)throw Error('fetch '+r.status);
+        return await r.text();
+      }catch(e){lastErr=e;}
+    }
+    throw lastErr||Error('fetch');
+  };
+
+  // 3) Fetch the tiny Japanese-name JSON first. This is much more reliable than the 12k-line names CSV.
+  if(savedNames.length<MAX_DEX){
+    try{
+      savedNames=await Promise.race([
+        fetchJSON([
+          'https://raw.githubusercontent.com/sindresorhus/pokemon/main/data/ja.json',
+          'https://cdn.jsdelivr.net/gh/sindresorhus/pokemon@main/data/ja.json',
+          'https://unpkg.com/pokemon@3.3.0/data/ja.json'
+        ]),
+        new Promise((_,reject)=>setTimeout(()=>reject(Error('name timeout')),8000))
+      ]);
+      if(savedNames.length>=MAX_DEX){
+        try{localStorage.setItem(namesKey,JSON.stringify(savedNames.slice(0,MAX_DEX)));}catch{}
       }
-      throw lastErr||Error('fetch');
-    };
+    }catch(err){console.warn('日本語名JSONを取得できませんでした。',err);}
+  }
+
+  // 4) Try to fetch the species metadata. If it fails, still build a fully searchable Japanese list.
+  try{
     const speciesMirrors=[SPECIES_URL,'https://cdn.jsdelivr.net/gh/PokeAPI/pokeapi@master/data/v2/csv/pokemon_species.csv'];
-    const namesMirrors=[NAMES_URL,'https://cdn.jsdelivr.net/gh/PokeAPI/pokeapi@master/data/v2/csv/pokemon_species_names.csv'];
-    const [st,nt]=await Promise.race([
-      Promise.all([fetchText(speciesMirrors),fetchText(namesMirrors)]),
-      new Promise((_,reject)=>setTimeout(()=>reject(Error('timeout')),10000))
+    const st=await Promise.race([
+      fetchText(speciesMirrors),
+      new Promise((_,reject)=>setTimeout(()=>reject(Error('species timeout')),8000))
     ]);
-    const sr=parseCSV(st), nr=parseCSV(nt);
-    const sh=sr[0], si=Object.fromEntries(sh.map((x,i)=>[x,i]));
-    const names=new Map();
-    for(let i=1;i<nr.length;i++){if(nr[i][1]==='1')names.set(Number(nr[i][0]),nr[i][2]);}
+    const sr=parseCSV(st), sh=sr[0], si=Object.fromEntries(sh.map((x,i)=>[x,i]));
     const species=[];
     for(let i=1;i<sr.length;i++){
       const no=Number(sr[i][si.id]); if(!no||no>MAX_DEX)continue;
       species.push({
         no,
         en:sr[i][si.identifier],
-        name:names.get(no)||sr[i][si.identifier],
+        name:savedNames[no-1]||sr[i][si.identifier],
         gen:Number(sr[i][si.generation_id])||genFor(no),
         genderDiff:sr[i][si.has_gender_differences]==='1'
       });
     }
     if(species.length>=MAX_DEX){
-      localStorage.setItem('shinyHomeSpeciesCache_'+DATA_VERSION,JSON.stringify(species));
-      localStorage.setItem(stableKey,JSON.stringify(species));
+      try{
+        localStorage.setItem('shinyHomeSpeciesCache_'+DATA_VERSION,JSON.stringify(species));
+        localStorage.setItem(stableKey,JSON.stringify(species));
+      }catch{}
       return species;
     }
-  }catch(err){
-    console.warn('外部ポケモンデータを取得できないため、オフライン表示で起動します。',err);
+  }catch(err){console.warn('種データ取得失敗。日本語名だけで起動します。',err);}
+
+  // 5) Last resort: retain Japanese names/search even when all metadata endpoints are temporarily unavailable.
+  if(savedNames.length>=MAX_DEX){
+    return Array.from({length:MAX_DEX},(_,i)=>({
+      no:i+1,
+      en:`pokemon-${i+1}`,
+      name:savedNames[i]||`No.${String(i+1).padStart(4,'0')}`,
+      gen:genFor(i+1),
+      genderDiff:false
+    }));
   }
+
+  // Never poison the durable caches with No.0001 placeholders.
   return offlineSpeciesFallback();
 }
 let backupRestoring=false;
