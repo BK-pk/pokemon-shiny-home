@@ -840,6 +840,11 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
         <button class="btn" id="cloud-download" type="button">フルデータをクラウドから読込</button>
         <button class="btn" id="cloud-check" type="button">クラウド確認</button>
       </div>
+      <div class="counter-row" style="margin-top:10px">
+        <button class="btn" id="cloud-auto-backup-now" type="button">🛡 今すぐ安全バックアップ</button>
+        <button class="btn" id="cloud-auto-backup-restore" type="button">↶ 安全バックアップから復元</button>
+      </div>
+      <div id="cloud-auto-backup-status" class="home-help" style="margin-top:8px">自動バックアップ：待機中</div>
       <div id="cloud-status" class="home-help">未設定です。</div>
       <div id="auto-sync-status" class="home-help" style="margin-top:8px">同期：v95 外出向け省通信</div><div id="network-status" class="net-pill">● 通信状態を確認中</div>
       <div class="home-help" style="margin-top:8px">
@@ -851,7 +856,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 </section>
 
 <script>
-const DATA_VERSION='full-2026-09-09-v104';
+const DATA_VERSION='full-2026-09-09-v105';
 const SPECIES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species.csv';
 const NAMES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
 const MAX_DEX=1025;
@@ -3111,9 +3116,92 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 })();
 
 
+
+// ===== v105 Supabase backup-only safety copy =====
+(function(){
+  const AUTO_SUFFIX='::auto-backup';
+  const PREV_SUFFIX='::auto-backup-prev';
+  const META_KEY='shinyHomeCloudAutoBackupMeta_v1';
+  const INTERVAL_MS=15*60*1000;
+  let running=false;
+  const $=id=>document.getElementById(id);
+  function settings(){
+    let s={};
+    try{s=JSON.parse(localStorage.getItem('shinyHomeCloudSettings_v1')||'{}')||{}}catch(_){s={}}
+    if(!s.url||!s.key||!s.userId){
+      try{s={...s,...(JSON.parse(localStorage.getItem('shinyHomeCloudSettings_v2')||'{}')||{})}}catch(_){}
+    }
+    return {url:String(s.url||'').replace(/\/$/,''),key:String(s.key||''),userId:String(s.userId||'')};
+  }
+  function headers(c,prefer=''){const h={apikey:c.key,Authorization:'Bearer '+c.key,'Content-Type':'application/json'};if(prefer)h.Prefer=prefer;return h}
+  function ownedCount(){try{return Object.values(state||{}).filter(Boolean).length}catch(_){return 0}}
+  function individualCount(){try{return Object.values(individualState||{}).reduce((n,a)=>n+(Array.isArray(a)?a.length:0),0)}catch(_){return 0}}
+  function meta(){try{return JSON.parse(localStorage.getItem(META_KEY)||'{}')||{}}catch(_){return {}}}
+  function setMeta(x){try{localStorage.setItem(META_KEY,JSON.stringify(x))}catch(_){}}
+  function status(t,bad=false){const e=$('cloud-auto-backup-status');if(e){e.textContent='自動バックアップ：'+t;e.style.color=bad?'#ff9c9c':'#9bb2c7'}}
+  function validate(){
+    const owned=ownedCount(), indiv=individualCount(), prev=meta();
+    if(prev.ownedCount>=20 && owned < Math.floor(prev.ownedCount*0.5)){
+      throw new Error(`所持数が前回 ${prev.ownedCount} → ${owned} と大幅に減っているため自動保存を停止しました。`);
+    }
+    if(prev.individualCount>=20 && indiv < Math.floor(prev.individualCount*0.5)){
+      throw new Error(`個体数が前回 ${prev.individualCount} → ${indiv} と大幅に減っているため自動保存を停止しました。`);
+    }
+    return {owned,indiv};
+  }
+  async function getRow(c,id){
+    const r=await fetch(c.url+'/rest/v1/shiny_home_sync?user_id=eq.'+encodeURIComponent(id)+'&select=payload,updated_at',{headers:headers(c),cache:'no-store'});
+    if(!r.ok)throw Error(await r.text());const a=await r.json();return a[0]||null;
+  }
+  async function upsert(c,id,payload){
+    const r=await fetch(c.url+'/rest/v1/shiny_home_sync',{method:'POST',headers:headers(c,'resolution=merge-duplicates,return=minimal'),body:JSON.stringify({user_id:id,payload,updated_at:new Date().toISOString()})});
+    if(!r.ok)throw Error(await r.text());
+  }
+  async function backup(manual=false){
+    if(running)return false;
+    const c=settings();if(!c.url||!c.key||!c.userId){status('同期設定が未設定です',true);return false}
+    if(!navigator.onLine){status('オフラインのため端末内データを維持');return false}
+    running=true;status('作成中…');
+    try{
+      const counts=validate();
+      const latestId=c.userId+AUTO_SUFFIX, prevId=c.userId+PREV_SUFFIX;
+      const old=await getRow(c,latestId);
+      if(old?.payload) await upsert(c,prevId,old.payload);
+      const payload={backupOnly:true,version:DATA_VERSION,backedUpAt:new Date().toISOString(),ownedCount:counts.owned,individualCount:counts.indiv,data:currentDataSnapshot()};
+      await upsert(c,latestId,payload);
+      const m={at:Date.now(),ownedCount:counts.owned,individualCount:counts.indiv};setMeta(m);
+      status(`保存済み ${new Date(m.at).toLocaleString('ja-JP')}（所持 ${counts.owned} / 個体 ${counts.indiv}）`);
+      if(manual&&typeof showToast==='function')showToast('安全クラウドバックアップを作成しました。');
+      return true;
+    }catch(e){status(e.message||'保存に失敗しました',true);return false}finally{running=false}
+  }
+  async function restore(){
+    const c=settings();if(!c.url||!c.key||!c.userId){status('同期設定が未設定です',true);return}
+    if(!confirm('安全クラウドバックアップから現在のデータを置き換えます。続けますか？'))return;
+    running=true;status('復元データを確認中…');
+    try{
+      const row=await getRow(c,c.userId+AUTO_SUFFIX);if(!row?.payload)throw Error('安全バックアップがありません。');
+      const p=row.payload.data||row.payload;
+      if(!p||typeof p!=='object')throw Error('バックアップ形式を確認できません。');
+      // 復元直前に現在状態をIndexedDB/既存バックアップへ残すため、通常saveのバックアップも維持する。
+      backupRestoring=true;restoreSnapshotObject(p);ensureLegacyIndividuals();save();backupRestoring=false;render();
+      status('復元しました '+new Date().toLocaleString('ja-JP'));
+      if(typeof showToast==='function')showToast('安全クラウドバックアップから復元しました。');
+    }catch(e){backupRestoring=false;status(e.message||'復元に失敗しました',true)}finally{running=false}
+  }
+  function init(){
+    const b=$('cloud-auto-backup-now'),r=$('cloud-auto-backup-restore');if(b)b.addEventListener('click',()=>backup(true));if(r)r.addEventListener('click',restore);
+    const m=meta();if(m.at)status(`前回 ${new Date(m.at).toLocaleString('ja-JP')}（所持 ${m.ownedCount||0} / 個体 ${m.individualCount||0}）`);
+    setTimeout(()=>backup(false),60000);
+    setInterval(()=>{if(document.visibilityState==='visible')backup(false)},INTERVAL_MS);
+  }
+  window.shinyCloudSafetyBackupNow=()=>backup(true);
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+})();
+
 // ===== v56 automatic update / cache repair =====
 (function(){
-  const APP_VERSION='v104';
+  const APP_VERSION='v105';
   const UPDATE_KEY='shinyHomeReloadedForSW_'+APP_VERSION;
 
   async function registerFreshWorker(){
