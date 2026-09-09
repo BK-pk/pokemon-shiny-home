@@ -503,7 +503,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
   -webkit-tap-highlight-color:transparent;
 }
 
-/* ===== v83 hunt UX / dashboard / drag / offline ===== */
+/* ===== v86 hunt UX / dashboard / drag / offline ===== */
 .hunt-progress-strip{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:2px}
 .hunt-mini-stat{background:#091522;border:1px solid #263c53;border-radius:10px;padding:8px 10px}.hunt-mini-stat span{display:block;color:var(--muted);font-size:9px;margin-bottom:2px}.hunt-mini-stat strong{font-size:13px;color:#eef7ff}.hunt-mini-stat.prob strong{color:var(--gold)}
 .drag-handle{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border:1px solid #36516d;border-radius:9px;color:#9db5c9;cursor:grab;user-select:none;touch-action:none;background:#0b1b2b;font-size:17px}.drag-handle:active{cursor:grabbing}.hunt-chip.dragging,.mobile-hunt-card.dragging{opacity:.62;outline:2px solid var(--cyan);transform:scale(.99)}
@@ -559,7 +559,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
   </div>
 
   <div id="mobile-active-hunt" class="mobile-active-hunt" style="display:none">
-    <div id="mobile-sync-status" class="mobile-hunt-meta" style="text-align:center;margin:4px 0 8px">☁️ 端末内に保存済み ・ v83</div>
+    <div id="mobile-sync-status" class="mobile-hunt-meta" style="text-align:center;margin:4px 0 8px">☁️ 端末内に保存済み ・ v86</div>
     <div id="mobile-multi-hunt-list" class="mobile-hunt-list"></div>
     <button id="mobile-multi-add" class="btn" type="button">＋ 厳選を追加</button>
   </div>
@@ -812,7 +812,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
     <div class="extra-panel">
       <div class="extra-head">
         <div><h2 style="margin:0">☁️ Supabase 同期</h2>
-        <span class="section-count">PC・iPhoneで同じデータを共有 ・ build v83</span></div>
+        <span class="section-count">PC・iPhoneで同じデータを共有 ・ build v86</span></div>
       </div>
       <div class="sync-fields">
         <label>Supabase URL<input id="supabase-url" autocomplete="off" placeholder="https://xxxx.supabase.co"></label>
@@ -827,9 +827,9 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
         <button class="btn" id="cloud-check" type="button">クラウド確認</button>
       </div>
       <div id="cloud-status" class="home-help">未設定です。</div>
-      <div id="auto-sync-status" class="home-help" style="margin-top:8px">同期：v85 外出向け省通信</div><div id="network-status" class="net-pill">● 通信状態を確認中</div>
+      <div id="auto-sync-status" class="home-help" style="margin-top:8px">同期：v86 外出向け省通信</div><div id="network-status" class="net-pill">● 通信状態を確認中</div>
       <div class="home-help" style="margin-top:8px">
-        v85では日本語名を自動再取得し、通信復帰後は画面を開いたまま名前を復元します。カウンター操作中は通信せず端末内へ即保存し、10秒操作がなければクラウドへ保存します。
+        v86ではカウンター操作中は通信せず端末内へ即保存します。10秒操作がなければクラウドへ保存し、他端末は最新時刻の値だけを取り込みます。所持状況・HOME BOXなどのフルデータは上のボタンで手動同期します。
       </div>
       <div class="home-help" style="margin-top:10px">初回は「設定保存」→「接続テスト」の順に確認してください。既存データがある場合、確認前にクラウドへ保存しないでください。</div>
     </div>
@@ -837,7 +837,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 </section>
 
 <script>
-const DATA_VERSION='full-2026-09-09-v85';
+const DATA_VERSION='full-2026-09-09-v86';
 const SPECIES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species.csv';
 const NAMES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
 const MAX_DEX=1025;
@@ -1012,124 +1012,55 @@ function offlineSpeciesFallback(){
   });
 }
 async function loadSpecies(){
-  // v85: Japanese names are treated as durable app data and cached separately.
-  // A build update or a temporary PokeAPI failure must never downgrade names to No.0001 etc.
-  const stableKey='shinyHomeSpeciesCache_stable_v1';
-  const namesKey='shinyHomeJapaneseNames_stable_v1';
-  const cacheKeys=[stableKey,'shinyHomeSpeciesCache_'+DATA_VERSION];
-  try{
-    for(let i=0;i<localStorage.length;i++){
-      const k=localStorage.key(i);
-      if(k&&k.startsWith('shinyHomeSpeciesCache_')&&!cacheKeys.includes(k))cacheKeys.push(k);
-    }
-  }catch{}
-
-  // 1) Prefer any previously successful full species cache.
+  const cacheKeys=[
+    'shinyHomeSpeciesCache_'+DATA_VERSION,
+    'shinyHomeSpeciesCache_full-2026-09-08-v50',
+    'shinyHomeSpeciesCache_full-2026-09-08-v49',
+    'shinyHomeSpeciesCache_full-2026-09-08-v48'
+  ];
   for(const key of cacheKeys){
     const cached=localStorage.getItem(key);
-    if(!cached)continue;
-    try{
-      const parsed=JSON.parse(cached);
-      const hasRealNames=Array.isArray(parsed)&&parsed.length>=MAX_DEX&&parsed.filter(x=>x&&x.name&&!/^No\.\d+$/.test(String(x.name))).length>900;
-      if(hasRealNames){
-        try{
-          localStorage.setItem(stableKey,JSON.stringify(parsed));
-          localStorage.setItem(namesKey,JSON.stringify(parsed.slice(0,MAX_DEX).map(x=>x&&x.name||'')));
-        }catch{}
-        return parsed;
-      }
-    }catch{}
+    if(cached){
+      try{
+        const parsed=JSON.parse(cached);
+        if(Array.isArray(parsed)&&parsed.length>=MAX_DEX)return parsed;
+      }catch{}
+    }
   }
 
-  // 2) Recover Japanese names from the dedicated durable cache.
-  let savedNames=[];
+  // 外部取得は最大4秒。取れなければ待たずにオフラインデータで起動。
   try{
-    const x=JSON.parse(localStorage.getItem(namesKey)||'[]');
-    if(Array.isArray(x)&&x.length>=MAX_DEX&&x.filter(Boolean).length>900)savedNames=x;
-  }catch{}
-
-  const fetchJSON=async urls=>{
-    let lastErr;
-    for(const url of urls){
-      try{
-        const r=await fetch(url,{cache:'no-store'});
-        if(!r.ok)throw Error('fetch '+r.status);
-        const j=await r.json();
-        if(Array.isArray(j)&&j.length>=MAX_DEX)return j;
-        throw Error('bad json');
-      }catch(e){lastErr=e;}
-    }
-    throw lastErr||Error('fetch');
-  };
-  const fetchText=async urls=>{
-    let lastErr;
-    for(const url of urls){
-      try{
-        const r=await fetch(url,{cache:'no-store'});
-        if(!r.ok)throw Error('fetch '+r.status);
-        return await r.text();
-      }catch(e){lastErr=e;}
-    }
-    throw lastErr||Error('fetch');
-  };
-
-  // 3) Fetch the tiny Japanese-name JSON first. This is much more reliable than the 12k-line names CSV.
-  if(savedNames.length<MAX_DEX){
-    try{
-      savedNames=await Promise.race([
-        fetchJSON([
-          'https://raw.githubusercontent.com/sindresorhus/pokemon/main/data/ja.json',
-          'https://cdn.jsdelivr.net/gh/sindresorhus/pokemon@main/data/ja.json',
-          'https://unpkg.com/pokemon@3.3.0/data/ja.json'
-        ]),
-        new Promise((_,reject)=>setTimeout(()=>reject(Error('name timeout')),8000))
-      ]);
-      if(savedNames.length>=MAX_DEX){
-        try{localStorage.setItem(namesKey,JSON.stringify(savedNames.slice(0,MAX_DEX)));}catch{}
-      }
-    }catch(err){console.warn('日本語名JSONを取得できませんでした。',err);}
-  }
-
-  // 4) Try to fetch the species metadata. If it fails, still build a fully searchable Japanese list.
-  try{
-    const speciesMirrors=[SPECIES_URL,'https://cdn.jsdelivr.net/gh/PokeAPI/pokeapi@master/data/v2/csv/pokemon_species.csv'];
-    const st=await Promise.race([
-      fetchText(speciesMirrors),
-      new Promise((_,reject)=>setTimeout(()=>reject(Error('species timeout')),8000))
+    const fetchText=async url=>{
+      const r=await fetch(url,{cache:'force-cache'});
+      if(!r.ok)throw Error('fetch');
+      return r.text();
+    };
+    const [st,nt]=await Promise.race([
+      Promise.all([fetchText(SPECIES_URL),fetchText(NAMES_URL)]),
+      new Promise((_,reject)=>setTimeout(()=>reject(Error('timeout')),4000))
     ]);
-    const sr=parseCSV(st), sh=sr[0], si=Object.fromEntries(sh.map((x,i)=>[x,i]));
+    const sr=parseCSV(st), nr=parseCSV(nt);
+    const sh=sr[0], si=Object.fromEntries(sh.map((x,i)=>[x,i]));
+    const names=new Map();
+    for(let i=1;i<nr.length;i++){if(nr[i][1]==='1')names.set(Number(nr[i][0]),nr[i][2]);}
     const species=[];
     for(let i=1;i<sr.length;i++){
       const no=Number(sr[i][si.id]); if(!no||no>MAX_DEX)continue;
       species.push({
         no,
         en:sr[i][si.identifier],
-        name:savedNames[no-1]||sr[i][si.identifier],
+        name:names.get(no)||sr[i][si.identifier],
         gen:Number(sr[i][si.generation_id])||genFor(no),
         genderDiff:sr[i][si.has_gender_differences]==='1'
       });
     }
     if(species.length>=MAX_DEX){
-      try{
-        localStorage.setItem('shinyHomeSpeciesCache_'+DATA_VERSION,JSON.stringify(species));
-        localStorage.setItem(stableKey,JSON.stringify(species));
-      }catch{}
+      localStorage.setItem('shinyHomeSpeciesCache_'+DATA_VERSION,JSON.stringify(species));
       return species;
     }
-  }catch(err){console.warn('種データ取得失敗。日本語名だけで起動します。',err);}
-
-  // 5) Last resort: retain Japanese names/search even when all metadata endpoints are temporarily unavailable.
-  if(savedNames.length>=MAX_DEX){
-    return Array.from({length:MAX_DEX},(_,i)=>({
-      no:i+1,
-      en:`pokemon-${i+1}`,
-      name:savedNames[i]||`No.${String(i+1).padStart(4,'0')}`,
-      gen:genFor(i+1),
-      genderDiff:false
-    }));
+  }catch(err){
+    console.warn('外部ポケモンデータを取得できないため、オフライン表示で起動します。',err);
   }
-
-  // Never poison the durable caches with No.0001 placeholders.
   return offlineSpeciesFallback();
 }
 let backupRestoring=false;
@@ -1215,7 +1146,7 @@ function individualBadges(id,uid){
   }
   return badges;
 }
-// v83: keep individual editors open across collection rerenders.
+// v86: keep individual editors open across collection rerenders.
 // This prevents the newly added editor from disappearing after saving fields
 // or after another panel/stat refresh.
 const openIndividualPanels=new Set();
@@ -1251,6 +1182,7 @@ function individualRowHTML(p,ind,i){
       <div class="detail-field"><label>ボール</label><div class="ball-select-wrap"><img id="ball-${encodeURIComponent(p.id)}-${i}" src="${ballIcon(ind.ball)}" alt=""><select onchange="setIndividual('${esc(p.id)}',${i},'ball',this.value);document.getElementById('ball-${encodeURIComponent(p.id)}-${i}').src=ballIcon(this.value)">${ballOptions(ind.ball)}</select></div></div>
       <div class="detail-field"><label>厳選方法</label><select onchange="setIndividual('${esc(p.id)}',${i},'huntMethod',this.value)">${huntMethodOptions(ind.huntMethod||'')}</select></div>
       <div class="detail-field"><label>${esc(counterLabel(ind.huntMethod||''))}</label><input type="number" min="0" value="${Number(ind.huntCount||0)}" onchange="setManualHuntCount('${esc(p.id)}','${esc(ind.uid)}',this.value)"></div>
+
       <div class="detail-field"><label>入手区分</label><select onchange="setIndividual('${esc(p.id)}',${i},'source',this.value)"><option value="">入手区分</option><option ${ind.source==='自己産'?'selected':''}>自己産</option><option ${ind.source==='交換'?'selected':''}>交換</option><option ${ind.source==='配布'?'selected':''}>配布</option><option ${ind.source==='その他'?'selected':''}>その他</option></select></div>
       <div class="detail-field"><label>開始日</label><input type="date" value="${esc(ind.huntStart||'')}" onchange="setIndividual('${esc(p.id)}',${i},'huntStart',this.value)"></div>
     </div>
@@ -2450,7 +2382,7 @@ function estimatedOdds(indOrHunt){
   if(method==='国際孵化')return charm?512:683;
   if(method==='SOS連鎖')return charm?273.53:315.54;
   if(game==='SV'&&['サンドウィッチ厳選','大量発生＋サンドウィッチ','大量発生','大量発生（SV）'].includes(method)){
-    const sp=Number(indOrHunt.sparkling)||0, cleared=String(indOrHunt.outbreak||'0');
+    const sp=Number(indOrHunt.sparkling)||0,cleared=String(indOrHunt.outbreak||'0');
     let rolls=1+(charm?2:0)+Math.max(0,Math.min(3,sp));
     if(['大量発生＋サンドウィッチ','大量発生','大量発生（SV）'].includes(method)){if(cleared==='30')rolls+=1;if(cleared==='60')rolls+=2;}
     return oddsFromRolls(rolls);
@@ -2654,7 +2586,7 @@ function shinyOdds(game,method,charm,hunt={}){
   if(game==='SV'&&['大量発生','大量発生（SV）','サンドウィッチ厳選','大量発生＋サンドウィッチ'].includes(method)){
     const isOutbreak=['大量発生','大量発生（SV）','大量発生＋サンドウィッチ'].includes(method);
     const cleared=isOutbreak?String(hunt.outbreak||'0'):'0';
-    const sp=['サンドウィッチ厳選','大量発生＋サンドウィッチ'].includes(method)?Number(hunt.sparkling)||0:(Number(hunt.sparkling)||0);
+    const sp=Number(hunt.sparkling)||0;
     let rolls=1+(c?2:0)+Math.max(0,Math.min(3,sp));
     if(isOutbreak&&cleared==='30')rolls+=1;
     if(isOutbreak&&cleared==='60')rolls+=2;
@@ -2809,41 +2741,6 @@ el('imageBackupInput').onchange=e=>{
 el('exportBtn').onclick=()=>{const blob=new Blob([JSON.stringify({version:DATA_VERSION,state,boxState,dateState,gameState,individualState,targetState,huntState,monthImages,individualScreenshots},null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='shiny-home-backup.json';a.click();URL.revokeObjectURL(a.href)};
 el('importBtn').onclick=()=>el('fileInput').click();el('fileInput').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);Object.assign(state,d.state||{});Object.assign(boxState,d.boxState||{});Object.assign(dateState,d.dateState||{});Object.assign(gameState,d.gameState||{});if(d.individualState)Object.assign(individualState,d.individualState);if(d.targetState)Object.assign(targetState,d.targetState);if(d.huntState)Object.assign(huntState,d.huntState);if(d.monthImages)Object.assign(monthImages,d.monthImages);if(d.individualScreenshots)Object.assign(individualScreenshots,d.individualScreenshots);ensureLegacyIndividuals();save();render()}catch{alert('バックアップファイルを読み込めませんでした')}};r.readAsText(f)};
 for(const g of gameOptions.filter(Boolean)){const o=document.createElement('option');o.value=g;o.textContent=g;el('gameFilter').appendChild(o);}for(const [slug,name] of BALLS){const o=document.createElement('option');o.value=slug;o.textContent=name;el('ballFilter').appendChild(o);}
-
-let japaneseNameRetryTimer=null;
-let japaneseNameRetryBusy=false;
-function hasJapaneseSpeciesNames(species){
-  return Array.isArray(species)&&species.length>=MAX_DEX&&species.filter(s=>s&&s.name&&!/^No\.\d{4}$/.test(String(s.name))).length>900;
-}
-async function retryJapaneseNames(showMessage=false){
-  if(japaneseNameRetryBusy)return false;
-  japaneseNameRetryBusy=true;
-  const loading=el('loading');
-  if(showMessage&&loading){loading.style.display='block';loading.innerHTML='🔄 ポケモン名を再取得しています…';}
-  try{
-    // Bad placeholder caches are never trusted by loadSpecies(), so simply retry all mirrors.
-    const species=await loadSpecies();
-    if(!hasJapaneseSpeciesNames(species))return false;
-    data=buildData(species);
-    ensureLegacyIndividuals();
-    render();
-    renderExtraPanels();
-    restoreAppTab();
-    if(loading)loading.style.display='none';
-    if(japaneseNameRetryTimer){clearInterval(japaneseNameRetryTimer);japaneseNameRetryTimer=null;}
-    if(showMessage)showToast('ポケモン名を復元しました。');
-    return true;
-  }catch(e){console.warn('日本語名の再取得に失敗',e);return false;}
-  finally{japaneseNameRetryBusy=false;}
-}
-function startJapaneseNameRetry(){
-  if(japaneseNameRetryTimer)return;
-  japaneseNameRetryTimer=setInterval(()=>{if(document.visibilityState==='visible')retryJapaneseNames(false)},12000);
-}
-window.retryJapaneseNames=retryJapaneseNames;
-window.addEventListener('online',()=>setTimeout(()=>retryJapaneseNames(false),500));
-window.addEventListener('focus',()=>{if(data.some(s=>/^No\.\d{4}$/.test(s.name||'')))retryJapaneseNames(false)});
-
 (async()=>{
   try{
     const species=await loadSpecies();
@@ -2854,10 +2751,9 @@ window.addEventListener('focus',()=>{if(data.some(s=>/^No\.\d{4}$/.test(s.name||
     if(loading){
       const offline=species.some(s=>/^No\.\d{4}$/.test(s.name||''));
       if(offline){
-        loading.innerHTML='📱 ポケモン名データを取得できませんでした。<br><small>画面はそのまま使えます。通信でき次第、自動で日本語名を復元します。</small><br><button class="btn" type="button" style="margin-top:10px" onclick="retryJapaneseNames(true)">🔄 名前データを再取得</button>';
+        loading.innerHTML='📱 オフライン表示で起動しました。<br><small>保存済みデータ・HOME BOX・統計は利用できます。ポケモン名と画像は、外部通信できるブラウザで開くと自動表示されます。</small>';
         loading.style.display='block';
         loading.style.marginBottom='18px';
-        startJapaneseNameRetry();
       }else{
         loading.style.display='none';
       }
@@ -2870,7 +2766,7 @@ window.addEventListener('focus',()=>{if(data.some(s=>/^No\.\d{4}$/.test(s.name||
     ensureLegacyIndividuals();
     render();
     const loading=el('loading');
-    if(loading){loading.style.display='block';loading.innerHTML='📱 ポケモン名データを取得できませんでした。<br><button class="btn" type="button" style="margin-top:10px" onclick="retryJapaneseNames(true)">🔄 名前データを再取得</button>';} startJapaneseNameRetry();
+    if(loading)loading.innerHTML='📱 オフライン表示で起動しました。';
   }
 })();
 
@@ -3022,7 +2918,7 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 // ===== v56 automatic update / cache repair =====
 (function(){
-  const APP_VERSION='v83';
+  const APP_VERSION='v86';
   const UPDATE_KEY='shinyHomeReloadedForSW_'+APP_VERSION;
 
   async function registerFreshWorker(){
@@ -3076,7 +2972,7 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 
 
-// ===== v83 travel sync: local-first + hunt-session cloud sync =====
+// ===== v86 travel sync: local-first + hunt-session cloud sync =====
 (function(){
   const CLOUD_KEY='shinyHomeCloudSettings_v2', COUNTER_TABLE='shiny_home_hunt_counters';
   const EDIT_KEY='shinyHomeCounterLocalEdits_v1', SYNC_KEY='shinyHomeCounterLastSync_v1';
@@ -3085,7 +2981,7 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
   function cfg(){const fallback={url:'https://litkisamojglstbjwloo.supabase.co',key:'sb_publishable_pc-8E8ETM6yZ3OcB1cNkjA_OzVjc-Rh',userId:'pokemon-shiny-home'};try{return {...fallback,...(JSON.parse(localStorage.getItem(CLOUD_KEY)||localStorage.getItem('shinyHomeCloudSettings_v1')||'{}')||{})}}catch{return fallback}}
   function headers(c){return {apikey:c.key,Authorization:'Bearer '+c.key,'Content-Type':'application/json'}}
   function readMap(k){try{return JSON.parse(localStorage.getItem(k)||'{}')||{}}catch{return {}}} function writeMap(k,o){try{localStorage.setItem(k,JSON.stringify(o))}catch(_){}}
-  function setStatus(msg,kind){const e=$('auto-sync-status');if(e){e.textContent='同期：'+msg;e.style.color=kind==='ok'?'#8fe6b0':kind==='err'?'#ff9c9c':''}const m=$('mobile-sync-status');if(m){m.textContent='☁️ '+msg+' ・ v83';m.style.color=kind==='ok'?'#8fe6b0':kind==='err'?'#ff9c9c':''}}
+  function setStatus(msg,kind){const e=$('auto-sync-status');if(e){e.textContent='同期：'+msg;e.style.color=kind==='ok'?'#8fe6b0':kind==='err'?'#ff9c9c':''}const m=$('mobile-sync-status');if(m){m.textContent='☁️ '+msg+' ・ v86';m.style.color=kind==='ok'?'#8fe6b0':kind==='err'?'#ff9c9c':''}}
   function hunts(){try{return typeof huntState==='object'&&huntState?huntState:JSON.parse(localStorage.getItem('shinyHomeHunts_v1')||'{}')}catch{return {}}} function targets(){try{return typeof targetState==='object'&&targetState?targetState:JSON.parse(localStorage.getItem('shinyHomeTargets_v1')||'{}')}catch{return {}}}
   function persist(h,t){localStorage.setItem('shinyHomeHunts_v1',JSON.stringify(h));localStorage.setItem('shinyHomeTargets_v1',JSON.stringify(t));try{if(typeof save==='function')save()}catch(_){}}
   function markEdit(id,at){const m=readMap(EDIT_KEY);m[id]=at;writeMap(EDIT_KEY,m)} function editAt(id){return Number(readMap(EDIT_KEY)[id]||0)||0} function markSync(id,at){const m=readMap(SYNC_KEY);m[id]=at;writeMap(SYNC_KEY,m)}
