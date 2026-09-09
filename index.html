@@ -432,6 +432,11 @@
 .home-dex-slot.missing{background:linear-gradient(180deg,#0c1b28,#091520);opacity:.72}
 .home-dex-slot.locked{background:linear-gradient(180deg,#211b2c,#12131c)}
 .home-dex-slot.owned{cursor:pointer;border-color:#397a9e;box-shadow:0 0 0 1px rgba(85,202,255,.08) inset}
+.home-dex-slot.custom-movable{touch-action:none;user-select:none;-webkit-user-select:none}
+.home-dex-slot.custom-selected{outline:3px solid #ffd85a;outline-offset:-3px;box-shadow:0 0 18px rgba(255,216,90,.45)}
+.home-dex-slot.custom-drop{outline:2px dashed #72d8ff;outline-offset:-3px}
+.home-custom-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}.home-custom-actions button{font-size:11px;padding:7px 10px}
+.home-custom-status{margin-top:7px;font-size:11px;color:#ffd85a;min-height:1.4em}
 .home-dex-slot img{width:78%;height:70%;object-fit:contain}
 .home-dex-slot.missing img{filter:grayscale(1) brightness(.12);opacity:.42}
 .home-dex-no{position:absolute;left:7px;top:6px;font-size:11px;font-weight:900;color:#9bb8ca}
@@ -660,13 +665,14 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 <div class="home-owned-count" id="home-dex-owned-count"></div>
 </div>
 <div class="home-dex-board" id="home-dex-board"></div>
-<div class="home-help">色違いコレクションと同じ順番で30枠ずつ自動配置します。①全国図鑑 → ②リージョン → ③オス・メス違い → ④その他の姿違い → ⑤キョダイマックス。区分が変わるときは、前のBOXに空きがあっても次のBOXから始まります。</div>
+<div class="home-help">最初はコレクション順です。PCはドラッグ、スマホ・タブレットはポケモンを長押ししてから移動先をタップすると、好きな位置へ移動できます。別BOXへ移す場合は長押し後にBOXを切り替えて移動先をタップしてください。</div>
 </main>
 <aside class="home-box-info">
 <div class="home-info-card">
-<div class="home-side-title">表示・並び順</div>
-<label class="home-radio"><input checked="" disabled="" type="radio"/> コレクション順</label>
-<div class="home-info-note">① 全国図鑑（番号順）<br/>② リージョン<br/>③ オス・メス違い<br/>④ その他の姿違い<br/>⑤ キョダイマックス<br/><br/>各区分は必ず新しいBOXから開始します。</div>
+<div class="home-side-title">BOXカスタマイズ</div>
+<div class="home-info-note">PC：ドラッグ＆ドロップ<br/>スマホ：長押し → 移動先をタップ<br/>別BOXにも移動できます。ポケモンがいる枠へ置くと位置を入れ替えます。</div>
+<div class="home-custom-actions"><button class="btn" onclick="resetCustomHomeLayout()">↺ コレクション順に戻す</button></div>
+<div class="home-custom-status" id="home-custom-status"></div>
 </div>
 <div class="home-info-card">
 <div class="home-side-title">BOX情報</div>
@@ -837,7 +843,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 </section>
 
 <script>
-const DATA_VERSION='full-2026-09-09-v96';
+const DATA_VERSION='full-2026-09-09-v97';
 const SPECIES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species.csv';
 const NAMES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
 const MAX_DEX=1025;
@@ -1085,7 +1091,7 @@ function safeLocalSet(key,value){
   catch(e){console.warn('localStorage save skipped:',key,e);return false}
 }
 function save(){
-  // v96: 保存容量不足が起きても、ボタン操作や画面更新を止めない。
+  // v97: 保存容量不足が起きても、ボタン操作や画面更新を止めない。
   // 画像(base64)を自動バックアップへ複製すると容量を急激に消費するため、バックアップ対象から除外する。
   if(!backupRestoring){
     try{
@@ -1176,7 +1182,7 @@ function individualBadges(id,uid){
   }
   return badges;
 }
-// v96: keep individual editors open across collection rerenders.
+// v97: keep individual editors open across collection rerenders.
 // This prevents the newly added editor from disappearing after saving fields
 // or after another panel/stat refresh.
 const openIndividualPanels=new Set();
@@ -1260,7 +1266,7 @@ window.addIndividual=id=>{
   if(!Array.isArray(individualState[id]))individualState[id]=[];
   const ind=newIndividual(); individualState[id].push(ind); openIndividualPanels.add(id);
   syncOwned(id);
-  // v96: do not rebuild the whole collection. Rebuilding was making the click appear to do nothing.
+  // v97: do not rebuild the whole collection. Rebuilding was making the click appear to do nothing.
   if(!refreshSingleCollectionCard(id,{openIndividuals:true,focusUid:ind.uid})){
     pendingIndividualFocus={id,uid:ind.uid}; try{render()}catch(e){console.error('individual render',e)}
   }
@@ -1272,7 +1278,7 @@ window.deleteIndividual=(id,i)=>{
 };
 window.setIndividual=(id,i,key,val)=>{if(!individualState[id]||!individualState[id][i])return;individualState[id][i][key]=val;openIndividualPanels.add(id);syncOwned(id);try{renderExtraPanels()}catch(e){console.warn(e)}};
 
-// v96: 入力途中の値もその場で localStorage へ保存する。
+// v97: 入力途中の値もその場で localStorage へ保存する。
 // バージョン更新・再読み込み・タブ終了の前にフォーカスを外さなくても内容が残る。
 window.setIndividualLive=(id,i,key,val)=>{
   if(!individualState[id]||!individualState[id][i])return;
@@ -1312,7 +1318,7 @@ window.toggleTarget=id=>{
   if(targetState[id]&&!huntState[id]) huntState[id]={count:0,start:new Date().toISOString().slice(0,10),method:'',ball:'',game:'',charm:'',outbreak:'0',sparkling:'0',daily:{}};
   else if(targetState[id]&&!huntState[id].start) huntState[id].start=new Date().toISOString().slice(0,10);
   save(); if(typeof requestAutoSyncAfterDataChange==='function')requestAutoSyncAfterDataChange();
-  // v96: update only the clicked card and hunt panel so the button always responds.
+  // v97: update only the clicked card and hunt panel so the button always responds.
   refreshSingleCollectionCard(id,{openIndividuals:openIndividualPanels.has(id)});
   try{renderCurrentHunt()}catch(e){console.error('hunt render',e)}
 };
@@ -2256,7 +2262,7 @@ function renderHomeBoxPage(){
 
 
 let activeNationalHomeBox=Number(localStorage.getItem('shinyHomeNationalBox_v1')||1);
-function nationalHomeBoxCount(){return Math.ceil(MAX_DEX/30)}
+function nationalHomeBoxCount(){try{return Math.ceil(customHomeSlotIds().length/30)}catch(e){return Math.ceil(MAX_DEX/30)}}
 function setNationalHomeBox(n){
   activeNationalHomeBox=Math.max(1,Math.min(nationalHomeBoxCount(),Number(n)||1));
   localStorage.setItem('shinyHomeNationalBox_v1',String(activeNationalHomeBox));
@@ -2398,67 +2404,75 @@ function nationalHomeBoxCount(){
   try{return homeBoxLayout().length}catch(e){return Math.ceil(MAX_DEX/30)}
 }
 
+const HOME_CUSTOM_LAYOUT_KEY='shinyHomeCustomLayout_v1';
+let homeCustomSelected=null;
+let homeLongPressTimer=null;
+function defaultHomeSlotIds(){return collectionHomeBoxes().flatMap(b=>b.entries.map(p=>p?p.id:null));}
+function customHomeSlotIds(){
+  const def=defaultHomeSlotIds();
+  try{
+    const saved=JSON.parse(localStorage.getItem(HOME_CUSTOM_LAYOUT_KEY)||'null');
+    if(!Array.isArray(saved))return def;
+    const valid=new Set(def.filter(Boolean)),seen=new Set(),arr=[];
+    for(const id of saved){if(id===null){arr.push(null);continue}if(valid.has(id)&&!seen.has(id)){arr.push(id);seen.add(id)}else arr.push(null)}
+    for(const id of def)if(id&&!seen.has(id)){const hole=arr.indexOf(null);if(hole>=0)arr[hole]=id;else arr.push(id);seen.add(id)}
+    while(arr.length<def.length)arr.push(null);return arr.slice(0,def.length);
+  }catch(e){return def}
+}
+function saveCustomHomeSlots(arr){safeLocalSet(HOME_CUSTOM_LAYOUT_KEY,JSON.stringify(arr));}
+function resetCustomHomeLayout(){if(!confirm('HOME BOXの並び順をコレクション順に戻しますか？'))return;localStorage.removeItem(HOME_CUSTOM_LAYOUT_KEY);homeCustomSelected=null;renderNationalHomeBox();}
+function homeSlotMove(from,to){
+  if(from==null||to==null||from===to)return;
+  const arr=customHomeSlotIds();if(from<0||to<0||from>=arr.length||to>=arr.length)return;
+  [arr[from],arr[to]]=[arr[to],arr[from]];saveCustomHomeSlots(arr);homeCustomSelected=null;renderNationalHomeBox();
+}
+function selectHomeSlot(globalIndex){
+  const arr=customHomeSlotIds();if(!arr[globalIndex])return;homeCustomSelected=globalIndex;renderNationalHomeBox();
+}
+function homeSlotTap(globalIndex){
+  if(homeCustomSelected!=null){homeSlotMove(homeCustomSelected,globalIndex);return}
+  const id=customHomeSlotIds()[globalIndex];if(id)showPokemonDetail(id);
+}
+function initHomeCustomInteractions(){
+  const board=el('home-dex-board');if(!board)return;
+  board.querySelectorAll('.home-dex-slot[data-home-index]').forEach(slot=>{
+    const gi=Number(slot.dataset.homeIndex),has=slot.dataset.hasPokemon==='1';
+    slot.draggable=has;
+    slot.addEventListener('dragstart',e=>{if(!has){e.preventDefault();return}homeCustomSelected=gi;e.dataTransfer.setData('text/plain',String(gi));e.dataTransfer.effectAllowed='move';});
+    slot.addEventListener('dragover',e=>{e.preventDefault();slot.classList.add('custom-drop')});
+    slot.addEventListener('dragleave',()=>slot.classList.remove('custom-drop'));
+    slot.addEventListener('drop',e=>{e.preventDefault();slot.classList.remove('custom-drop');const from=Number(e.dataTransfer.getData('text/plain'));homeSlotMove(from,gi)});
+    if(has){
+      slot.addEventListener('touchstart',e=>{clearTimeout(homeLongPressTimer);homeLongPressTimer=setTimeout(()=>{selectHomeSlot(gi);if(navigator.vibrate)navigator.vibrate(30)},450)},{passive:true});
+      slot.addEventListener('touchend',()=>clearTimeout(homeLongPressTimer),{passive:true});
+      slot.addEventListener('touchmove',()=>clearTimeout(homeLongPressTimer),{passive:true});
+    }
+  });
+}
 function renderNationalHomeBox(){
   const list=el('home-dex-box-list'),board=el('home-dex-board'),title=el('home-dex-box-title'),range=el('home-dex-range'),count=el('home-dex-owned-count'),info=el('home-dex-box-info');
   if(!list||!board)return;
-
-  // HOME BOXは色違いコレクションと同じ区分順を標準表示にする。
-  homeOrder='living';
-  localStorage.setItem('shinyHomeOrder_v1','living');
-
-  const boxes=collectionHomeBoxes(),totalBoxes=boxes.length;
+  const arr=customHomeSlotIds(),totalBoxes=Math.ceil(arr.length/30);
   activeNationalHomeBox=Math.max(1,Math.min(activeNationalHomeBox,totalBoxes));
-
-  list.innerHTML=boxes.map((box,i)=>{
-    const real=box.entries.filter(Boolean);
-    const have=real.filter(p=>homeEntryOwned(p)>0).length;
-    return `<button class="home-dex-box-btn ${i+1===activeNationalHomeBox?'active':''}" onclick="setNationalHomeBox(${i+1})">
-      <span>📦 BOX ${i+1}</span>
-      <small>${box.sectionNo} ${box.sectionLabel}　${have}/${real.length}</small>
-    </button>`;
+  list.innerHTML=Array.from({length:totalBoxes},(_,i)=>{
+    const slice=arr.slice(i*30,i*30+30),real=slice.filter(Boolean),have=real.filter(id=>(individualState[id]||[]).length>0).length;
+    return `<button class="home-dex-box-btn ${i+1===activeNationalHomeBox?'active':''}" onclick="setNationalHomeBox(${i+1})"><span>📦 BOX ${i+1}</span><small>${have}/${real.length}</small></button>`;
   }).join('');
-
-  const box=boxes[activeNationalHomeBox-1];
-  const real=box.entries.filter(Boolean);
-  title.textContent=`BOX ${activeNationalHomeBox}`;
-  if(range){
-    const first=real[0],last=real[real.length-1];
-    const noRange=first&&last?`No.${String(first.no).padStart(4,'0')}〜No.${String(last.no).padStart(4,'0')}`:'';
-    range.textContent=`${box.sectionNo} ${box.sectionLabel} ・ 区分内BOX ${box.sectionBoxNo}${noRange?' ・ '+noRange:''}`;
-  }
-
+  const base=(activeNationalHomeBox-1)*30,slice=arr.slice(base,base+30);while(slice.length<30)slice.push(null);
+  title.textContent=`BOX ${activeNationalHomeBox}`;range.textContent='カスタム配置 ・ 30枠';
   let have=0,inds=0;
-  board.innerHTML=box.entries.map((p,i)=>{
-    if(!p){
-      return `<div class="home-dex-slot missing"><span class="home-dex-no">—</span></div>`;
-    }
-    const n=homeEntryOwned(p);
-    if(n){have++;inds+=n}
-    const detail=[
-      p.form&&p.form!=='通常'?esc(p.form):'',
-      p.gender&&p.gender!=='共通'?esc(p.gender):''
-    ].filter(Boolean).join(' ');
-    return `<div class="home-dex-slot ${n?'owned':'missing'}" ${n?`onclick="showPokemonDetail('${esc(p.id)}')"`:''}>
-      <span class="home-dex-no">${p.no}</span>
-      <img loading="lazy" src="${spriteURL(p)}" onerror="this.src='${baseSpriteURL(p)}'">
-      ${n>1?`<span class="home-dex-count">×${n}</span>`:''}
-      ${n?'<span class="home-dex-shine">✨</span>':''}
-      <span class="home-dex-name">${esc(p.name)}${detail?`<br>${detail}`:''}</span>
-    </div>`;
+  board.innerHTML=slice.map((id,i)=>{
+    const gi=base+i,p=id?data.find(x=>x.id===id):null,n=p?(individualState[p.id]||[]).length:0;if(n){have++;inds+=n}
+    const detail=p?[p.form&&p.form!=='通常'?esc(p.form):'',p.gender&&p.gender!=='共通'?esc(p.gender):''].filter(Boolean).join(' '):'';
+    return `<div class="home-dex-slot custom-movable ${p?(n?'owned':'missing'):'missing'} ${homeCustomSelected===gi?'custom-selected':''}" data-home-index="${gi}" data-has-pokemon="${p?'1':'0'}" onclick="homeSlotTap(${gi})">
+      <span class="home-dex-no">${p?p.no:'—'}</span>${p?`<img loading="lazy" src="${spriteURL(p)}" onerror="this.src='${baseSpriteURL(p)}'">`:''}
+      ${n>1?`<span class="home-dex-count">×${n}</span>`:''}${n?'<span class="home-dex-shine">✨</span>':''}
+      <span class="home-dex-name">${p?esc(p.name)+(detail?`<br>${detail}`:''):'空き'}</span></div>`;
   }).join('');
-
-  if(count)count.textContent=`${have} / ${real.length}`;
-  if(info)info.innerHTML=`
-    <div class="home-info-row"><span>区分</span><b>${box.sectionNo} ${box.sectionLabel}</b></div>
-    <div class="home-info-row"><span>区分内BOX</span><b>${box.sectionBoxNo}</b></div>
-    <div class="home-info-row"><span>登録枠</span><b>${real.length} / 30</b></div>
-    <div class="home-info-row"><span>所持枠</span><b>${have}</b></div>
-    <div class="home-info-row"><span>未所持</span><b>${real.length-have}</b></div>
-    <div class="home-info-row"><span>空き枠</span><b>${30-real.length}</b></div>
-    <div class="home-info-row"><span>登録個体</span><b>${inds}</b></div>`;
-
-  const active=list.querySelector('.active');
-  if(active)active.scrollIntoView({block:'nearest'});
+  if(count)count.textContent=`${have} / ${slice.filter(Boolean).length}`;
+  if(info)info.innerHTML=`<div class="home-info-row"><span>BOX</span><b>${activeNationalHomeBox}</b></div><div class="home-info-row"><span>配置枠</span><b>${slice.filter(Boolean).length} / 30</b></div><div class="home-info-row"><span>所持枠</span><b>${have}</b></div><div class="home-info-row"><span>登録個体</span><b>${inds}</b></div>`;
+  const st=el('home-custom-status');if(st)st.textContent=homeCustomSelected!=null?'移動するポケモンを選択中：移動先の枠をタップしてください。':'';
+  initHomeCustomInteractions();const active=list.querySelector('.active');if(active)active.scrollIntoView({block:'nearest'});
 }
 
 function initHomeSwipe(){
@@ -3013,7 +3027,7 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 // ===== v56 automatic update / cache repair =====
 (function(){
-  const APP_VERSION='v96';
+  const APP_VERSION='v97';
   const UPDATE_KEY='shinyHomeReloadedForSW_'+APP_VERSION;
 
   async function registerFreshWorker(){
