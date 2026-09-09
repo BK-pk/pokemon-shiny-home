@@ -1,6 +1,63 @@
-const CACHE_NAME='shiny-home-v98';
-const APP_SHELL=['./','./index.html','./manifest.webmanifest','./icon-192.png','./icon-512.png'];
-self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE_NAME).then(c=>c.addAll(APP_SHELL)).then(()=>self.skipWaiting())));
-self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE_NAME).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
-self.addEventListener('message',e=>{if(e.data&&e.data.type==='SKIP_WAITING')self.skipWaiting()});
-self.addEventListener('fetch',e=>{const req=e.request;if(req.method!=='GET')return;if(req.mode==='navigate'||(req.headers.get('accept')||'').includes('text/html')){e.respondWith(fetch(req,{cache:'no-store'}).then(res=>{const cp=res.clone();caches.open(CACHE_NAME).then(c=>c.put('./index.html',cp));return res}).catch(()=>caches.match('./index.html')));return;}e.respondWith(caches.match(req).then(cached=>{const network=fetch(req).then(res=>{if(res&&res.ok){const cp=res.clone();caches.open(CACHE_NAME).then(c=>c.put(req,cp))}return res}).catch(()=>cached);return cached||network}))});
+const CACHE_NAME = 'shiny-home-v106';
+const CORE = [
+  './',
+  './index.html',
+  './manifest.webmanifest',
+  './icon-192.png',
+  './icon-512.png'
+];
+
+self.addEventListener('install', event => {
+  self.skipWaiting();
+  event.waitUntil((async () => {
+    const cache = await caches.open(CACHE_NAME);
+    for (const url of CORE) {
+      try { await cache.add(new Request(url, {cache:'reload'})); } catch (_) {}
+    }
+  })());
+});
+
+self.addEventListener('activate', event => {
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)));
+    await self.clients.claim();
+  })());
+});
+
+self.addEventListener('fetch', event => {
+  const req = event.request;
+  if (req.method !== 'GET') return;
+  const url = new URL(req.url);
+  if (url.origin !== self.location.origin) return;
+
+  // Always prefer the network for HTML so a new app version is never hidden by an old cache.
+  const acceptsHtml = req.mode === 'navigate' || (req.headers.get('accept') || '').includes('text/html');
+  if (acceptsHtml) {
+    event.respondWith((async () => {
+      try {
+        const fresh = await fetch(req, {cache:'no-store'});
+        if (fresh && fresh.ok && (url.pathname.endsWith('/index.html') || url.pathname.endsWith('/pokemon-shiny-home/'))) {
+          const cache = await caches.open(CACHE_NAME);
+          cache.put('./index.html', fresh.clone()).catch(()=>{});
+        }
+        return fresh;
+      } catch (_) {
+        return (await caches.match(req)) || (await caches.match('./index.html')) || Response.error();
+      }
+    })());
+    return;
+  }
+
+  event.respondWith((async () => {
+    const cached = await caches.match(req);
+    const network = fetch(req).then(async res => {
+      if (res && res.ok) {
+        const cache = await caches.open(CACHE_NAME);
+        cache.put(req, res.clone()).catch(()=>{});
+      }
+      return res;
+    }).catch(() => null);
+    return cached || await network || Response.error();
+  })());
+});
