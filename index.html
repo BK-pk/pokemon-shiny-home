@@ -576,6 +576,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 <button class="btn" id="importBtn">読込</button>
 <button class="btn" id="exportImagesBtn">画像だけ保存</button>
 <button class="btn" id="importImagesBtn">画像だけ読込</button>
+<button class="btn" id="restorePreUpdateBtn" type="button" onclick="restorePreUpdateBackup()">🛟 更新前に戻す</button>
 <input accept="application/json" hidden="" id="fileInput" type="file"/>
 <input accept="application/json" hidden="" id="imageBackupInput" type="file"/>
 </div><div class="undo-bar">
@@ -843,7 +844,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 </section>
 
 <script>
-const DATA_VERSION='full-2026-09-09-v99';
+const DATA_VERSION='full-2026-09-09-v100';
 const SPECIES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species.csv';
 const NAMES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
 const MAX_DEX=1025;
@@ -2168,6 +2169,49 @@ function captureRecordMessage(count){
 }
 
 
+
+const PREUPDATE_BACKUP_KEY='shinyHomePreUpdateBackup_v1';
+function getPreUpdateBackup(){
+  try{return JSON.parse(localStorage.getItem(PREUPDATE_BACKUP_KEY)||'null')}catch(e){return null}
+}
+function restorePreUpdateBackup(){
+  const b=getPreUpdateBackup();
+  if(!b||!b.values){showToast('更新前バックアップはまだありません。');return}
+  const when=b.createdAt?new Date(b.createdAt).toLocaleString('ja-JP'):'日時不明';
+  const src=b.sourceVersion||'更新前';
+  const count=Object.keys(b.values).length;
+  const note=b.partial?'\n※画像データは容量の都合で含まれていません。':'';
+  if(!confirm(`${src} の更新前バックアップ（${when} / ${count}項目）へ戻しますか？${note}\n\n現在のデータはこの操作で置き換わります。`))return;
+  try{
+    backupRestoring=true;
+    // Restore raw localStorage values directly. This avoids running save() against a half-restored state.
+    const managed=[
+      'shinyHomeState_v1','shinyHomeBoxes_v1','shinyHomeDates_v1','shinyHomeGames_v1',
+      'shinyHomeIndividuals_v1','shinyHomeTargets_v1','shinyHomeHunts_v1','shinyHomeMonthImages_v1',
+      'shinyHomeIndividualScreenshots_v1','shinyHomeNationalBox_v1','shinyHomeOrder_v1',
+      'shinyHomeActiveTab_v1','shinyHomeMobileFocusedHunt_v1'
+    ];
+    for(const key of managed){
+      if(Object.prototype.hasOwnProperty.call(b.values,key)) localStorage.setItem(key,b.values[key]);
+      else if(!b.partial) localStorage.removeItem(key);
+    }
+    backupRestoring=false;
+    location.reload();
+  }catch(e){
+    backupRestoring=false;
+    alert('更新前バックアップを復元できませんでした: '+e.message);
+  }
+}
+function updatePreUpdateButtonState(){
+  const btn=document.getElementById('restorePreUpdateBtn'); if(!btn)return;
+  const b=getPreUpdateBackup();
+  if(!b){btn.disabled=true;btn.title='更新前バックアップはまだありません';return}
+  btn.disabled=false;
+  const when=b.createdAt?new Date(b.createdAt).toLocaleString('ja-JP'):'日時不明';
+  btn.title=`${b.sourceVersion||'更新前'} / ${when}${b.partial?' / 画像なし':''}`;
+}
+setTimeout(updatePreUpdateButtonState,0);
+
 function restoreSnapshotObject(d){
   for(const [target,src] of [[state,d.state],[boxState,d.boxState],[dateState,d.dateState],[gameState,d.gameState],[individualState,d.individualState],[targetState,d.targetState],[huntState,d.huntState],[monthImages,d.monthImages],[individualScreenshots,d.individualScreenshots]]){
     Object.keys(target).forEach(k=>delete target[k]);Object.assign(target,src||{});
@@ -3027,7 +3071,7 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 // ===== v56 automatic update / cache repair =====
 (function(){
-  const APP_VERSION='v99';
+  const APP_VERSION='v100';
   const UPDATE_KEY='shinyHomeReloadedForSW_'+APP_VERSION;
 
   async function registerFreshWorker(){
