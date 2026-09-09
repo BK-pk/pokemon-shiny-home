@@ -503,7 +503,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
   -webkit-tap-highlight-color:transparent;
 }
 
-/* ===== v90 hunt UX / dashboard / drag / offline ===== */
+/* ===== v91 hunt UX / dashboard / drag / offline ===== */
 .hunt-progress-strip{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:2px}
 .hunt-mini-stat{background:#091522;border:1px solid #263c53;border-radius:10px;padding:8px 10px}.hunt-mini-stat span{display:block;color:var(--muted);font-size:9px;margin-bottom:2px}.hunt-mini-stat strong{font-size:13px;color:#eef7ff}.hunt-mini-stat.prob strong{color:var(--gold)}
 .drag-handle{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border:1px solid #36516d;border-radius:9px;color:#9db5c9;cursor:grab;user-select:none;touch-action:none;background:#0b1b2b;font-size:17px}.drag-handle:active{cursor:grabbing}.hunt-chip.dragging,.mobile-hunt-card.dragging{opacity:.62;outline:2px solid var(--cyan);transform:scale(.99)}
@@ -559,7 +559,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
   </div>
 
   <div id="mobile-active-hunt" class="mobile-active-hunt" style="display:none">
-    <div id="mobile-sync-status" class="mobile-hunt-meta" style="text-align:center;margin:4px 0 8px">☁️ 端末内に保存済み ・ v90</div>
+    <div id="mobile-sync-status" class="mobile-hunt-meta" style="text-align:center;margin:4px 0 8px">☁️ 端末内に保存済み ・ v91</div>
     <div id="mobile-multi-hunt-list" class="mobile-hunt-list"></div>
     <button id="mobile-multi-add" class="btn" type="button">＋ 厳選を追加</button>
   </div>
@@ -812,7 +812,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
     <div class="extra-panel">
       <div class="extra-head">
         <div><h2 style="margin:0">☁️ Supabase 同期</h2>
-        <span class="section-count">PC・iPhoneで同じデータを共有 ・ build v90</span></div>
+        <span class="section-count">PC・iPhoneで同じデータを共有 ・ build v91</span></div>
       </div>
       <div class="sync-fields">
         <label>Supabase URL<input id="supabase-url" autocomplete="off" placeholder="https://xxxx.supabase.co"></label>
@@ -827,9 +827,9 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
         <button class="btn" id="cloud-check" type="button">クラウド確認</button>
       </div>
       <div id="cloud-status" class="home-help">未設定です。</div>
-      <div id="auto-sync-status" class="home-help" style="margin-top:8px">同期：v90 外出向け省通信</div><div id="network-status" class="net-pill">● 通信状態を確認中</div>
+      <div id="auto-sync-status" class="home-help" style="margin-top:8px">同期：v91 外出向け省通信</div><div id="network-status" class="net-pill">● 通信状態を確認中</div>
       <div class="home-help" style="margin-top:8px">
-        v90ではカウンター操作中は通信せず端末内へ即保存します。10秒操作がなければクラウドへ保存し、他端末は最新時刻の値だけを取り込みます。所持状況・HOME BOXなどのフルデータは上のボタンで手動同期します。
+        v91ではカウンター操作中は通信せず端末内へ即保存します。10秒操作がなければクラウドへ保存し、他端末は最新時刻の値だけを取り込みます。所持状況・HOME BOXなどのフルデータは上のボタンで手動同期します。
       </div>
       <div class="home-help" style="margin-top:10px">初回は「設定保存」→「接続テスト」の順に確認してください。既存データがある場合、確認前にクラウドへ保存しないでください。</div>
     </div>
@@ -837,13 +837,9 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 </section>
 
 <script>
-const DATA_VERSION='full-2026-09-09-v90';
+const DATA_VERSION='full-2026-09-09-v91';
 const SPECIES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species.csv';
 const NAMES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
-const SPECIES_URLS=[SPECIES_URL,'https://cdn.jsdelivr.net/gh/PokeAPI/pokeapi@master/data/v2/csv/pokemon_species.csv'];
-const NAMES_URLS=[NAMES_URL,'https://cdn.jsdelivr.net/gh/PokeAPI/pokeapi@master/data/v2/csv/pokemon_species_names.csv'];
-const JA_NAMES_URLS=['https://raw.githubusercontent.com/sindresorhus/pokemon/main/data/ja.json','https://cdn.jsdelivr.net/gh/sindresorhus/pokemon@main/data/ja.json','https://unpkg.com/pokemon@3.3.0/data/ja.json'];
-const EN_NAMES_URLS=['https://raw.githubusercontent.com/sindresorhus/pokemon/main/data/en.json','https://cdn.jsdelivr.net/gh/sindresorhus/pokemon@main/data/en.json','https://unpkg.com/pokemon@3.3.0/data/en.json'];
 const MAX_DEX=1025;
 const BUILTIN_JA_NAMES=["フシギダネ","フシギソウ","フシギバナ","ヒトカゲ","リザード","リザードン","ゼニガメ","カメール","カメックス","キャタピー","トランセル","バタフリー","ビードル","コクーン","スピアー","ポッポ","ピジョン","ピジョット","コラッタ","ラッタ","オニスズメ","オニドリル","アーボ","アーボック","ピカチュウ","ライチュウ","サンド","サンドパン","ニドラン♀","ニドリーナ","ニドクイン","ニドラン♂","ニドリーノ","ニドキング","ピッピ","ピクシー","ロコン","キュウコン","プリン","プクリン","ズバット","ゴルバット","ナゾノクサ","クサイハナ","ラフレシア","パラス","パラセクト","コンパン","モルフォン","ディグダ","ダグトリオ","ニャース","ペルシアン","コダック","ゴルダック","マンキー","オコリザル","ガーディ","ウインディ","ニョロモ","ニョロゾ","ニョロボン","ケーシィ","ユンゲラー","フーディン","ワンリキー","ゴーリキー","カイリキー","マダツボミ","ウツドン","ウツボット","メノクラゲ","ドククラゲ","イシツブテ","ゴローン","ゴローニャ","ポニータ","ギャロップ","ヤドン","ヤドラン","コイル","レアコイル","カモネギ","ドードー","ドードリオ","パウワウ","ジュゴン","ベトベター","ベトベトン","シェルダー","パルシェン","ゴース","ゴースト","ゲンガー","イワーク","スリープ","スリーパー","クラブ","キングラー","ビリリダマ","マルマイン","タマタマ","ナッシー","カラカラ","ガラガラ","サワムラー","エビワラー","ベロリンガ","ドガース","マタドガス","サイホーン","サイドン","ラッキー","モンジャラ","ガルーラ","タッツー","シードラ","トサキント","アズマオウ","ヒトデマン","スターミー","バリヤード","ストライク","ルージュラ","エレブー","ブーバー","カイロス","ケンタロス","コイキング","ギャラドス","ラプラス","メタモン","イーブイ","シャワーズ","サンダース","ブースター","ポリゴン","オムナイト","オムスター","カブト","カブトプス","プテラ","カビゴン","フリーザー","サンダー","ファイヤー","ミニリュウ","ハクリュー","カイリュー","ミュウツー","ミュウ","チコリータ","ベイリーフ","メガニウム","ヒノアラシ","マグマラシ","バクフーン","ワニノコ","アリゲイツ","オーダイル","オタチ","オオタチ","ホーホー","ヨルノズク","レディバ","レディアン","イトマル","アリアドス","クロバット","チョンチー","ランターン","ピチュー","ピィ","ププリン","トゲピー","トゲチック","ネイティ","ネイティオ","メリープ","モココ","デンリュウ","キレイハナ","マリル","マリルリ","ウソッキー","ニョロトノ","ハネッコ","ポポッコ","ワタッコ","エイパム","ヒマナッツ","キマワリ","ヤンヤンマ","ウパー","ヌオー","エーフィ","ブラッキー","ヤミカラス","ヤドキング","ムウマ","アンノーン","ソーナンス","キリンリキ","クヌギダマ","フォレトス","ノコッチ","グライガー","ハガネール","ブルー","グランブル","ハリーセン","ハッサム","ツボツボ","ヘラクロス","ニューラ","ヒメグマ","リングマ","マグマッグ","マグカルゴ","ウリムー","イノムー","サニーゴ","テッポウオ","オクタン","デリバード","マンタイン","エアームド","デルビル","ヘルガー","キングドラ","ゴマゾウ","ドンファン","ポリゴン２","オドシシ","ドーブル","バルキー","カポエラー","ムチュール","エレキッド","ブビィ","ミルタンク","ハピナス","ライコウ","エンテイ","スイクン","ヨーギラス","サナギラス","バンギラス","ルギア","ホウオウ","セレビィ","キモリ","ジュプトル","ジュカイン","アチャモ","ワカシャモ","バシャーモ","ミズゴロウ","ヌマクロー","ラグラージ","ポチエナ","グラエナ","ジグザグマ","マッスグマ","ケムッソ","カラサリス","アゲハント","マユルド","ドクケイル","ハスボー","ハスブレロ","ルンパッパ","タネボー","コノハナ","ダーテング","スバメ","オオスバメ","キャモメ","ペリッパー","ラルトス","キルリア","サーナイト","アメタマ","アメモース","キノココ","キノガッサ","ナマケロ","ヤルキモノ","ケッキング","ツチニン","テッカニン","ヌケニン","ゴニョニョ","ドゴーム","バクオング","マクノシタ","ハリテヤマ","ルリリ","ノズパス","エネコ","エネコロロ","ヤミラミ","クチート","ココドラ","コドラ","ボスゴドラ","アサナン","チャーレム","ラクライ","ライボルト","プラスル","マイナン","バルビート","イルミーゼ","ロゼリア","ゴクリン","マルノーム","キバニア","サメハダー","ホエルコ","ホエルオー","ドンメル","バクーダ","コータス","バネブー","ブーピッグ","パッチール","ナックラー","ビブラーバ","フライゴン","サボネア","ノクタス","チルット","チルタリス","ザングース","ハブネーク","ルナトーン","ソルロック","ドジョッチ","ナマズン","ヘイガニ","シザリガー","ヤジロン","ネンドール","リリーラ","ユレイドル","アノプス","アーマルド","ヒンバス","ミロカロス","ポワルン","カクレオン","カゲボウズ","ジュペッタ","ヨマワル","サマヨール","トロピウス","チリーン","アブソル","ソーナノ","ユキワラシ","オニゴーリ","タマザラシ","トドグラー","トドゼルガ","パールル","ハンテール","サクラビス","ジーランス","ラブカス","タツベイ","コモルー","ボーマンダ","ダンバル","メタング","メタグロス","レジロック","レジアイス","レジスチル","ラティアス","ラティオス","カイオーガ","グラードン","レックウザ","ジラーチ","デオキシス","ナエトル","ハヤシガメ","ドダイトス","ヒコザル","モウカザル","ゴウカザル","ポッチャマ","ポッタイシ","エンペルト","ムックル","ムクバード","ムクホーク","ビッパ","ビーダル","コロボーシ","コロトック","コリンク","ルクシオ","レントラー","スボミー","ロズレイド","ズガイドス","ラムパルド","タテトプス","トリデプス","ミノムッチ","ミノマダム","ガーメイル","ミツハニー","ビークイン","パチリス","ブイゼル","フローゼル","チェリンボ","チェリム","カラナクシ","トリトドン","エテボース","フワンテ","フワライド","ミミロル","ミミロップ","ムウマージ","ドンカラス","ニャルマー","ブニャット","リーシャン","スカンプー","スカタンク","ドーミラー","ドータクン","ウソハチ","マネネ","ピンプク","ペラップ","ミカルゲ","フカマル","ガバイト","ガブリアス","ゴンベ","リオル","ルカリオ","ヒポポタス","カバルドン","スコルピ","ドラピオン","グレッグル","ドクロッグ","マスキッパ","ケイコウオ","ネオラント","タマンタ","ユキカブリ","ユキノオー","マニューラ","ジバコイル","ベロベルト","ドサイドン","モジャンボ","エレキブル","ブーバーン","トゲキッス","メガヤンマ","リーフィア","グレイシア","グライオン","マンムー","ポリゴンＺ","エルレイド","ダイノーズ","ヨノワール","ユキメノコ","ロトム","ユクシー","エムリット","アグノム","ディアルガ","パルキア","ヒードラン","レジギガス","ギラティナ","クレセリア","フィオネ","マナフィ","ダークライ","シェイミ","アルセウス","ビクティニ","ツタージャ","ジャノビー","ジャローダ","ポカブ","チャオブー","エンブオー","ミジュマル","フタチマル","ダイケンキ","ミネズミ","ミルホッグ","ヨーテリー","ハーデリア","ムーランド","チョロネコ","レパルダス","ヤナップ","ヤナッキー","バオップ","バオッキー","ヒヤップ","ヒヤッキー","ムンナ","ムシャーナ","マメパト","ハトーボー","ケンホロウ","シママ","ゼブライカ","ダンゴロ","ガントル","ギガイアス","コロモリ","ココロモリ","モグリュー","ドリュウズ","タブンネ","ドッコラー","ドテッコツ","ローブシン","オタマロ","ガマガル","ガマゲロゲ","ナゲキ","ダゲキ","クルミル","クルマユ","ハハコモリ","フシデ","ホイーガ","ペンドラー","モンメン","エルフーン","チュリネ","ドレディア","バスラオ","メグロコ","ワルビル","ワルビアル","ダルマッカ","ヒヒダルマ","マラカッチ","イシズマイ","イワパレス","ズルッグ","ズルズキン","シンボラー","デスマス","デスカーン","プロトーガ","アバゴーラ","アーケン","アーケオス","ヤブクロン","ダストダス","ゾロア","ゾロアーク","チラーミィ","チラチーノ","ゴチム","ゴチミル","ゴチルゼル","ユニラン","ダブラン","ランクルス","コアルヒー","スワンナ","バニプッチ","バニリッチ","バイバニラ","シキジカ","メブキジカ","エモンガ","カブルモ","シュバルゴ","タマゲタケ","モロバレル","プルリル","ブルンゲル","ママンボウ","バチュル","デンチュラ","テッシード","ナットレイ","ギアル","ギギアル","ギギギアル","シビシラス","シビビール","シビルドン","リグレー","オーベム","ヒトモシ","ランプラー","シャンデラ","キバゴ","オノンド","オノノクス","クマシュン","ツンベアー","フリージオ","チョボマキ","アギルダー","マッギョ","コジョフー","コジョンド","クリムガン","ゴビット","ゴルーグ","コマタナ","キリキザン","バッフロン","ワシボン","ウォーグル","バルチャイ","バルジーナ","クイタラン","アイアント","モノズ","ジヘッド","サザンドラ","メラルバ","ウルガモス","コバルオン","テラキオン","ビリジオン","トルネロス","ボルトロス","レシラム","ゼクロム","ランドロス","キュレム","ケルディオ","メロエッタ","ゲノセクト","ハリマロン","ハリボーグ","ブリガロン","フォッコ","テールナー","マフォクシー","ケロマツ","ゲコガシラ","ゲッコウガ","ホルビー","ホルード","ヤヤコマ","ヒノヤコマ","ファイアロー","コフキムシ","コフーライ","ビビヨン","シシコ","カエンジシ","フラベベ","フラエッテ","フラージェス","メェークル","ゴーゴート","ヤンチャム","ゴロンダ","トリミアン","ニャスパー","ニャオニクス","ヒトツキ","ニダンギル","ギルガルド","シュシュプ","フレフワン","ペロッパフ","ペロリーム","マーイーカ","カラマネロ","カメテテ","ガメノデス","クズモー","ドラミドロ","ウデッポウ","ブロスター","エリキテル","エレザード","チゴラス","ガチゴラス","アマルス","アマルルガ","ニンフィア","ルチャブル","デデンネ","メレシー","ヌメラ","ヌメイル","ヌメルゴン","クレッフィ","ボクレー","オーロット","バケッチャ","パンプジン","カチコール","クレベース","オンバット","オンバーン","ゼルネアス","イベルタル","ジガルデ","ディアンシー","フーパ","ボルケニオン","モクロー","フクスロー","ジュナイパー","ニャビー","ニャヒート","ガオガエン","アシマリ","オシャマリ","アシレーヌ","ツツケラ","ケララッパ","ドデカバシ","ヤングース","デカグース","アゴジムシ","デンヂムシ","クワガノン","マケンカニ","ケケンカニ","オドリドリ","アブリー","アブリボン","イワンコ","ルガルガン","ヨワシ","ヒドイデ","ドヒドイデ","ドロバンコ","バンバドロ","シズクモ","オニシズクモ","カリキリ","ラランテス","ネマシュ","マシェード","ヤトウモリ","エンニュート","ヌイコグマ","キテルグマ","アマカジ","アママイコ","アマージョ","キュワワー","ヤレユータン","ナゲツケサル","コソクムシ","グソクムシャ","スナバァ","シロデスナ","ナマコブシ","タイプ：ヌル","シルヴァディ","メテノ","ネッコアラ","バクガメス","トゲデマル","ミミッキュ","ハギギシリ","ジジーロン","ダダリン","ジャラコ","ジャランゴ","ジャラランガ","カプ・コケコ","カプ・テテフ","カプ・ブルル","カプ・レヒレ","コスモッグ","コスモウム","ソルガレオ","ルナアーラ","ウツロイド","マッシブーン","フェローチェ","デンジュモク","テッカグヤ","カミツルギ","アクジキング","ネクロズマ","マギアナ","マーシャドー","ベベノム","アーゴヨン","ツンデツンデ","ズガドーン","ゼラオラ","メルタン","メルメタル","サルノリ","バチンキー","ゴリランダー","ヒバニー","ラビフット","エースバーン","メッソン","ジメレオン","インテレオン","ホシガリス","ヨクバリス","ココガラ","アオガラス","アーマーガア","サッチムシ","レドームシ","イオルブ","クスネ","フォクスライ","ヒメンカ","ワタシラガ","ウールー","バイウールー","カムカメ","カジリガメ","ワンパチ","パルスワン","タンドン","トロッゴン","セキタンザン","カジッチュ","アップリュー","タルップル","スナヘビ","サダイジャ","ウッウ","サシカマス","カマスジョー","エレズン","ストリンダー","ヤクデ","マルヤクデ","タタッコ","オトスパス","ヤバチャ","ポットデス","ミブリム","テブリム","ブリムオン","ベロバー","ギモー","オーロンゲ","タチフサグマ","ニャイキング","サニゴーン","ネギガナイト","バリコオル","デスバーン","マホミル","マホイップ","タイレーツ","バチンウニ","ユキハミ","モスノウ","イシヘンジン","コオリッポ","イエッサン","モルペコ","ゾウドウ","ダイオウドウ","パッチラゴン","パッチルドン","ウオノラゴン","ウオチルドン","ジュラルドン","ドラメシヤ","ドロンチ","ドラパルト","ザシアン","ザマゼンタ","ムゲンダイナ","ダクマ","ウーラオス","ザルード","レジエレキ","レジドラゴ","ブリザポス","レイスポス","バドレックス","アヤシシ","バサギリ","ガチグマ","イダイトウ","オオニューラ","ハリーマン","ラブトロス","ニャオハ","ニャローテ","マスカーニャ","ホゲータ","アチゲータ","ラウドボーン","クワッス","ウェルカモ","ウェーニバル","グルトン","パフュートン","タマンチュラ","ワナイダー","マメバッタ","エクスレッグ","パモ","パモット","パーモット","ワッカネズミ","イッカネズミ","パピモッチ","バウッツェル","ミニーブ","オリーニョ","オリーヴァ","イキリンコ","コジオ","ジオヅム","キョジオーン","カルボウ","グレンアルマ","ソウブレイズ","ズピカ","ハラバリー","カイデン","タイカイデン","オラチフ","マフィティフ","シルシュルー","タギングル","アノクサ","アノホラグサ","ノノクラゲ","リククラゲ","ガケガニ","カプサイジ","スコヴィラン","シガロコ","ベラカス","ヒラヒナ","クエスパトラ","カヌチャン","ナカヌチャン","デカヌチャン","ウミディグダ","ウミトリオ","オトシドリ","ナミイルカ","イルカマン","ブロロン","ブロロローム","モトトカゲ","ミミズズ","キラーメ","キラフロル","ボチ","ハカドッグ","カラミンゴ","アルクジラ","ハルクジラ","ミガルーサ","ヘイラッシャ","シャリタツ","コノヨザル","ドオー","リキキリン","ノココッチ","ドドゲザン","イダイナキバ","サケブシッポ","アラブルタケ","ハバタクカミ","チヲハウハネ","スナノケガワ","テツノワダチ","テツノツツミ","テツノカイナ","テツノコウベ","テツノドクガ","テツノイバラ","セビエ","セゴール","セグレイブ","コレクレー","サーフゴー","チオンジェン","パオジアン","ディンルー","イーユイ","トドロクツキ","テツノブジン","コライドン","ミライドン","ウネルミナモ","テツノイサハ","カミッチュ","チャデス","ヤバソチャ","イイネイヌ","マシマシラ","キチキギス","オーガポン","ブリジュラス","カミツオロチ","ウガツホムラ","タケルライコ","テツノイワオ","テツノカシラ","テラパゴス","モモワロウ"];
 let data=[];
@@ -1010,55 +1006,63 @@ function offlineSpeciesFallback(){
     return {
       no,
       en:`pokemon-${no}`,
-      name:`No.${String(no).padStart(4,'0')}`,
+      name:BUILTIN_JA_NAMES[no-1]||`No.${String(no).padStart(4,'0')}`,
       gen:genFor(no),
       genderDiff:false
     };
   });
 }
 async function loadSpecies(){
-  // v90: 日本語名1025匹分をアプリ本体に内蔵。
-  // 外部サイト・キャッシュ・通信状態に関係なく、必ず日本語名で起動する。
-  let species=Array.from({length:MAX_DEX},(_,i)=>({
-    no:i+1,
-    en:`pokemon-${i+1}`,
-    name:BUILTIN_JA_NAMES[i]||`No.${String(i+1).padStart(4,'0')}`,
-    gen:genFor(i+1),
-    genderDiff:false
-  }));
-
-  // 英語slug・性別差などの補助情報だけ、取れれば後から使う。
-  // 失敗しても日本語名表示・検索には一切影響しない。
-  try{
-    const cached=localStorage.getItem('shinyHomeSpeciesMeta_stable_v1');
+  const cacheKeys=[
+    'shinyHomeSpeciesCache_'+DATA_VERSION,
+    'shinyHomeSpeciesCache_full-2026-09-08-v50',
+    'shinyHomeSpeciesCache_full-2026-09-08-v49',
+    'shinyHomeSpeciesCache_full-2026-09-08-v48'
+  ];
+  for(const key of cacheKeys){
+    const cached=localStorage.getItem(key);
     if(cached){
-      const meta=JSON.parse(cached);
-      if(Array.isArray(meta)&&meta.length>=MAX_DEX){
-        species=species.map((x,i)=>({...x,...(meta[i]||{}),name:x.name,no:x.no}));
-        return species;
-      }
+      try{
+        const parsed=JSON.parse(cached);
+        if(Array.isArray(parsed)&&parsed.length>=MAX_DEX)return parsed;
+      }catch{}
     }
-  }catch(_){ }
+  }
 
-  // 補助メタデータはバックグラウンド取得。起動は待たない。
-  setTimeout(async()=>{
-    try{
-      let st='';
-      for(const url of SPECIES_URLS){
-        try{const r=await fetch(url,{cache:'force-cache'});if(r.ok){st=await r.text();if(st.length>1000)break}}catch(_){ }
-      }
-      if(!st)return;
-      const sr=parseCSV(st),sh=sr[0],si=Object.fromEntries(sh.map((x,i)=>[x,i]));
-      const meta=Array.from({length:MAX_DEX},()=>null);
-      for(let i=1;i<sr.length;i++){
-        const no=Number(sr[i][si.id]);if(!no||no>MAX_DEX)continue;
-        meta[no-1]={en:sr[i][si.identifier],gen:Number(sr[i][si.generation_id])||genFor(no),genderDiff:sr[i][si.has_gender_differences]==='1'};
-      }
-      if(meta.filter(Boolean).length>=MAX_DEX){localStorage.setItem('shinyHomeSpeciesMeta_stable_v1',JSON.stringify(meta));}
-    }catch(_){ }
-  },0);
-
-  return species;
+  // 外部取得は最大4秒。取れなければ待たずにオフラインデータで起動。
+  try{
+    const fetchText=async url=>{
+      const r=await fetch(url,{cache:'force-cache'});
+      if(!r.ok)throw Error('fetch');
+      return r.text();
+    };
+    const [st,nt]=await Promise.race([
+      Promise.all([fetchText(SPECIES_URL),fetchText(NAMES_URL)]),
+      new Promise((_,reject)=>setTimeout(()=>reject(Error('timeout')),4000))
+    ]);
+    const sr=parseCSV(st), nr=parseCSV(nt);
+    const sh=sr[0], si=Object.fromEntries(sh.map((x,i)=>[x,i]));
+    const names=new Map();
+    for(let i=1;i<nr.length;i++){if(nr[i][1]==='1')names.set(Number(nr[i][0]),nr[i][2]);}
+    const species=[];
+    for(let i=1;i<sr.length;i++){
+      const no=Number(sr[i][si.id]); if(!no||no>MAX_DEX)continue;
+      species.push({
+        no,
+        en:sr[i][si.identifier],
+        name:names.get(no)||sr[i][si.identifier],
+        gen:Number(sr[i][si.generation_id])||genFor(no),
+        genderDiff:sr[i][si.has_gender_differences]==='1'
+      });
+    }
+    if(species.length>=MAX_DEX){
+      localStorage.setItem('shinyHomeSpeciesCache_'+DATA_VERSION,JSON.stringify(species));
+      return species;
+    }
+  }catch(err){
+    console.warn('外部ポケモンデータを取得できないため、オフライン表示で起動します。',err);
+  }
+  return offlineSpeciesFallback();
 }
 let backupRestoring=false;
 function currentDataSnapshot(){
@@ -1143,7 +1147,7 @@ function individualBadges(id,uid){
   }
   return badges;
 }
-// v90: keep individual editors open across collection rerenders.
+// v91: keep individual editors open across collection rerenders.
 // This prevents the newly added editor from disappearing after saving fields
 // or after another panel/stat refresh.
 const openIndividualPanels=new Set();
@@ -1179,7 +1183,6 @@ function individualRowHTML(p,ind,i){
       <div class="detail-field"><label>ボール</label><div class="ball-select-wrap"><img id="ball-${encodeURIComponent(p.id)}-${i}" src="${ballIcon(ind.ball)}" alt=""><select onchange="setIndividual('${esc(p.id)}',${i},'ball',this.value);document.getElementById('ball-${encodeURIComponent(p.id)}-${i}').src=ballIcon(this.value)">${ballOptions(ind.ball)}</select></div></div>
       <div class="detail-field"><label>厳選方法</label><select onchange="setIndividual('${esc(p.id)}',${i},'huntMethod',this.value)">${huntMethodOptions(ind.huntMethod||'')}</select></div>
       <div class="detail-field"><label>${esc(counterLabel(ind.huntMethod||''))}</label><input type="number" min="0" value="${Number(ind.huntCount||0)}" onchange="setManualHuntCount('${esc(p.id)}','${esc(ind.uid)}',this.value)"></div>
-
       <div class="detail-field"><label>入手区分</label><select onchange="setIndividual('${esc(p.id)}',${i},'source',this.value)"><option value="">入手区分</option><option ${ind.source==='自己産'?'selected':''}>自己産</option><option ${ind.source==='交換'?'selected':''}>交換</option><option ${ind.source==='配布'?'selected':''}>配布</option><option ${ind.source==='その他'?'selected':''}>その他</option></select></div>
       <div class="detail-field"><label>開始日</label><input type="date" value="${esc(ind.huntStart||'')}" onchange="setIndividual('${esc(p.id)}',${i},'huntStart',this.value)"></div>
     </div>
@@ -2379,7 +2382,7 @@ function estimatedOdds(indOrHunt){
   if(method==='国際孵化')return charm?512:683;
   if(method==='SOS連鎖')return charm?273.53:315.54;
   if(game==='SV'&&['サンドウィッチ厳選','大量発生＋サンドウィッチ','大量発生','大量発生（SV）'].includes(method)){
-    const sp=Number(indOrHunt.sparkling)||0,cleared=String(indOrHunt.outbreak||'0');
+    const sp=Number(indOrHunt.sparkling)||0, cleared=String(indOrHunt.outbreak||'0');
     let rolls=1+(charm?2:0)+Math.max(0,Math.min(3,sp));
     if(['大量発生＋サンドウィッチ','大量発生','大量発生（SV）'].includes(method)){if(cleared==='30')rolls+=1;if(cleared==='60')rolls+=2;}
     return oddsFromRolls(rolls);
@@ -2583,7 +2586,7 @@ function shinyOdds(game,method,charm,hunt={}){
   if(game==='SV'&&['大量発生','大量発生（SV）','サンドウィッチ厳選','大量発生＋サンドウィッチ'].includes(method)){
     const isOutbreak=['大量発生','大量発生（SV）','大量発生＋サンドウィッチ'].includes(method);
     const cleared=isOutbreak?String(hunt.outbreak||'0'):'0';
-    const sp=Number(hunt.sparkling)||0;
+    const sp=['サンドウィッチ厳選','大量発生＋サンドウィッチ'].includes(method)?Number(hunt.sparkling)||0:(Number(hunt.sparkling)||0);
     let rolls=1+(c?2:0)+Math.max(0,Math.min(3,sp));
     if(isOutbreak&&cleared==='30')rolls+=1;
     if(isOutbreak&&cleared==='60')rolls+=2;
@@ -2741,23 +2744,29 @@ for(const g of gameOptions.filter(Boolean)){const o=document.createElement('opti
 (async()=>{
   try{
     const species=await loadSpecies();
-    if(!species){
-      const loading=el('loading');
-      if(loading)loading.innerHTML='📡 ポケモン名データを取得できませんでした。<br><button class="btn" type="button" onclick="location.reload()" style="margin-top:10px">↻ もう一度読み込む</button>';
-      return;
-    }
     data=buildData(species);
     ensureLegacyIndividuals();
     save();
     const loading=el('loading');
     if(loading){
-      loading.style.display='none';
+      const offline=species.some(s=>/^No\.\d{4}$/.test(s.name||''));
+      if(offline){
+        loading.innerHTML='📱 オフライン表示で起動しました。<br><small>保存済みデータ・HOME BOX・統計は利用できます。ポケモン名と画像は、外部通信できるブラウザで開くと自動表示されます。</small>';
+        loading.style.display='block';
+        loading.style.marginBottom='18px';
+      }else{
+        loading.style.display='none';
+      }
     }
     render();
   }catch(err){
     console.error(err);
+    // 最終保険：通信やキャッシュに問題があっても画面を起動する。
+    data=buildData(offlineSpeciesFallback());
+    ensureLegacyIndividuals();
+    render();
     const loading=el('loading');
-    if(loading){loading.style.display='block';loading.innerHTML='📡 ポケモン名を読み込めませんでした。<br><small>数秒後に自動で再接続します。</small>';setTimeout(()=>location.reload(),5000);}
+    if(loading)loading.innerHTML='📱 オフライン表示で起動しました。';
   }
 })();
 
@@ -2909,7 +2918,7 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 // ===== v56 automatic update / cache repair =====
 (function(){
-  const APP_VERSION='v90';
+  const APP_VERSION='v91';
   const UPDATE_KEY='shinyHomeReloadedForSW_'+APP_VERSION;
 
   async function registerFreshWorker(){
@@ -2963,7 +2972,7 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 
 
-// ===== v90 travel sync: local-first + hunt-session cloud sync =====
+// ===== v91 travel sync: local-first + hunt-session cloud sync =====
 (function(){
   const CLOUD_KEY='shinyHomeCloudSettings_v2', COUNTER_TABLE='shiny_home_hunt_counters';
   const EDIT_KEY='shinyHomeCounterLocalEdits_v1', SYNC_KEY='shinyHomeCounterLastSync_v1';
@@ -2972,7 +2981,7 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
   function cfg(){const fallback={url:'https://litkisamojglstbjwloo.supabase.co',key:'sb_publishable_pc-8E8ETM6yZ3OcB1cNkjA_OzVjc-Rh',userId:'pokemon-shiny-home'};try{return {...fallback,...(JSON.parse(localStorage.getItem(CLOUD_KEY)||localStorage.getItem('shinyHomeCloudSettings_v1')||'{}')||{})}}catch{return fallback}}
   function headers(c){return {apikey:c.key,Authorization:'Bearer '+c.key,'Content-Type':'application/json'}}
   function readMap(k){try{return JSON.parse(localStorage.getItem(k)||'{}')||{}}catch{return {}}} function writeMap(k,o){try{localStorage.setItem(k,JSON.stringify(o))}catch(_){}}
-  function setStatus(msg,kind){const e=$('auto-sync-status');if(e){e.textContent='同期：'+msg;e.style.color=kind==='ok'?'#8fe6b0':kind==='err'?'#ff9c9c':''}const m=$('mobile-sync-status');if(m){m.textContent='☁️ '+msg+' ・ v90';m.style.color=kind==='ok'?'#8fe6b0':kind==='err'?'#ff9c9c':''}}
+  function setStatus(msg,kind){const e=$('auto-sync-status');if(e){e.textContent='同期：'+msg;e.style.color=kind==='ok'?'#8fe6b0':kind==='err'?'#ff9c9c':''}const m=$('mobile-sync-status');if(m){m.textContent='☁️ '+msg+' ・ v91';m.style.color=kind==='ok'?'#8fe6b0':kind==='err'?'#ff9c9c':''}}
   function hunts(){try{return typeof huntState==='object'&&huntState?huntState:JSON.parse(localStorage.getItem('shinyHomeHunts_v1')||'{}')}catch{return {}}} function targets(){try{return typeof targetState==='object'&&targetState?targetState:JSON.parse(localStorage.getItem('shinyHomeTargets_v1')||'{}')}catch{return {}}}
   function persist(h,t){localStorage.setItem('shinyHomeHunts_v1',JSON.stringify(h));localStorage.setItem('shinyHomeTargets_v1',JSON.stringify(t));try{if(typeof save==='function')save()}catch(_){}}
   function markEdit(id,at){const m=readMap(EDIT_KEY);m[id]=at;writeMap(EDIT_KEY,m)} function editAt(id){return Number(readMap(EDIT_KEY)[id]||0)||0} function markSync(id,at){const m=readMap(SYNC_KEY);m[id]=at;writeMap(SYNC_KEY,m)}
