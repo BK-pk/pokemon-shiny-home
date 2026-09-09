@@ -851,7 +851,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 </section>
 
 <script>
-const DATA_VERSION='full-2026-09-09-v102';
+const DATA_VERSION='full-2026-09-09-v103';
 const SPECIES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species.csv';
 const NAMES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
 const MAX_DEX=1025;
@@ -2182,76 +2182,75 @@ function captureRecordMessage(count){
 
 const PREUPDATE_BACKUP_KEY='shinyHomePreUpdateBackup_v1';
 const PREUPDATE_HISTORY_KEY='shinyHomePreUpdateHistory_v1';
+const PREUPDATE_IDB_DB='shinyHomeSafeBackups_v1';
+const PREUPDATE_IDB_STORE='backups';
 function getPreUpdateHistory(){
   try{const a=JSON.parse(localStorage.getItem(PREUPDATE_HISTORY_KEY)||'[]');return Array.isArray(a)?a:[]}catch(e){return []}
 }
 function backupOwnedCount(b){
-  try{const st=JSON.parse((b.values||{}).shinyHomeState_v1||'{}');return Object.values(st).filter(Boolean).length}catch(e){return 0}
+  try{const st=JSON.parse((b.values||{}).shinyHomeState_v1||'{}');return Object.values(st).filter(Boolean).length}catch(e){return Number(b.ownedCount)||0}
 }
 function backupIndividualCount(b){
-  try{const d=JSON.parse((b.values||{}).shinyHomeIndividuals_v1||'{}');return Object.values(d).reduce((n,a)=>n+(Array.isArray(a)?a.length:0),0)}catch(e){return 0}
+  try{const d=JSON.parse((b.values||{}).shinyHomeIndividuals_v1||'{}');return Object.values(d).reduce((n,a)=>n+(Array.isArray(a)?a.length:0),0)}catch(e){return Number(b.individualCount)||0}
 }
-function openBackupHistory(){
+function openBackupDB(){
+  return new Promise((resolve,reject)=>{
+    const req=indexedDB.open(PREUPDATE_IDB_DB,1);
+    req.onupgradeneeded=()=>{const db=req.result;if(!db.objectStoreNames.contains(PREUPDATE_IDB_STORE))db.createObjectStore(PREUPDATE_IDB_STORE,{keyPath:'id'})};
+    req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error||new Error('IndexedDBを開けません'));
+  });
+}
+async function idbGetBackup(id){
+  const db=await openBackupDB();
+  try{return await new Promise((resolve,reject)=>{const tx=db.transaction(PREUPDATE_IDB_STORE,'readonly'),r=tx.objectStore(PREUPDATE_IDB_STORE).get(id);r.onsuccess=()=>resolve(r.result||null);r.onerror=()=>reject(r.error)})}
+  finally{db.close()}
+}
+async function openBackupHistory(){
   const modal=document.getElementById('backupHistoryModal'),box=document.getElementById('backupHistoryList');if(!modal||!box)return;
   const arr=getPreUpdateHistory();
   box.innerHTML=arr.length?arr.map((b,i)=>{
     const when=b.createdAt?new Date(b.createdAt).toLocaleString('ja-JP'):'日時不明';
     const owned=backupOwnedCount(b),inds=backupIndividualCount(b);
-    return `<div style="border:1px solid #20364e;background:#091522;border-radius:13px;padding:13px;margin:9px 0;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><div><strong>${esc(b.sourceVersion||'更新前')} 更新直前</strong><div style="font-size:12px;color:#87a0b8;margin-top:4px">${esc(when)} ・ 所持 ${owned} ・ 個体 ${inds}${b.partial?' ・ 画像なし':''}</div></div><button class="btn" type="button" onclick="restoreHistoryBackup(${i})">この時点へ復元</button></div>`;
+    const mode=b.storage==='indexeddb'?'安全領域':'旧方式';
+    return `<div style="border:1px solid #20364e;background:#091522;border-radius:13px;padding:13px;margin:9px 0;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><div><strong>${esc(b.sourceVersion||'更新前')} 更新直前</strong><div style="font-size:12px;color:#87a0b8;margin-top:4px">${esc(when)} ・ 所持 ${owned} ・ 個体 ${inds} ・ ${mode}${b.partial?' ・ 画像なし':''}</div></div><button class="btn" type="button" onclick="restoreHistoryBackup(${i})">この時点へ復元</button></div>`;
   }).join(''):'<div style="padding:28px;text-align:center;color:#87a0b8">更新前バックアップ履歴はまだありません。</div>';
   modal.style.display='block';
 }
 function closeBackupHistory(){const m=document.getElementById('backupHistoryModal');if(m)m.style.display='none'}
-function restoreHistoryBackup(i){
-  const b=getPreUpdateHistory()[i];if(!b||!b.values){showToast('バックアップを読み込めません。');return}
+async function resolveBackupEntry(meta){
+  if(!meta)return null;
+  if(meta.values)return meta;
+  if(meta.storage==='indexeddb'&&meta.id){try{return await idbGetBackup(meta.id)}catch(e){console.warn('IDB backup read failed',e);return null}}
+  return null;
+}
+function restoreRawBackup(b){
+  const managed=['shinyHomeState_v1','shinyHomeBoxes_v1','shinyHomeDates_v1','shinyHomeGames_v1','shinyHomeIndividuals_v1','shinyHomeTargets_v1','shinyHomeHunts_v1','shinyHomeMonthImages_v1','shinyHomeIndividualScreenshots_v1','shinyHomeNationalBox_v1','shinyHomeOrder_v1','shinyHomeActiveTab_v1','shinyHomeMobileFocusedHunt_v1'];
+  for(const key of managed){if(Object.prototype.hasOwnProperty.call(b.values||{},key))localStorage.setItem(key,b.values[key]);else if(!b.partial)localStorage.removeItem(key)}
+}
+async function restoreHistoryBackup(i){
+  const meta=getPreUpdateHistory()[i],b=await resolveBackupEntry(meta);if(!b||!b.values){showToast('バックアップを読み込めません。');return}
   const when=b.createdAt?new Date(b.createdAt).toLocaleString('ja-JP'):'日時不明';
   if(!confirm(`${b.sourceVersion||'更新前'} 更新直前（${when}）へ戻しますか？\n\n現在のデータはこの操作で置き換わります。`))return;
-  try{
-    backupRestoring=true;
-    const managed=['shinyHomeState_v1','shinyHomeBoxes_v1','shinyHomeDates_v1','shinyHomeGames_v1','shinyHomeIndividuals_v1','shinyHomeTargets_v1','shinyHomeHunts_v1','shinyHomeMonthImages_v1','shinyHomeIndividualScreenshots_v1','shinyHomeNationalBox_v1','shinyHomeOrder_v1','shinyHomeActiveTab_v1','shinyHomeMobileFocusedHunt_v1'];
-    for(const key of managed){if(Object.prototype.hasOwnProperty.call(b.values,key))localStorage.setItem(key,b.values[key]);else if(!b.partial)localStorage.removeItem(key)}
-    backupRestoring=false;location.reload();
-  }catch(e){backupRestoring=false;alert('バックアップを復元できませんでした: '+e.message)}
+  try{backupRestoring=true;restoreRawBackup(b);backupRestoring=false;location.reload()}catch(e){backupRestoring=false;alert('バックアップを復元できませんでした: '+e.message)}
 }
-
 function getPreUpdateBackup(){
   try{return JSON.parse(localStorage.getItem(PREUPDATE_BACKUP_KEY)||'null')}catch(e){return null}
 }
-function restorePreUpdateBackup(){
-  const b=getPreUpdateBackup();
+async function restorePreUpdateBackup(){
+  const local=getPreUpdateBackup();
+  let b=local&&local.values?local:null;
+  if(!b){const arr=getPreUpdateHistory();if(arr.length)b=await resolveBackupEntry(arr[0])}
   if(!b||!b.values){showToast('更新前バックアップはまだありません。');return}
-  const when=b.createdAt?new Date(b.createdAt).toLocaleString('ja-JP'):'日時不明';
-  const src=b.sourceVersion||'更新前';
-  const count=Object.keys(b.values).length;
-  const note=b.partial?'\n※画像データは容量の都合で含まれていません。':'';
-  if(!confirm(`${src} の更新前バックアップ（${when} / ${count}項目）へ戻しますか？${note}\n\n現在のデータはこの操作で置き換わります。`))return;
-  try{
-    backupRestoring=true;
-    // Restore raw localStorage values directly. This avoids running save() against a half-restored state.
-    const managed=[
-      'shinyHomeState_v1','shinyHomeBoxes_v1','shinyHomeDates_v1','shinyHomeGames_v1',
-      'shinyHomeIndividuals_v1','shinyHomeTargets_v1','shinyHomeHunts_v1','shinyHomeMonthImages_v1',
-      'shinyHomeIndividualScreenshots_v1','shinyHomeNationalBox_v1','shinyHomeOrder_v1',
-      'shinyHomeActiveTab_v1','shinyHomeMobileFocusedHunt_v1'
-    ];
-    for(const key of managed){
-      if(Object.prototype.hasOwnProperty.call(b.values,key)) localStorage.setItem(key,b.values[key]);
-      else if(!b.partial) localStorage.removeItem(key);
-    }
-    backupRestoring=false;
-    location.reload();
-  }catch(e){
-    backupRestoring=false;
-    alert('更新前バックアップを復元できませんでした: '+e.message);
-  }
+  const when=b.createdAt?new Date(b.createdAt).toLocaleString('ja-JP'):'日時不明',src=b.sourceVersion||'更新前';
+  const note=b.partial?'\n※画像データは含まれていません。':'';
+  if(!confirm(`${src} の更新前バックアップ（${when}）へ戻しますか？${note}\n\n現在のデータはこの操作で置き換わります。`))return;
+  try{backupRestoring=true;restoreRawBackup(b);backupRestoring=false;location.reload()}catch(e){backupRestoring=false;alert('更新前バックアップを復元できませんでした: '+e.message)}
 }
 function updatePreUpdateButtonState(){
-  const btn=document.getElementById('restorePreUpdateBtn'); if(!btn)return;
-  const b=getPreUpdateBackup();
+  const btn=document.getElementById('restorePreUpdateBtn');if(!btn)return;
+  const local=getPreUpdateBackup(),arr=getPreUpdateHistory(),b=(local&&local.values)?local:arr[0];
   if(!b){btn.disabled=true;btn.title='更新前バックアップはまだありません';return}
-  btn.disabled=false;
-  const when=b.createdAt?new Date(b.createdAt).toLocaleString('ja-JP'):'日時不明';
-  btn.title=`${b.sourceVersion||'更新前'} / ${when}${b.partial?' / 画像なし':''}`;
+  btn.disabled=false;const when=b.createdAt?new Date(b.createdAt).toLocaleString('ja-JP'):'日時不明';btn.title=`${b.sourceVersion||'更新前'} / ${when}${b.partial?' / 画像なし':''}`;
 }
 setTimeout(updatePreUpdateButtonState,0);
 
@@ -3114,7 +3113,7 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 // ===== v56 automatic update / cache repair =====
 (function(){
-  const APP_VERSION='v102';
+  const APP_VERSION='v103';
   const UPDATE_KEY='shinyHomeReloadedForSW_'+APP_VERSION;
 
   async function registerFreshWorker(){
