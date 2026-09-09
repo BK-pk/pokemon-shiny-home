@@ -503,7 +503,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
   -webkit-tap-highlight-color:transparent;
 }
 
-/* ===== v81 hunt UX / dashboard / drag / offline ===== */
+/* ===== v83 hunt UX / dashboard / drag / offline ===== */
 .hunt-progress-strip{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:2px}
 .hunt-mini-stat{background:#091522;border:1px solid #263c53;border-radius:10px;padding:8px 10px}.hunt-mini-stat span{display:block;color:var(--muted);font-size:9px;margin-bottom:2px}.hunt-mini-stat strong{font-size:13px;color:#eef7ff}.hunt-mini-stat.prob strong{color:var(--gold)}
 .drag-handle{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border:1px solid #36516d;border-radius:9px;color:#9db5c9;cursor:grab;user-select:none;touch-action:none;background:#0b1b2b;font-size:17px}.drag-handle:active{cursor:grabbing}.hunt-chip.dragging,.mobile-hunt-card.dragging{opacity:.62;outline:2px solid var(--cyan);transform:scale(.99)}
@@ -559,7 +559,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
   </div>
 
   <div id="mobile-active-hunt" class="mobile-active-hunt" style="display:none">
-    <div id="mobile-sync-status" class="mobile-hunt-meta" style="text-align:center;margin:4px 0 8px">☁️ 端末内に保存済み ・ v81</div>
+    <div id="mobile-sync-status" class="mobile-hunt-meta" style="text-align:center;margin:4px 0 8px">☁️ 端末内に保存済み ・ v83</div>
     <div id="mobile-multi-hunt-list" class="mobile-hunt-list"></div>
     <button id="mobile-multi-add" class="btn" type="button">＋ 厳選を追加</button>
   </div>
@@ -812,7 +812,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
     <div class="extra-panel">
       <div class="extra-head">
         <div><h2 style="margin:0">☁️ Supabase 同期</h2>
-        <span class="section-count">PC・iPhoneで同じデータを共有 ・ build v81</span></div>
+        <span class="section-count">PC・iPhoneで同じデータを共有 ・ build v83</span></div>
       </div>
       <div class="sync-fields">
         <label>Supabase URL<input id="supabase-url" autocomplete="off" placeholder="https://xxxx.supabase.co"></label>
@@ -827,9 +827,9 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
         <button class="btn" id="cloud-check" type="button">クラウド確認</button>
       </div>
       <div id="cloud-status" class="home-help">未設定です。</div>
-      <div id="auto-sync-status" class="home-help" style="margin-top:8px">同期：v81 外出向け省通信</div><div id="network-status" class="net-pill">● 通信状態を確認中</div>
+      <div id="auto-sync-status" class="home-help" style="margin-top:8px">同期：v83 外出向け省通信</div><div id="network-status" class="net-pill">● 通信状態を確認中</div>
       <div class="home-help" style="margin-top:8px">
-        v81ではカウンター操作中は通信せず端末内へ即保存します。10秒操作がなければクラウドへ保存し、他端末は最新時刻の値だけを取り込みます。所持状況・HOME BOXなどのフルデータは上のボタンで手動同期します。
+        v83ではカウンター操作中は通信せず端末内へ即保存します。10秒操作がなければクラウドへ保存し、他端末は最新時刻の値だけを取り込みます。所持状況・HOME BOXなどのフルデータは上のボタンで手動同期します。
       </div>
       <div class="home-help" style="margin-top:10px">初回は「設定保存」→「接続テスト」の順に確認してください。既存データがある場合、確認前にクラウドへ保存しないでください。</div>
     </div>
@@ -837,7 +837,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 </section>
 
 <script>
-const DATA_VERSION='full-2026-09-09-v81';
+const DATA_VERSION='full-2026-09-09-v83';
 const SPECIES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species.csv';
 const NAMES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
 const MAX_DEX=1025;
@@ -1012,7 +1012,7 @@ function offlineSpeciesFallback(){
   });
 }
 async function loadSpecies(){
-  // v81: species/name data is shared across app builds. A version bump must not
+  // v83: species/name data is shared across app builds. A version bump must not
   // throw away the last successfully downloaded Japanese names.
   const stableKey='shinyHomeSpeciesCache_stable_v1';
   const cacheKeys=[stableKey,'shinyHomeSpeciesCache_'+DATA_VERSION];
@@ -1163,7 +1163,7 @@ function individualBadges(id,uid){
   }
   return badges;
 }
-// v81: keep individual editors open across collection rerenders.
+// v83: keep individual editors open across collection rerenders.
 // This prevents the newly added editor from disappearing after saving fields
 // or after another panel/stat refresh.
 const openIndividualPanels=new Set();
@@ -1197,9 +1197,8 @@ function individualRowHTML(p,ind,i){
       <div class="detail-field"><label>捕獲日</label><input type="date" value="${esc(ind.date||'')}" onchange="setIndividual('${esc(p.id)}',${i},'date',this.value)"></div>
       <div class="detail-field"><label>ゲーム</label><select onchange="setIndividual('${esc(p.id)}',${i},'game',this.value)">${gameOptionsHTML(ind.game||'')}</select></div>
       <div class="detail-field"><label>ボール</label><div class="ball-select-wrap"><img id="ball-${encodeURIComponent(p.id)}-${i}" src="${ballIcon(ind.ball)}" alt=""><select onchange="setIndividual('${esc(p.id)}',${i},'ball',this.value);document.getElementById('ball-${encodeURIComponent(p.id)}-${i}').src=ballIcon(this.value)">${ballOptions(ind.ball)}</select></div></div>
-      <div class="detail-field"><label>厳選方法</label><input value="${esc(ind.huntMethod||'')}" placeholder="例：国際孵化" onchange="setIndividual('${esc(p.id)}',${i},'huntMethod',this.value)"></div>
+      <div class="detail-field"><label>厳選方法</label><select onchange="setIndividual('${esc(p.id)}',${i},'huntMethod',this.value)">${huntMethodOptions(ind.huntMethod||'')}</select></div>
       <div class="detail-field"><label>${esc(counterLabel(ind.huntMethod||''))}</label><input type="number" min="0" value="${Number(ind.huntCount||0)}" onchange="setManualHuntCount('${esc(p.id)}','${esc(ind.uid)}',this.value)"></div>
-      <div class="detail-field"><label>HOME BOX</label><input value="${esc(ind.box||'')}" placeholder="HOME BOX" onchange="setIndividual('${esc(p.id)}',${i},'box',this.value)"></div>
       <div class="detail-field"><label>入手区分</label><select onchange="setIndividual('${esc(p.id)}',${i},'source',this.value)"><option value="">入手区分</option><option ${ind.source==='自己産'?'selected':''}>自己産</option><option ${ind.source==='交換'?'selected':''}>交換</option><option ${ind.source==='配布'?'selected':''}>配布</option><option ${ind.source==='その他'?'selected':''}>その他</option></select></div>
       <div class="detail-field"><label>開始日</label><input type="date" value="${esc(ind.huntStart||'')}" onchange="setIndividual('${esc(p.id)}',${i},'huntStart',this.value)"></div>
     </div>
@@ -1290,6 +1289,16 @@ const HUNT_GAMES=[
   ['SM','SM'],['USUM','USUM'],['Let’s Go','Let’s Go'],['剣盾','剣盾'],['BDSP','BDSP'],['Pokémon LEGENDS アルセウス','Pokémon LEGENDS アルセウス'],['SV','SV']
 ];
 function huntGameOptions(v){return HUNT_GAMES.map(([x,n])=>`<option value="${x}" ${v===x?'selected':''}>${n}</option>`).join('')}
+
+const HUNT_METHODS=[
+  '野生遭遇','固定リセット','ソフトリセット','国際孵化','SOS連鎖','ポケトレ',
+  '大量発生','大量発生（SV）','サンドウィッチ厳選','大量発生＋サンドウィッチ','ダイマックスアドベンチャー','レイド','連鎖','その他'
+];
+function huntMethodOptions(v){
+  const cur=String(v||'');
+  const vals=HUNT_METHODS.includes(cur)||!cur?HUNT_METHODS:[cur,...HUNT_METHODS];
+  return '<option value="">厳選方法を選択</option>'+vals.map(x=>`<option value="${esc(x)}" ${cur===x?'selected':''}>${esc(x)}</option>`).join('');
+}
 
 function counterLabel(method){
   if(method==='SOS連鎖')return '呼び出し回数';
@@ -2388,6 +2397,12 @@ function estimatedOdds(indOrHunt){
   if(method==='ダイマックスアドベンチャー')return charm?100:300;
   if(method==='国際孵化')return charm?512:683;
   if(method==='SOS連鎖')return charm?273.53:315.54;
+  if(game==='SV'&&['サンドウィッチ厳選','大量発生＋サンドウィッチ','大量発生','大量発生（SV）'].includes(method)){
+    const sp=Number(indOrHunt.sparkling)||0, cleared=String(indOrHunt.outbreak||'0');
+    let rolls=1+(charm?2:0)+Math.max(0,Math.min(3,sp));
+    if(['大量発生＋サンドウィッチ','大量発生','大量発生（SV）'].includes(method)){if(cleared==='30')rolls+=1;if(cleared==='60')rolls+=2;}
+    return oddsFromRolls(rolls);
+  }
   if(/SM|USUM|XY|ORAS|剣盾|BDSP|SV/.test(game))return charm?1365.67:4096;
   if(/BW2/.test(game))return charm?2731:8192;
   return /BW|DP|Pt|HGSS/.test(game)?8192:4096;
@@ -2584,12 +2599,17 @@ function shinyOdds(game,method,charm,hunt={}){
     if(c)rolls+=2;
     return {text:fmtOdds(oddsFromRolls(rolls)),note:`連鎖 ${n}回 ・ ${rolls}ロール相当`};
   }
-  if(method==='大量発生'&&game==='SV'){
-    const cleared=String(hunt.outbreak||'0'),sp=Number(hunt.sparkling)||0;
-    let rolls=1+(c?2:0)+sp;
-    if(cleared==='30')rolls+=1;
-    if(cleared==='60')rolls+=2;
-    return {text:fmtOdds(oddsFromRolls(rolls)),note:`SV大量発生：${cleared==='60'?'60匹以上':cleared==='30'?'30～59匹':'0～29匹'}・かがやきLv${sp}`};
+  if(game==='SV'&&['大量発生','大量発生（SV）','サンドウィッチ厳選','大量発生＋サンドウィッチ'].includes(method)){
+    const isOutbreak=['大量発生','大量発生（SV）','大量発生＋サンドウィッチ'].includes(method);
+    const cleared=isOutbreak?String(hunt.outbreak||'0'):'0';
+    const sp=['サンドウィッチ厳選','大量発生＋サンドウィッチ'].includes(method)?Number(hunt.sparkling)||0:(Number(hunt.sparkling)||0);
+    let rolls=1+(c?2:0)+Math.max(0,Math.min(3,sp));
+    if(isOutbreak&&cleared==='30')rolls+=1;
+    if(isOutbreak&&cleared==='60')rolls+=2;
+    const parts=[];
+    if(isOutbreak)parts.push(`大量発生：${cleared==='60'?'60匹以上':cleared==='30'?'30～59匹':'0～29匹'}`);
+    if(['サンドウィッチ厳選','大量発生＋サンドウィッチ'].includes(method)||sp>0)parts.push(`かがやきパワー：${sp?`Lv${sp}`:'なし'}`);
+    return {text:fmtOdds(oddsFromRolls(rolls)),note:`SV ${parts.join('・')||'通常遭遇'}`};
   }
   if(method==='ダイマックスアドベンチャー'){
     if(game!=='剣盾')return {text:'—',note:'ダイマックスアドベンチャーは剣盾のみ'};
@@ -2702,8 +2722,8 @@ function renderCurrentHunt(){
       <div><div class="hunt-title-row"><div><span class="hunt-no">No.${String(p.no).padStart(4,'0')}</span><b>${esc(p.name)}</b><small>${p.form!=='通常'?esc(p.form):kindLabel(p)}</small></div><span class="drag-handle" title="ドラッグで並び替え">☰</span></div></div>
       <div class="counter-row"><span class="counter-value">${Number(x.count)||0}回</span><span class="counter-label">${counterLabel(x.method||'')}</span><button class="hunt-action" onclick="incHunt('${esc(p.id)}',1)">＋1</button><button class="hunt-action" onclick="incHunt('${esc(p.id)}',10)">＋10</button><button class="hunt-action" onclick="incHunt('${esc(p.id)}',100)">＋100</button><button class="hunt-action" onclick="incHunt('${esc(p.id)}',-1)">−1</button><button class="hunt-action danger" onclick="resetHuntCount('${esc(p.id)}')">0にリセット</button></div>
       <div class="hunt-progress-strip"><div class="hunt-mini-stat"><span>今日の厳選</span><strong data-hunt-today>${todayHuntCount(p.id)}回</strong></div><div class="hunt-mini-stat"><span>経過日数</span><strong data-hunt-elapsed>${huntElapsedText(x.start)}</strong></div><div class="hunt-mini-stat prob"><span>1匹以上出る目安</span><strong data-hunt-prob>${cum.text}</strong></div></div>
-      <div class="hunt-controls"><input type="date" value="${esc(x.start||'')}" title="厳選開始日" onchange="setHunt('${esc(p.id)}','start',this.value)"><select onchange="setHunt('${esc(p.id)}','game',this.value);renderCurrentHunt()">${huntGameOptions(x.game||'')}</select><select onchange="setHunt('${esc(p.id)}','charm',this.value);renderCurrentHunt()"><option value="">ひかるおまもり</option><option value="なし" ${x.charm==='なし'?'selected':''}>ひかるおまもり：なし</option><option value="あり" ${x.charm==='あり'?'selected':''}>ひかるおまもり：あり</option></select><select onchange="setHunt('${esc(p.id)}','method',this.value);renderCurrentHunt()"><option value="">厳選方法</option>${['野生遭遇','大量発生','国際孵化','SOS連鎖','ポケトレ','ダイマックスアドベンチャー','ひかるおまもり厳選','固定リセット','その他'].map(v=>`<option ${x.method===v?'selected':''}>${v}</option>`).join('')}</select><div class="ball-select-wrap"><img id="huntball-${encodeURIComponent(p.id)}" src="${ballIcon(x.ball)}" alt=""><select onchange="setHunt('${esc(p.id)}','ball',this.value);document.getElementById('huntball-${encodeURIComponent(p.id)}').src=ballIcon(this.value)">${ballOptions(x.ball)}</select></div><button class="hunt-action capture" onclick="captureHunt('${esc(p.id)}')">✨ 捕獲！</button></div>
-      ${(x.method==='大量発生'&&x.game==='SV')?`<div class="special-odds"><select onchange="setHunt('${esc(p.id)}','outbreak',this.value);renderCurrentHunt()"><option value="0" ${String(x.outbreak||'0')==='0'?'selected':''}>大量発生：0～29匹</option><option value="30" ${String(x.outbreak)==='30'?'selected':''}>大量発生：30～59匹</option><option value="60" ${String(x.outbreak)==='60'?'selected':''}>大量発生：60匹以上</option></select><select onchange="setHunt('${esc(p.id)}','sparkling',this.value);renderCurrentHunt()"><option value="0" ${String(x.sparkling||'0')==='0'?'selected':''}>かがやきパワー：なし</option><option value="1" ${String(x.sparkling)==='1'?'selected':''}>かがやきパワー Lv1</option><option value="2" ${String(x.sparkling)==='2'?'selected':''}>かがやきパワー Lv2</option><option value="3" ${String(x.sparkling)==='3'?'selected':''}>かがやきパワー Lv3</option></select></div>`:''}
+      <div class="hunt-controls"><input type="date" value="${esc(x.start||'')}" title="厳選開始日" onchange="setHunt('${esc(p.id)}','start',this.value)"><select onchange="setHunt('${esc(p.id)}','game',this.value);renderCurrentHunt()">${huntGameOptions(x.game||'')}</select><select onchange="setHunt('${esc(p.id)}','charm',this.value);renderCurrentHunt()"><option value="">ひかるおまもり</option><option value="なし" ${x.charm==='なし'?'selected':''}>ひかるおまもり：なし</option><option value="あり" ${x.charm==='あり'?'selected':''}>ひかるおまもり：あり</option></select><select onchange="setHunt('${esc(p.id)}','method',this.value);renderCurrentHunt()"><option value="">厳選方法</option>${['野生遭遇','大量発生','サンドウィッチ厳選','大量発生＋サンドウィッチ','国際孵化','SOS連鎖','ポケトレ','ダイマックスアドベンチャー','ひかるおまもり厳選','固定リセット','その他'].map(v=>`<option ${x.method===v?'selected':''}>${v}</option>`).join('')}</select><div class="ball-select-wrap"><img id="huntball-${encodeURIComponent(p.id)}" src="${ballIcon(x.ball)}" alt=""><select onchange="setHunt('${esc(p.id)}','ball',this.value);document.getElementById('huntball-${encodeURIComponent(p.id)}').src=ballIcon(this.value)">${ballOptions(x.ball)}</select></div><button class="hunt-action capture" onclick="captureHunt('${esc(p.id)}')">✨ 捕獲！</button></div>
+      ${(x.game==='SV'&&['大量発生','大量発生（SV）','サンドウィッチ厳選','大量発生＋サンドウィッチ'].includes(x.method))?`<div class="special-odds">${['大量発生','大量発生（SV）','大量発生＋サンドウィッチ'].includes(x.method)?`<select onchange="setHunt('${esc(p.id)}','outbreak',this.value);renderCurrentHunt()"><option value="0" ${String(x.outbreak||'0')==='0'?'selected':''}>大量発生：0～29匹</option><option value="30" ${String(x.outbreak)==='30'?'selected':''}>大量発生：30～59匹</option><option value="60" ${String(x.outbreak)==='60'?'selected':''}>大量発生：60匹以上</option></select>`:''}${['サンドウィッチ厳選','大量発生＋サンドウィッチ'].includes(x.method)?`<select onchange="setHunt('${esc(p.id)}','sparkling',this.value);renderCurrentHunt()"><option value="0" ${String(x.sparkling||'0')==='0'?'selected':''}>かがやきパワー：なし</option><option value="1" ${String(x.sparkling)==='1'?'selected':''}>かがやきパワー Lv1</option><option value="2" ${String(x.sparkling)==='2'?'selected':''}>かがやきパワー Lv2</option><option value="3" ${String(x.sparkling)==='3'?'selected':''}>かがやきパワー Lv3</option></select>`:''}</div>`:''}
       ${(()=>{const o=shinyOdds(x.game||'',x.method||'',x.charm||'',x);return `<div class="odds-box"><span>現在の1回あたり色違い確率</span><strong>${o.text}</strong><span class="odds-note">${esc(o.note)} ／ 累積確率は現在の1回あたり確率での概算</span></div>`})()}
       ${supportsAlternateCatch(x.method||'')?`<details class="alt-catch"><summary>✨ 別のポケモンが光った</summary><div class="alt-catch-row"><input id="alt-q-${safeId(p.id)}" type="text" placeholder="名前または図鑑No.で検索" oninput="altCatchSearch('${esc(p.id)}')"></div><div id="alt-r-${safeId(p.id)}" class="alt-results"></div><div id="alt-c-${safeId(p.id)}" class="alt-confirm"></div></details>`:''}
       <div class="hunt-journal"><div class="counter-row"><button class="hunt-action" onclick="addHuntJournal('${esc(p.id)}')">＋ 厳選日記</button>${x.start?`<span class="hunt-days">${huntElapsedDays(x.start)}</span>`:''}</div><div class="hunt-journal-list">${(Array.isArray(x.journal)?x.journal:[]).slice().reverse().map(j=>`<div class="hunt-journal-entry">${new Date(j.at).toLocaleString('ja-JP')}　${Number(j.count)||0}回　${esc(j.text||'')}</div>`).join('')||'<div class="hunt-journal-entry">途中経過を残せます</div>'}</div></div>
@@ -2914,7 +2934,7 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 // ===== v56 automatic update / cache repair =====
 (function(){
-  const APP_VERSION='v81';
+  const APP_VERSION='v83';
   const UPDATE_KEY='shinyHomeReloadedForSW_'+APP_VERSION;
 
   async function registerFreshWorker(){
@@ -2968,7 +2988,7 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 
 
-// ===== v81 travel sync: local-first + hunt-session cloud sync =====
+// ===== v83 travel sync: local-first + hunt-session cloud sync =====
 (function(){
   const CLOUD_KEY='shinyHomeCloudSettings_v2', COUNTER_TABLE='shiny_home_hunt_counters';
   const EDIT_KEY='shinyHomeCounterLocalEdits_v1', SYNC_KEY='shinyHomeCounterLastSync_v1';
@@ -2977,7 +2997,7 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
   function cfg(){const fallback={url:'https://litkisamojglstbjwloo.supabase.co',key:'sb_publishable_pc-8E8ETM6yZ3OcB1cNkjA_OzVjc-Rh',userId:'pokemon-shiny-home'};try{return {...fallback,...(JSON.parse(localStorage.getItem(CLOUD_KEY)||localStorage.getItem('shinyHomeCloudSettings_v1')||'{}')||{})}}catch{return fallback}}
   function headers(c){return {apikey:c.key,Authorization:'Bearer '+c.key,'Content-Type':'application/json'}}
   function readMap(k){try{return JSON.parse(localStorage.getItem(k)||'{}')||{}}catch{return {}}} function writeMap(k,o){try{localStorage.setItem(k,JSON.stringify(o))}catch(_){}}
-  function setStatus(msg,kind){const e=$('auto-sync-status');if(e){e.textContent='同期：'+msg;e.style.color=kind==='ok'?'#8fe6b0':kind==='err'?'#ff9c9c':''}const m=$('mobile-sync-status');if(m){m.textContent='☁️ '+msg+' ・ v81';m.style.color=kind==='ok'?'#8fe6b0':kind==='err'?'#ff9c9c':''}}
+  function setStatus(msg,kind){const e=$('auto-sync-status');if(e){e.textContent='同期：'+msg;e.style.color=kind==='ok'?'#8fe6b0':kind==='err'?'#ff9c9c':''}const m=$('mobile-sync-status');if(m){m.textContent='☁️ '+msg+' ・ v83';m.style.color=kind==='ok'?'#8fe6b0':kind==='err'?'#ff9c9c':''}}
   function hunts(){try{return typeof huntState==='object'&&huntState?huntState:JSON.parse(localStorage.getItem('shinyHomeHunts_v1')||'{}')}catch{return {}}} function targets(){try{return typeof targetState==='object'&&targetState?targetState:JSON.parse(localStorage.getItem('shinyHomeTargets_v1')||'{}')}catch{return {}}}
   function persist(h,t){localStorage.setItem('shinyHomeHunts_v1',JSON.stringify(h));localStorage.setItem('shinyHomeTargets_v1',JSON.stringify(t));try{if(typeof save==='function')save()}catch(_){}}
   function markEdit(id,at){const m=readMap(EDIT_KEY);m[id]=at;writeMap(EDIT_KEY,m)} function editAt(id){return Number(readMap(EDIT_KEY)[id]||0)||0} function markSync(id,at){const m=readMap(SYNC_KEY);m[id]=at;writeMap(SYNC_KEY,m)}
