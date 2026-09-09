@@ -835,7 +835,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
     <div class="extra-panel">
       <div class="extra-head">
         <div><h2 style="margin:0">☁️ Supabase 同期</h2>
-        <span class="section-count">PC・iPhoneで同じデータを共有 ・ build v107</span></div>
+        <span class="section-count">PC・iPhoneで同じデータを共有 ・ build v108</span></div>
       </div>
       <div class="sync-fields">
         <label>Supabase URL<input id="supabase-url" autocomplete="off" placeholder="https://xxxx.supabase.co"></label>
@@ -857,7 +857,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
       <div id="cloud-status" class="home-help">未設定です。</div>
       <div id="auto-sync-status" class="home-help" style="margin-top:8px">同期：v95 外出向け省通信</div><div id="network-status" class="net-pill">● 通信状態を確認中</div>
       <div class="home-help" style="margin-top:8px">
-        v107ではカウンター操作中は通信せず端末内へ即保存します。10秒操作がなければクラウドへ保存し、他端末は最新時刻の値だけを取り込みます。所持状況・HOME BOXなどのフルデータは上のボタンで手動同期します。
+        v108ではスマホ起動時に安全クラウドバックアップからコレクションを一方向で取り込み、厳選カウンターは従来どおり専用同期します。10秒操作がなければクラウドへ保存し、他端末は最新時刻の値だけを取り込みます。所持状況・HOME BOXなどのフルデータは上のボタンで手動同期します。
       </div>
       <div class="home-help" style="margin-top:10px">初回は「設定保存」→「接続テスト」の順に確認してください。既存データがある場合、確認前にクラウドへ保存しないでください。</div>
     </div>
@@ -865,7 +865,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 </section>
 
 <script>
-const DATA_VERSION='full-2026-09-09-v105';
+const DATA_VERSION='full-2026-09-09-v108';
 const SPECIES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species.csv';
 const NAMES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
 const MAX_DEX=1025;
@@ -2972,10 +2972,51 @@ el('imageBackupInput').onchange=e=>{
 el('exportBtn').onclick=()=>{const blob=new Blob([JSON.stringify({version:DATA_VERSION,state,boxState,dateState,gameState,individualState,targetState,huntState,monthImages,individualScreenshots},null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='shiny-home-backup.json';a.click();URL.revokeObjectURL(a.href)};
 el('importBtn').onclick=()=>el('fileInput').click();el('fileInput').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);Object.assign(state,d.state||{});Object.assign(boxState,d.boxState||{});Object.assign(dateState,d.dateState||{});Object.assign(gameState,d.gameState||{});if(d.individualState)Object.assign(individualState,d.individualState);if(d.targetState)Object.assign(targetState,d.targetState);if(d.huntState)Object.assign(huntState,d.huntState);if(d.monthImages)Object.assign(monthImages,d.monthImages);if(d.individualScreenshots)Object.assign(individualScreenshots,d.individualScreenshots);ensureLegacyIndividuals();save();render()}catch{alert('バックアップファイルを読み込めませんでした')}};r.readAsText(f)};
 for(const g of gameOptions.filter(Boolean)){const o=document.createElement('option');o.value=g;o.textContent=g;el('gameFilter').appendChild(o);}for(const [slug,name] of BALLS){const o=document.createElement('option');o.value=slug;o.textContent=name;el('ballFilter').appendChild(o);}
+
+// v108: mobile collection bootstrap. Hunt counters remain on their dedicated sync table.
+async function hydrateMobileCollectionFromSafetyBackup(){
+  const mobile=window.matchMedia&&window.matchMedia('(max-width: 800px)').matches;
+  if(!mobile||!navigator.onLine)return false;
+  const fallback={url:'https://litkisamojglstbjwloo.supabase.co',key:'sb_publishable_pc-8E8ETM6yZ3OcB1cNkjA_OzVjc-Rh',userId:'pokemon-shiny-home'};
+  let c={};try{c=JSON.parse(localStorage.getItem('shinyHomeCloudSettings_v2')||localStorage.getItem('shinyHomeCloudSettings_v1')||'{}')||{}}catch(_){}
+  c={...fallback,...c}; c.url=String(c.url||'').replace(/\/$/,'');
+  if(!c.url||!c.key||!c.userId)return false;
+  try{
+    const id=c.userId+'::auto-backup';
+    const r=await fetch(c.url+'/rest/v1/shiny_home_sync?user_id=eq.'+encodeURIComponent(id)+'&select=payload,updated_at',{headers:{apikey:c.key,Authorization:'Bearer '+c.key},cache:'no-store'});
+    if(!r.ok)throw Error(await r.text());
+    const rows=await r.json(), payload=rows[0]?.payload;
+    const snap=payload?.data||payload; if(!snap||typeof snap!=='object')return false;
+    const remoteAt=Date.parse(payload?.backedUpAt||rows[0]?.updated_at||'')||0;
+    const lastAt=Number(localStorage.getItem('shinyHomeMobileCollectionCloudAt_v1')||0)||0;
+    const localOwned=Object.values(state||{}).filter(Boolean).length;
+    const remoteOwned=Number(payload?.ownedCount)||Object.values(snap.state||{}).filter(Boolean).length;
+    const localInd=Object.values(individualState||{}).reduce((n,a)=>n+(Array.isArray(a)?a.length:0),0);
+    const remoteInd=Number(payload?.individualCount)||Object.values(snap.individualState||{}).reduce((n,a)=>n+(Array.isArray(a)?a.length:0),0);
+    // Only import when cloud is newer or the phone has no collection. Never upload from this path.
+    if(!(localOwned===0&&remoteOwned>0) && !(remoteAt>lastAt && (remoteOwned>localOwned || remoteInd>localInd)))return false;
+    // Merge collection data so a mobile-only capture event is never discarded.
+    Object.assign(state,snap.state||{});
+    Object.assign(boxState,snap.boxState||{});Object.assign(dateState,snap.dateState||{});Object.assign(gameState,snap.gameState||{});
+    Object.assign(monthImages,snap.monthImages||{});Object.assign(individualScreenshots,snap.individualScreenshots||{});
+    for(const [id,arr] of Object.entries(snap.individualState||{})){
+      if(!Array.isArray(arr))continue; const cur=Array.isArray(individualState[id])?individualState[id]:[];
+      const seen=new Set(cur.map(x=>x&&x.uid).filter(Boolean));
+      for(const raw of arr){if(!raw)continue;const uid=raw.uid||'';if(uid&&seen.has(uid))continue;cur.push(newIndividual(raw));if(uid)seen.add(uid)}
+      individualState[id]=cur; if(cur.length)state[id]=true;
+    }
+    // HOME BOX custom arrangement is optional in newer backups.
+    if(payload?.homeCustomLayout) safeLocalSet('shinyHomeCustomLayout_v1',JSON.stringify(payload.homeCustomLayout));
+    safeLocalSet('shinyHomeMobileCollectionCloudAt_v1',String(remoteAt||Date.now()));
+    backupRestoring=true;ensureLegacyIndividuals();save();backupRestoring=false;
+    return true;
+  }catch(e){console.warn('mobile collection bootstrap skipped',e);return false}
+}
 (async()=>{
   try{
     const species=await loadSpecies();
     data=buildData(species);
+    await hydrateMobileCollectionFromSafetyBackup();
     ensureLegacyIndividuals();
     save();
     const loading=el('loading');
@@ -3198,7 +3239,7 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
       const latestId=c.userId+AUTO_SUFFIX, prevId=c.userId+PREV_SUFFIX;
       const old=await getRow(c,latestId);
       if(old?.payload) await upsert(c,prevId,old.payload);
-      const payload={backupOnly:true,version:DATA_VERSION,backedUpAt:new Date().toISOString(),ownedCount:counts.owned,individualCount:counts.indiv,data:currentDataSnapshot()};
+      const payload={backupOnly:true,version:DATA_VERSION,backedUpAt:new Date().toISOString(),ownedCount:counts.owned,individualCount:counts.indiv,homeCustomLayout:(()=>{try{return JSON.parse(localStorage.getItem('shinyHomeCustomLayout_v1')||'null')}catch(_){return null}})(),data:currentDataSnapshot()};
       await upsert(c,latestId,payload);
       const m={at:Date.now(),ownedCount:counts.owned,individualCount:counts.indiv};setMeta(m);
       status(`保存済み ${new Date(m.at).toLocaleString('ja-JP')}（所持 ${counts.owned} / 個体 ${counts.indiv}）`);
@@ -3214,6 +3255,7 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
       const row=await getRow(c,c.userId+AUTO_SUFFIX);if(!row?.payload)throw Error('安全バックアップがありません。');
       const p=row.payload.data||row.payload;
       if(!p||typeof p!=='object')throw Error('バックアップ形式を確認できません。');
+      if(row.payload.homeCustomLayout) safeLocalSet('shinyHomeCustomLayout_v1',JSON.stringify(row.payload.homeCustomLayout));
       // 復元直前に現在状態をIndexedDB/既存バックアップへ残すため、通常saveのバックアップも維持する。
       backupRestoring=true;restoreSnapshotObject(p);ensureLegacyIndividuals();save();backupRestoring=false;render();
       status('復元しました '+new Date().toLocaleString('ja-JP'));
@@ -3232,14 +3274,14 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 // ===== v56 automatic update / cache repair =====
 (function(){
-  const APP_VERSION='v107';
+  const APP_VERSION='v108';
   const UPDATE_KEY='shinyHomeReloadedForSW_'+APP_VERSION;
 
   async function registerFreshWorker(){
     if(!('serviceWorker' in navigator) || location.protocol==='file:') return;
     try{
       const reg = await navigator.serviceWorker.register(
-        './service-worker.js?v=107',
+        './service-worker.js?v=108',
         {updateViaCache:'none'}
       );
 
