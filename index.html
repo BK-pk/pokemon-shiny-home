@@ -4,9 +4,11 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1" name="viewport"/>
-<title>Pokémon HOME Shiny Collection</title>
+<title>Shiny HOME</title>
 <meta name="theme-color" content="#07111d"/>
 <link rel="manifest" href="manifest.webmanifest"/>
+<link rel="apple-touch-icon" href="icon-192.png"/>
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="Shiny HOME"/>
@@ -500,6 +502,16 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
   touch-action:manipulation;
   -webkit-tap-highlight-color:transparent;
 }
+
+/* ===== v78 hunt UX / dashboard / drag / offline ===== */
+.hunt-progress-strip{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:2px}
+.hunt-mini-stat{background:#091522;border:1px solid #263c53;border-radius:10px;padding:8px 10px}.hunt-mini-stat span{display:block;color:var(--muted);font-size:9px;margin-bottom:2px}.hunt-mini-stat strong{font-size:13px;color:#eef7ff}.hunt-mini-stat.prob strong{color:var(--gold)}
+.drag-handle{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border:1px solid #36516d;border-radius:9px;color:#9db5c9;cursor:grab;user-select:none;touch-action:none;background:#0b1b2b;font-size:17px}.drag-handle:active{cursor:grabbing}.hunt-chip.dragging,.mobile-hunt-card.dragging{opacity:.62;outline:2px solid var(--cyan);transform:scale(.99)}
+.hunt-title-row{display:flex;justify-content:space-between;gap:8px;align-items:start}.mobile-hunt-substats{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}.mobile-hunt-substats span{font-size:11px;color:#a9bfd1;background:#091726;border:1px solid #203d55;border-radius:999px;padding:5px 8px}.mobile-hunt-substats b{color:#fff}.mobile-hunt-substats .prob{color:#ffd36b}
+.dashboard-title{display:flex;align-items:end;justify-content:space-between;margin:2px 2px 9px}.dashboard-title h3{margin:0;font-size:14px}.dashboard-title span{font-size:11px;color:var(--muted)}
+.history-toolbar{display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px;margin:10px 0}.history-page-wrap{overflow:auto}.history-summary{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0}.history-summary .dashcard{min-width:150px;flex:1}
+.net-pill{display:inline-flex;gap:6px;align-items:center;border:1px solid #29445d;border-radius:999px;padding:5px 8px;font-size:10px;color:var(--muted)}.net-pill.online{color:#8fe6b0}.net-pill.offline{color:#ffd36b}
+@media(max-width:700px){.hunt-progress-strip{grid-template-columns:1fr 1fr 1fr}.history-toolbar{grid-template-columns:1fr}.dashboard2{grid-template-columns:1fr 1fr}.drag-handle{width:34px;height:34px}}
 </style>
 
 <style>
@@ -547,7 +559,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
   </div>
 
   <div id="mobile-active-hunt" class="mobile-active-hunt" style="display:none">
-    <div id="mobile-sync-status" class="mobile-hunt-meta" style="text-align:center;margin:4px 0 8px">☁️ 端末内に保存済み ・ v77</div>
+    <div id="mobile-sync-status" class="mobile-hunt-meta" style="text-align:center;margin:4px 0 8px">☁️ 端末内に保存済み ・ v78</div>
     <div id="mobile-multi-hunt-list" class="mobile-hunt-list"></div>
     <button id="mobile-multi-add" class="btn" type="button">＋ 厳選を追加</button>
   </div>
@@ -575,6 +587,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 <button class="app-tab" data-tab="calendar" onclick="switchAppTab('calendar',this)" type="button">
 <img alt="" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/251.png"/>カレンダー
   </button>
+<button class="app-tab" data-tab="history" onclick="switchAppTab('history',this)" type="button">📜 捕獲履歴</button>
 <button class="app-tab" data-tab="stats" onclick="switchAppTab('stats',this)" type="button">
 <img alt="" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/151.png"/>統計・ランキング
   </button>
@@ -585,8 +598,8 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 </nav><section class="tab-page active" id="tab-collection"><section class="hero">
 <div class="summary"><div class="eyebrow">collection progress</div><div class="summary-main"><div class="big"><span id="ownedCount">0</span><small> / <span id="totalCount">0</span></small></div><div class="percent" id="percent">0.0%</div></div><div class="progress"><div class="bar" id="bar"></div></div><div class="mini"><span>未所持 <b id="missingCount">0</b></span><span>表示中 <b id="visibleCount">0</b></span><span>保存 <b>自動</b></span><span>対象 <b id="targetCount">0</b></span><span>色違い総個体数 <b id="individualCount">0</b></span></div></div>
 <div class="sidepanel"><div class="stat"><span>全国図鑑</span><strong id="normalStat">0.0%</strong><div class="statdetail" id="normalDetail">0 / 0</div></div><div class="stat"><span>リージョン</span><strong id="regionStat">0.0%</strong><div class="statdetail" id="regionDetail">0 / 0</div></div><div class="stat"><span>オス・メス違い</span><strong id="genderStat">0.0%</strong><div class="statdetail" id="genderDetail">0 / 0</div></div><div class="stat"><span>その他の姿違い</span><strong id="formStat">0.0%</strong><div class="statdetail" id="formDetail">0 / 0</div></div><div class="stat"><span>キョダイマックス</span><strong id="gmaxStat">0.0%</strong><div class="statdetail" id="gmaxDetail">0 / 0</div></div><div class="stat"><span>色違い未解禁</span><strong id="lockedStat">0</strong><div class="statdetail">％計算対象外</div></div></div>
-</section><div class="collection-goals" id="collection-goals"></div><div class="genpanel"><div class="genstat"><span>第1世代</span><strong id="gen1Stat">0.0%</strong><small id="gen1Detail">0 / 0</small></div><div class="genstat"><span>第2世代</span><strong id="gen2Stat">0.0%</strong><small id="gen2Detail">0 / 0</small></div><div class="genstat"><span>第3世代</span><strong id="gen3Stat">0.0%</strong><small id="gen3Detail">0 / 0</small></div><div class="genstat"><span>第4世代</span><strong id="gen4Stat">0.0%</strong><small id="gen4Detail">0 / 0</small></div><div class="genstat"><span>第5世代</span><strong id="gen5Stat">0.0%</strong><small id="gen5Detail">0 / 0</small></div><div class="genstat"><span>第6世代</span><strong id="gen6Stat">0.0%</strong><small id="gen6Detail">0 / 0</small></div><div class="genstat"><span>第7世代</span><strong id="gen7Stat">0.0%</strong><small id="gen7Detail">0 / 0</small></div><div class="genstat"><span>第8世代</span><strong id="gen8Stat">0.0%</strong><small id="gen8Detail">0 / 0</small></div><div class="genstat"><span>第9世代</span><strong id="gen9Stat">0.0%</strong><small id="gen9Detail">0 / 0</small></div></div><div class="dashboard2"><div class="dashcard"><span>色違い総個体数</span><strong id="dashIndividuals">0</strong></div></div><div class="current-hunt"><div class="current-hunt-head"><h3>🎯 今厳選しているポケモン</h3><span>カードの「次に狙う」で登録</span></div><div class="current-hunt-list" id="currentHunt"></div></div><div class="software-panel"><div class="software-head"><h3>入手ソフト別 色違い個体数</h3><span class="section-count">登録済み個体のみ集計</span></div><div class="software-grid" id="softwareStats"></div></div>
-<div class="toolbar"><input id="search" placeholder="🔎 ポケモン名 / No. / フォルムを検索"/><select id="generation"><option value="all">全世代</option><option value="1">第1世代</option><option value="2">第2世代</option><option value="3">第3世代</option><option value="4">第4世代</option><option value="5">第5世代</option><option value="6">第6世代</option><option value="7">第7世代</option><option value="8">第8世代</option><option value="9">第9世代</option></select><select id="typeFilter"><option value="all">すべての種類</option><option value="normal">基本個体</option><option value="region">リージョン</option><option value="gender">オス・メス違い</option><option value="form">その他の姿違い</option><option value="gmax">キョダイマックス</option><option value="locked">色違い未解禁</option></select><select id="sort"><option value="no">全国図鑑順</option><option value="missing">未所持優先</option><option value="owned">所持済み優先</option></select><label class="toggle"><input id="missingOnly" style="width:auto" type="checkbox"/>未所持のみ</label></div><div class="filter2"><select id="gameFilter"><option value="all">全入手ソフト</option></select><select id="sourceFilter"><option value="all">全入手区分</option><option value="自己産">自己産</option><option value="交換">交換</option><option value="配布">配布</option><option value="その他">その他</option></select><select id="ballFilter"><option value="all">全ボール</option></select><label class="toggle"><input id="targetOnly" style="width:auto" type="checkbox"/>🎯 次に狙うのみ</label></div><div class="section-title"><h2>色違いコレクション</h2></div><div class="empty" id="loading" style="padding:34px">全ポケモンデータを読み込んでいます…</div><main id="grid"></main><details class="extra-panel" open="">
+</section><div class="collection-goals" id="collection-goals"></div><div class="genpanel"><div class="genstat"><span>第1世代</span><strong id="gen1Stat">0.0%</strong><small id="gen1Detail">0 / 0</small></div><div class="genstat"><span>第2世代</span><strong id="gen2Stat">0.0%</strong><small id="gen2Detail">0 / 0</small></div><div class="genstat"><span>第3世代</span><strong id="gen3Stat">0.0%</strong><small id="gen3Detail">0 / 0</small></div><div class="genstat"><span>第4世代</span><strong id="gen4Stat">0.0%</strong><small id="gen4Detail">0 / 0</small></div><div class="genstat"><span>第5世代</span><strong id="gen5Stat">0.0%</strong><small id="gen5Detail">0 / 0</small></div><div class="genstat"><span>第6世代</span><strong id="gen6Stat">0.0%</strong><small id="gen6Detail">0 / 0</small></div><div class="genstat"><span>第7世代</span><strong id="gen7Stat">0.0%</strong><small id="gen7Detail">0 / 0</small></div><div class="genstat"><span>第8世代</span><strong id="gen8Stat">0.0%</strong><small id="gen8Detail">0 / 0</small></div><div class="genstat"><span>第9世代</span><strong id="gen9Stat">0.0%</strong><small id="gen9Detail">0 / 0</small></div></div><div class="dashboard-title"><h3>📊 進捗ダッシュボード</h3><span>カテゴリ別の所持率をひと目で確認</span></div><div class="dashboard2"><div class="dashcard"><span>全国図鑑</span><strong id="dashBase">0.0%</strong><div class="statdetail" id="dashBaseDetail">0 / 0</div></div><div class="dashcard"><span>リージョン</span><strong id="dashRegion">0.0%</strong><div class="statdetail" id="dashRegionDetail">0 / 0</div></div><div class="dashcard"><span>オス・メス違い</span><strong id="dashGender">0.0%</strong><div class="statdetail" id="dashGenderDetail">0 / 0</div></div><div class="dashcard"><span>その他の姿違い</span><strong id="dashForms">0.0%</strong><div class="statdetail" id="dashFormsDetail">0 / 0</div></div><div class="dashcard"><span>色違い総個体数</span><strong id="dashIndividuals">0</strong><div class="statdetail">重複個体を含む</div></div></div><div class="current-hunt"><div class="current-hunt-head"><h3>🎯 今厳選しているポケモン</h3><span>カードの「次に狙う」で登録</span></div><div class="current-hunt-list" id="currentHunt"></div></div><div class="software-panel"><div class="software-head"><h3>入手ソフト別 色違い個体数</h3><span class="section-count">登録済み個体のみ集計</span></div><div class="software-grid" id="softwareStats"></div></div>
+<div class="toolbar"><input id="search" placeholder="🔎 ポケモン名 / No. / フォルムを検索"/><select id="generation"><option value="all">全世代</option><option value="1">第1世代</option><option value="2">第2世代</option><option value="3">第3世代</option><option value="4">第4世代</option><option value="5">第5世代</option><option value="6">第6世代</option><option value="7">第7世代</option><option value="8">第8世代</option><option value="9">第9世代</option></select><select id="typeFilter"><option value="all">すべての種類</option><option value="normal">基本個体</option><option value="region">リージョン</option><option value="gender">オス・メス違い</option><option value="form">その他の姿違い</option><option value="gmax">キョダイマックス</option><option value="locked">色違い未解禁</option></select><select id="sort"><option value="no">全国図鑑順</option><option value="missing">未所持優先</option><option value="owned">所持済み優先</option></select><label class="toggle"><input id="missingOnly" style="width:auto" type="checkbox"/>未所持のみ</label></div><div class="filter2"><select id="regionFormFilter"><option value="all">全地方フォーム</option><option value="アローラ">アローラ</option><option value="ガラル">ガラル</option><option value="ヒスイ">ヒスイ</option><option value="パルデア">パルデア</option></select><select id="gameFilter"><option value="all">全入手ソフト</option></select><select id="sourceFilter"><option value="all">全入手区分</option><option value="自己産">自己産</option><option value="交換">交換</option><option value="配布">配布</option><option value="その他">その他</option></select><select id="ballFilter"><option value="all">全ボール</option></select><label class="toggle"><input id="targetOnly" style="width:auto" type="checkbox"/>🎯 次に狙うのみ</label></div><div class="section-title"><h2>色違いコレクション</h2></div><div class="empty" id="loading" style="padding:34px">全ポケモンデータを読み込んでいます…</div><main id="grid"></main><details class="extra-panel" open="">
 <summary><img alt="" class="panel-poke-icon" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/137.png"/> HOME BOX一覧</summary>
 <div class="extra-head"><span class="section-count">登録したHOME BOXごとの個体数</span></div>
 <div class="box-grid" id="home-box-grid"></div>
@@ -717,6 +730,12 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 </details><details class="extra-panel" open="">
 <summary><img alt="" class="panel-poke-icon" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/493.png"/> 年間アルバム</summary>
 <div id="year-album"></div>
+</details></section><section class="tab-page" id="tab-history">
+<details class="extra-panel" open><summary>📜 捕獲履歴</summary>
+<div class="extra-head"><span class="section-count">「✨ 捕獲した」で登録した個体を日付・作品・方法・回数で一覧表示</span></div>
+<div class="history-summary"><div class="dashcard"><span>捕獲総数</span><strong id="history-total">0</strong></div><div class="dashcard"><span>今月</span><strong id="history-month">0</strong></div><div class="dashcard"><span>厳選回数記録あり</span><strong id="history-hunted">0</strong></div></div>
+<div class="history-toolbar"><input id="capture-history-search" type="search" placeholder="🔎 ポケモン / ソフト / 方法 / ボール" oninput="renderCaptureHistory()"><select id="capture-history-game" onchange="renderCaptureHistory()"><option value="all">全ソフト</option></select><select id="capture-history-method" onchange="renderCaptureHistory()"><option value="all">全厳選方法</option></select></div>
+<div class="history-page-wrap"><table class="history-table"><thead><tr><th>日付</th><th>ポケモン</th><th>ソフト</th><th>厳選方法</th><th>回数</th><th>ボール</th></tr></thead><tbody id="capture-history-page-body"></tbody></table></div>
 </details></section><section class="tab-page" id="tab-stats"><details class="extra-panel" open="">
 <summary><img alt="" class="panel-poke-icon" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/25.png"/> 年間まとめ</summary>
 <div class="extra-head">
@@ -798,7 +817,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
     <div class="extra-panel">
       <div class="extra-head">
         <div><h2 style="margin:0">☁️ Supabase 同期</h2>
-        <span class="section-count">PC・iPhoneで同じデータを共有 ・ build v77</span></div>
+        <span class="section-count">PC・iPhoneで同じデータを共有 ・ build v78</span></div>
       </div>
       <div class="sync-fields">
         <label>Supabase URL<input id="supabase-url" autocomplete="off" placeholder="https://xxxx.supabase.co"></label>
@@ -813,9 +832,9 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
         <button class="btn" id="cloud-check" type="button">クラウド確認</button>
       </div>
       <div id="cloud-status" class="home-help">未設定です。</div>
-      <div id="auto-sync-status" class="home-help" style="margin-top:8px">同期：v77 外出向け省通信</div>
+      <div id="auto-sync-status" class="home-help" style="margin-top:8px">同期：v78 外出向け省通信</div><div id="network-status" class="net-pill">● 通信状態を確認中</div>
       <div class="home-help" style="margin-top:8px">
-        v77ではカウンター操作中は通信せず端末内へ即保存します。10秒操作がなければクラウドへ保存し、他端末は最新時刻の値だけを取り込みます。所持状況・HOME BOXなどのフルデータは上のボタンで手動同期します。
+        v78ではカウンター操作中は通信せず端末内へ即保存します。10秒操作がなければクラウドへ保存し、他端末は最新時刻の値だけを取り込みます。所持状況・HOME BOXなどのフルデータは上のボタンで手動同期します。
       </div>
       <div class="home-help" style="margin-top:10px">初回は「設定保存」→「接続テスト」の順に確認してください。既存データがある場合、確認前にクラウドへ保存しないでください。</div>
     </div>
@@ -823,7 +842,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 </section>
 
 <script>
-const DATA_VERSION='full-2026-09-09-v77';
+const DATA_VERSION='full-2026-09-09-v78';
 const SPECIES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species.csv';
 const NAMES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
 const MAX_DEX=1025;
@@ -1063,7 +1082,7 @@ function save(){
   }
   localStorage.setItem('shinyHomeState_v1',JSON.stringify(state));localStorage.setItem('shinyHomeBoxes_v1',JSON.stringify(boxState));localStorage.setItem('shinyHomeDates_v1',JSON.stringify(dateState));localStorage.setItem('shinyHomeGames_v1',JSON.stringify(gameState));localStorage.setItem('shinyHomeIndividuals_v1',JSON.stringify(individualState));localStorage.setItem('shinyHomeTargets_v1',JSON.stringify(targetState));localStorage.setItem('shinyHomeHunts_v1',JSON.stringify(huntState));localStorage.setItem('shinyHomeMonthImages_v1',JSON.stringify(monthImages));localStorage.setItem('shinyHomeIndividualScreenshots_v1',JSON.stringify(individualScreenshots));
 }
-function newIndividual(seed={}){return {uid:Date.now().toString(36)+Math.random().toString(36).slice(2,7),date:seed.date||'',game:seed.game||'',box:seed.box||'',nickname:seed.nickname||'',source:seed.source||'',ball:seed.ball||'',memo:seed.memo||'',favorite:!!seed.favorite,huntCount:Number(seed.huntCount)||0,huntStart:seed.huntStart||'',huntMethod:seed.huntMethod||'',huntCharm:seed.huntCharm||'',huntTargetId:seed.huntTargetId||'',huntTargetName:seed.huntTargetName||'',huntJournal:Array.isArray(seed.huntJournal)?seed.huntJournal:[]};}
+function newIndividual(seed={}){return {uid:seed.uid||Date.now().toString(36)+Math.random().toString(36).slice(2,7),date:seed.date||'',game:seed.game||'',box:seed.box||'',nickname:seed.nickname||'',source:seed.source||'',ball:seed.ball||'',memo:seed.memo||'',favorite:!!seed.favorite,huntCount:Number(seed.huntCount)||0,huntStart:seed.huntStart||'',huntMethod:seed.huntMethod||'',huntCharm:seed.huntCharm||'',huntTargetId:seed.huntTargetId||'',huntTargetName:seed.huntTargetName||'',huntJournal:Array.isArray(seed.huntJournal)?seed.huntJournal:[]};}
 function ensureLegacyIndividuals(){for(const id of Object.keys(state)){if(state[id]&&(!Array.isArray(individualState[id])||individualState[id].length===0)){individualState[id]=[newIndividual({date:dateState[id]||'',game:gameState[id]||'',box:boxState[id]||''})];}}}
 function ownedCountFor(id){return Array.isArray(individualState[id])?individualState[id].length:0}
 function syncOwned(id){const arr=individualState[id]||[];state[id]=arr.length>0;if(arr.length){dateState[id]=arr[0].date||'';gameState[id]=arr[0].game||'';boxState[id]=arr[0].box||'';}else{dateState[id]='';gameState[id]='';boxState[id]='';}save();}
@@ -1181,13 +1200,13 @@ window.deleteIndividual=(id,i)=>{if(!individualState[id])return;individualState[
 window.setIndividual=(id,i,key,val)=>{if(!individualState[id]||!individualState[id][i])return;individualState[id][i][key]=val;syncOwned(id);renderExtraPanels()};
 window.toggleTarget=id=>{
   targetState[id]=!targetState[id];
-  if(targetState[id]&&!huntState[id]) huntState[id]={count:0,start:'',method:'',ball:'',game:'',charm:'',outbreak:'0',sparkling:'0'};
+  if(targetState[id]&&!huntState[id]) huntState[id]={count:0,start:new Date().toISOString().slice(0,10),method:'',ball:'',game:'',charm:'',outbreak:'0',sparkling:'0',daily:{}}; else if(targetState[id]&&!huntState[id].start) huntState[id].start=new Date().toISOString().slice(0,10);
   save();requestAutoSyncAfterDataChange();render();
 };
 window.toggleIndividuals=id=>{const d=el('inds-'+encodeURIComponent(id));if(d)d.classList.toggle('open')};
 function render(){
-  const q=el('search').value.trim().toLowerCase(),g=el('generation').value,k=el('typeFilter').value,miss=el('missingOnly').checked,sort=el('sort').value,game=el('gameFilter').value,source=el('sourceFilter').value,ball=el('ballFilter').value,target=el('targetOnly').checked;
-  let rows=data.filter(p=>{const inds=individualState[p.id]||[];return (!q||`${p.no} ${p.name} ${p.en} ${p.form} ${p.gender}`.toLowerCase().includes(q))&&(g==='all'||String(p.gen)===g)&&(k==='all'||(k==='locked'?p.locked:(k==='normal'?p.section==='base':p.baseKind===k)))&&(!miss||(!p.locked&&!ownedCountFor(p.id)))&&(game==='all'||inds.some(x=>x.game===game))&&(source==='all'||inds.some(x=>x.source===source))&&(ball==='all'||inds.some(x=>x.ball===ball))&&(!target||!!targetState[p.id]);});
+  const q=el('search').value.trim().toLowerCase(),g=el('generation').value,k=el('typeFilter').value,miss=el('missingOnly').checked,sort=el('sort').value,regionForm=el('regionFormFilter')?.value||'all',game=el('gameFilter').value,source=el('sourceFilter').value,ball=el('ballFilter').value,target=el('targetOnly').checked;
+  let rows=data.filter(p=>{const inds=individualState[p.id]||[];return (!q||`${p.no} ${p.name} ${p.en} ${p.form} ${p.gender}`.toLowerCase().includes(q))&&(g==='all'||String(p.gen)===g)&&(k==='all'||(k==='locked'?p.locked:(k==='normal'?p.section==='base':p.baseKind===k)))&&(regionForm==='all'||(p.form||'').includes(regionForm))&&(!miss||(!p.locked&&!ownedCountFor(p.id)))&&(game==='all'||inds.some(x=>x.game===game))&&(source==='all'||inds.some(x=>x.source===source))&&(ball==='all'||inds.some(x=>x.ball===ball))&&(!target||!!targetState[p.id]);});
 
   const sorter=(a,b)=>{
     if(sort==='missing'){const d=(!!ownedCountFor(a.id))-(!!ownedCountFor(b.id));if(d)return d;}
@@ -1212,23 +1231,23 @@ function render(){
   updateStats(rows.length);
   renderCurrentHunt();
 }
-function huntData(id){if(!huntState[id])huntState[id]={count:0,start:'',method:'',ball:'',game:'',charm:'',outbreak:'0',sparkling:'0'};return huntState[id]}
-window.incHunt=(id,n)=>{const x=huntData(id);x.count=Math.max(0,(Number(x.count)||0)+n);save();if(typeof syncHuntCounterValue==='function')syncHuntCounterValue(id,x.count);if(typeof updateCounterDOM==='function')updateCounterDOM(id,x.count)};
-window.resetHuntCount=id=>{const x=huntData(id);x.count=0;save();if(typeof syncHuntCounterValue==='function')syncHuntCounterValue(id,0);if(typeof updateCounterDOM==='function')updateCounterDOM(id,0)};
-window.setHunt=(id,key,val)=>{huntData(id)[key]=val;save();requestAutoSyncAfterDataChange()};
-window.captureHunt=id=>{
-  if(!individualState[id])individualState[id]=[];
-  const x=huntData(id),recordMsg=captureRecordMessage(x.count);
-  individualState[id].push(newIndividual({date:new Date().toISOString().slice(0,10),ball:x.ball||'',huntCount:Number(x.count)||0,huntStart:x.start||'',huntMethod:x.method||'',game:x.game||'',huntCharm:x.charm||'',huntTargetId:id,huntTargetName:(data.find(p=>p.id===id)?.name||''),huntJournal:Array.isArray(x.journal)?x.journal:[]}));
-  syncOwned(id);
-  targetState[id]=false;
-  save();
-  requestAutoSyncAfterDataChange();
-  render();
-  showShinyEffect(data.find(p=>p.id===id));
-  showToast(`${data.find(p=>p.id===id)?.name||'ポケモン'}を捕獲個体として登録しました.${recordMsg?` ${recordMsg}`:''}`);
-};
-window.stopHunt=id=>{targetState[id]=false;save();requestAutoSyncAfterDataChange();render()};
+function huntData(id){if(!huntState[id])huntState[id]={count:0,start:new Date().toISOString().slice(0,10),method:'',ball:'',game:'',charm:'',outbreak:'0',sparkling:'0',daily:{}};if(!huntState[id].daily||typeof huntState[id].daily!=='object')huntState[id].daily={};return huntState[id]}
+function huntTodayKey(){return new Date().toISOString().slice(0,10)}
+function todayHuntCount(id){const x=huntData(id);return Math.max(0,Number(x.daily?.[huntTodayKey()]||0)||0)}
+function addTodayHunt(id,delta){const x=huntData(id),k=huntTodayKey();x.daily=x.daily||{};x.daily[k]=Math.max(0,(Number(x.daily[k])||0)+delta)}
+function huntElapsedText(start){if(!start)return '開始日未設定';const a=new Date(start+'T00:00:00'),b=new Date();b.setHours(0,0,0,0);if(Number.isNaN(a.getTime()))return '開始日未設定';return `開始から${Math.max(1,Math.floor((b-a)/86400000)+1)}日目`}
+function oddsDenominator(odds){const s=String(odds?.text||'').replace(/,/g,'');const m=s.match(/1\s*\/\s*([0-9.]+)/);return m?Number(m[1]):0}
+function huntCumulativeProbability(id){const x=huntData(id),o=shinyOdds(x.game||'',x.method||'',x.charm||'',x),d=oddsDenominator(o),n=Math.max(0,Number(x.count)||0);if(!d||!n)return {pct:0,text:n?'計算条件不足':'0.0%',odds:o};const pct=(1-Math.pow(1-1/d,n))*100;return {pct,text:pct.toFixed(pct<10?1:0)+'%',odds:o}}
+function updateHuntMetaDOM(id){const safe=window.CSS&&CSS.escape?CSS.escape(id):String(id),x=huntData(id),today=todayHuntCount(id),cum=huntCumulativeProbability(id),elapsed=huntElapsedText(x.start);document.querySelectorAll('[data-key="'+safe+'"]').forEach(card=>{const a=card.querySelector('[data-hunt-today]');if(a)a.textContent=today+'回';const b=card.querySelector('[data-hunt-elapsed]');if(b)b.textContent=elapsed;const c=card.querySelector('[data-hunt-prob]');if(c)c.textContent=cum.text})}
+function orderedActiveHunts(){return data.filter(p=>!p.locked&&targetState[p.id]).sort((a,b)=>(Number(huntData(a.id).order)??999)-(Number(huntData(b.id).order)??999)||a.no-b.no)}
+function persistHuntOrder(ids){ids.forEach((id,i)=>huntData(id).order=i);save();requestAutoSyncAfterDataChange()}
+function enableHuntDrag(container,selector){if(!container||container.dataset.dragBound==='1')return;container.dataset.dragBound='1';let dragging=null;const move=e=>{if(!dragging)return;e.preventDefault();const hit=document.elementFromPoint(e.clientX,e.clientY)?.closest(selector);if(!hit||hit===dragging||hit.parentElement!==container)return;const r=hit.getBoundingClientRect();container.insertBefore(dragging,e.clientY<r.top+r.height/2?hit:hit.nextSibling)},up=()=>{if(!dragging)return;dragging.classList.remove('dragging');persistHuntOrder([...container.querySelectorAll(selector)].map(x=>x.dataset.key).filter(Boolean));dragging=null;window.removeEventListener('pointermove',move);window.removeEventListener('pointerup',up)};container.addEventListener('pointerdown',e=>{const h=e.target.closest('.drag-handle');if(!h)return;const card=h.closest(selector);if(!card)return;e.preventDefault();dragging=card;dragging.classList.add('dragging');window.addEventListener('pointermove',move,{passive:false});window.addEventListener('pointerup',up,{once:true})})}
+function appendCaptureEvent(targetId,caughtId,ind){const x=huntData(targetId);x.captureEvents=Array.isArray(x.captureEvents)?x.captureEvents:[];x.captureEvents.push({uid:ind.uid,caughtId,ind});x.captureEvents=x.captureEvents.slice(-20)}
+window.incHunt=(id,n)=>{const x=huntData(id),old=Math.max(0,Number(x.count)||0),next=Math.max(0,old+n),applied=next-old;x.count=next;if(applied)addTodayHunt(id,applied);save();if(typeof syncHuntCounterValue==='function')syncHuntCounterValue(id,x.count);if(typeof updateCounterDOM==='function')updateCounterDOM(id,x.count);updateHuntMetaDOM(id)};
+window.resetHuntCount=id=>{if(!confirm('厳選回数を0にリセットしますか？'))return;const x=huntData(id);x.count=0;save();if(typeof syncHuntCounterValue==='function')syncHuntCounterValue(id,0);if(typeof updateCounterDOM==='function')updateCounterDOM(id,0);updateHuntMetaDOM(id)};
+window.setHunt=(id,key,val)=>{huntData(id)[key]=val;save();requestAutoSyncAfterDataChange();updateHuntMetaDOM(id)};
+window.captureHunt=id=>{if(!individualState[id])individualState[id]=[];const x=huntData(id),recordMsg=captureRecordMessage(x.count),ind=newIndividual({date:new Date().toISOString().slice(0,10),ball:x.ball||'',huntCount:Number(x.count)||0,huntStart:x.start||'',huntMethod:x.method||'',game:x.game||'',huntCharm:x.charm||'',huntTargetId:id,huntTargetName:(data.find(p=>p.id===id)?.name||''),huntJournal:Array.isArray(x.journal)?x.journal:[]});individualState[id].push(ind);appendCaptureEvent(id,id,ind);syncOwned(id);targetState[id]=false;save();requestAutoSyncAfterDataChange();if(typeof syncHuntSessionState==='function')syncHuntSessionState();render();showShinyEffect(data.find(p=>p.id===id));showToast(`${data.find(p=>p.id===id)?.name||'ポケモン'}を捕獲個体として登録しました.${recordMsg?` ${recordMsg}`:''}`)};
+window.stopHunt=id=>{const p=data.find(x=>x.id===id);if(!confirm(`${p?.name||'このポケモン'}の厳選を終了しますか？`))return;targetState[id]=false;save();requestAutoSyncAfterDataChange();render()};
 
 const HUNT_GAMES=[
   ['','厳選ソフト'],['DP/Pt','DP / Pt'],['HGSS','HGSS'],['BW','BW'],['BW2','BW2'],['XY','XY'],['ORAS','ORAS'],
@@ -1752,9 +1771,16 @@ function renderMonthlyShinies(){
 </div>`).join(''):'<span class="section-count">この月の記録はありません</span>';
 }
 function renderCaptureHistory(){
-  const box=el('capture-history-body'); if(!box)return;
-  const rows=allIndividualsFlat().filter(r=>r.ind.date).sort((a,b)=>(b.ind.date||'').localeCompare(a.ind.date||'')).slice(0,100);
-  box.innerHTML=rows.length?rows.map(r=>`<tr><td>${esc(r.ind.date||'')}</td><td><div class="history-poke"><img src="${spriteURL(r.p)}" alt="" onerror="this.style.display='none'"><span>${esc(r.p.name)}</span></div></td><td>${esc(r.ind.game||'—')}</td><td>${esc(r.ind.huntMethod||'—')}</td><td>${r.ind.huntCount?`${r.ind.huntCount}回`:'—'}</td><td>${r.ind.ball?`<span class="ball-inline"><img src="${ballIcon(r.ind.ball)}" alt="">${esc(ballName(r.ind.ball))}</span>`:'—'}</td></tr>`).join(''):'<tr><td colspan="6" class="section-count">捕獲履歴はまだありません</td></tr>';
+  const all=allIndividualsFlat().filter(r=>r.ind.date).sort((a,b)=>(b.ind.date||'').localeCompare(a.ind.date||''));
+  const gameSel=el('capture-history-game'),methodSel=el('capture-history-method');
+  if(gameSel){const cur=gameSel.value||'all',vals=[...new Set(all.map(r=>r.ind.game).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'ja'));gameSel.innerHTML='<option value="all">全ソフト</option>'+vals.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('');gameSel.value=vals.includes(cur)?cur:'all'}
+  if(methodSel){const cur=methodSel.value||'all',vals=[...new Set(all.map(r=>r.ind.huntMethod).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'ja'));methodSel.innerHTML='<option value="all">全厳選方法</option>'+vals.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('');methodSel.value=vals.includes(cur)?cur:'all'}
+  const q=(el('capture-history-search')?.value||'').trim().toLowerCase(),gf=gameSel?.value||'all',mf=methodSel?.value||'all';
+  const rows=all.filter(r=>(!q||`${r.p.name} ${r.ind.game} ${r.ind.huntMethod} ${ballName(r.ind.ball)}`.toLowerCase().includes(q))&&(gf==='all'||r.ind.game===gf)&&(mf==='all'||r.ind.huntMethod===mf));
+  const rowHTML=r=>`<tr><td>${esc(r.ind.date||'')}</td><td><div class="history-poke"><img src="${spriteURL(r.p)}" alt="" onerror="this.style.display='none'"><span>${esc(r.p.name)}</span></div></td><td>${esc(r.ind.game||'—')}</td><td>${esc(r.ind.huntMethod||'—')}</td><td>${r.ind.huntCount?`${r.ind.huntCount}回`:'—'}</td><td>${r.ind.ball?`<span class="ball-inline"><img src="${ballIcon(r.ind.ball)}" alt="">${esc(ballName(r.ind.ball))}</span>`:'—'}</td></tr>`;
+  const box=el('capture-history-body');if(box)box.innerHTML=all.slice(0,100).map(rowHTML).join('')||'<tr><td colspan="6" class="section-count">捕獲履歴はまだありません</td></tr>';
+  const page=el('capture-history-page-body');if(page)page.innerHTML=rows.map(rowHTML).join('')||'<tr><td colspan="6" class="section-count">条件に一致する履歴はありません</td></tr>';
+  if(el('history-total'))el('history-total').textContent=all.length+'匹';const ym=new Date().toISOString().slice(0,7);if(el('history-month'))el('history-month').textContent=all.filter(r=>r.ind.date.startsWith(ym)).length+'匹';if(el('history-hunted'))el('history-hunted').textContent=all.filter(r=>(Number(r.ind.huntCount)||0)>0).length+'件';
 }
 function renderHuntStats(){
   const box=el('hunt-stats-grid'); if(!box)return;
@@ -2620,58 +2646,39 @@ window.captureAlternate=function(targetId){
   });
   individualState[caughtId]=individualState[caughtId]||[];
   individualState[caughtId].push(ind);
+  appendCaptureEvent(targetId,caughtId,ind);
   altCatchSelected[targetId]='';
   syncOwned(caughtId);
   save();
+  requestAutoSyncAfterDataChange();
+  if(typeof syncHuntSessionState==='function')syncHuntSessionState();
   render();
   showShinyEffect(caught);
   showToast(`${caught.name}を捕獲個体として登録しました.${target.name}の厳選は継続します。${recordMsg?` ${recordMsg}`:''}`);
 };
 function renderCurrentHunt(){
   const wrap=el('currentHunt'); if(!wrap)return;
-  const hunts=data.filter(p=>!p.locked&&targetState[p.id]);
+  const hunts=orderedActiveHunts();
   if(!hunts.length){wrap.innerHTML='<div class="hunt-empty">カードの「🎯 厳選する」を押すと、ここに現在厳選中のポケモンが表示されます。</div>';return;}
-  wrap.innerHTML=hunts.map(p=>{
-    const x=huntData(p.id);
-    return `<div class="hunt-chip" data-key="${esc(p.id)}">
+  wrap.innerHTML=hunts.map(p=>{const x=huntData(p.id),cum=huntCumulativeProbability(p.id);return `<div class="hunt-chip" data-key="${esc(p.id)}">
       <img src="${spriteURL(p)}" onerror="this.src='${baseSpriteURL(p)}'">
-      <div><span class="hunt-no">No.${String(p.no).padStart(4,'0')}</span><b>${esc(p.name)}</b><small>${p.form!=='通常'?esc(p.form):kindLabel(p)}</small></div>
+      <div><div class="hunt-title-row"><div><span class="hunt-no">No.${String(p.no).padStart(4,'0')}</span><b>${esc(p.name)}</b><small>${p.form!=='通常'?esc(p.form):kindLabel(p)}</small></div><span class="drag-handle" title="ドラッグで並び替え">☰</span></div></div>
       <div class="counter-row"><span class="counter-value">${Number(x.count)||0}回</span><span class="counter-label">${counterLabel(x.method||'')}</span><button class="hunt-action" onclick="incHunt('${esc(p.id)}',1)">＋1</button><button class="hunt-action" onclick="incHunt('${esc(p.id)}',10)">＋10</button><button class="hunt-action" onclick="incHunt('${esc(p.id)}',100)">＋100</button><button class="hunt-action" onclick="incHunt('${esc(p.id)}',-1)">−1</button><button class="hunt-action danger" onclick="resetHuntCount('${esc(p.id)}')">0にリセット</button></div>
-      <div class="hunt-controls">
-        <input type="date" value="${esc(x.start||'')}" title="厳選開始日" onchange="setHunt('${esc(p.id)}','start',this.value)">
-        <select onchange="setHunt('${esc(p.id)}','game',this.value);renderCurrentHunt()">${huntGameOptions(x.game||'')}</select>
-        <select onchange="setHunt('${esc(p.id)}','charm',this.value);renderCurrentHunt()"><option value="">ひかるおまもり</option><option value="なし" ${x.charm==='なし'?'selected':''}>ひかるおまもり：なし</option><option value="あり" ${x.charm==='あり'?'selected':''}>ひかるおまもり：あり</option></select>
-        <select onchange="setHunt('${esc(p.id)}','method',this.value);renderCurrentHunt()">
-          <option value="">厳選方法</option>
-          ${['野生遭遇','大量発生','国際孵化','SOS連鎖','ポケトレ','ダイマックスアドベンチャー','ひかるおまもり厳選','固定リセット','その他'].map(v=>`<option ${x.method===v?'selected':''}>${v}</option>`).join('')}
-        </select>
-        <div class="ball-select-wrap"><img id="huntball-${encodeURIComponent(p.id)}" src="${ballIcon(x.ball)}" alt=""><select onchange="setHunt('${esc(p.id)}','ball',this.value);document.getElementById('huntball-${encodeURIComponent(p.id)}').src=ballIcon(this.value)">${ballOptions(x.ball)}</select></div>
-        <button class="hunt-action capture" onclick="captureHunt('${esc(p.id)}')">✨ 捕獲！</button>
-      </div>
-      ${(x.method==='大量発生'&&x.game==='SV')?`<div class="special-odds">
-        <select onchange="setHunt('${esc(p.id)}','outbreak',this.value);renderCurrentHunt()"><option value="0" ${String(x.outbreak||'0')==='0'?'selected':''}>大量発生：0～29匹</option><option value="30" ${String(x.outbreak)==='30'?'selected':''}>大量発生：30～59匹</option><option value="60" ${String(x.outbreak)==='60'?'selected':''}>大量発生：60匹以上</option></select>
-        <select onchange="setHunt('${esc(p.id)}','sparkling',this.value);renderCurrentHunt()"><option value="0" ${String(x.sparkling||'0')==='0'?'selected':''}>かがやきパワー：なし</option><option value="1" ${String(x.sparkling)==='1'?'selected':''}>かがやきパワー Lv1</option><option value="2" ${String(x.sparkling)==='2'?'selected':''}>かがやきパワー Lv2</option><option value="3" ${String(x.sparkling)==='3'?'selected':''}>かがやきパワー Lv3</option></select>
-      </div>`:''}
-      ${(()=>{const o=shinyOdds(x.game||'',x.method||'',x.charm||'',x);return `<div class="odds-box"><span>色違い確率</span><strong>${o.text}</strong><span class="odds-note">${esc(o.note)}</span></div>`})()}
-      ${supportsAlternateCatch(x.method||'')?`<details class="alt-catch">
-        <summary>✨ 別のポケモンが光った</summary>
-        <div class="alt-catch-row">
-          <input id="alt-q-${safeId(p.id)}" type="text" placeholder="名前または図鑑No.で検索" oninput="altCatchSearch('${esc(p.id)}')">
-        </div>
-        <div id="alt-r-${safeId(p.id)}" class="alt-results"></div>
-        <div id="alt-c-${safeId(p.id)}" class="alt-confirm"></div>
-      </details>`:''}
+      <div class="hunt-progress-strip"><div class="hunt-mini-stat"><span>今日の厳選</span><strong data-hunt-today>${todayHuntCount(p.id)}回</strong></div><div class="hunt-mini-stat"><span>経過日数</span><strong data-hunt-elapsed>${huntElapsedText(x.start)}</strong></div><div class="hunt-mini-stat prob"><span>1匹以上出る目安</span><strong data-hunt-prob>${cum.text}</strong></div></div>
+      <div class="hunt-controls"><input type="date" value="${esc(x.start||'')}" title="厳選開始日" onchange="setHunt('${esc(p.id)}','start',this.value)"><select onchange="setHunt('${esc(p.id)}','game',this.value);renderCurrentHunt()">${huntGameOptions(x.game||'')}</select><select onchange="setHunt('${esc(p.id)}','charm',this.value);renderCurrentHunt()"><option value="">ひかるおまもり</option><option value="なし" ${x.charm==='なし'?'selected':''}>ひかるおまもり：なし</option><option value="あり" ${x.charm==='あり'?'selected':''}>ひかるおまもり：あり</option></select><select onchange="setHunt('${esc(p.id)}','method',this.value);renderCurrentHunt()"><option value="">厳選方法</option>${['野生遭遇','大量発生','国際孵化','SOS連鎖','ポケトレ','ダイマックスアドベンチャー','ひかるおまもり厳選','固定リセット','その他'].map(v=>`<option ${x.method===v?'selected':''}>${v}</option>`).join('')}</select><div class="ball-select-wrap"><img id="huntball-${encodeURIComponent(p.id)}" src="${ballIcon(x.ball)}" alt=""><select onchange="setHunt('${esc(p.id)}','ball',this.value);document.getElementById('huntball-${encodeURIComponent(p.id)}').src=ballIcon(this.value)">${ballOptions(x.ball)}</select></div><button class="hunt-action capture" onclick="captureHunt('${esc(p.id)}')">✨ 捕獲！</button></div>
+      ${(x.method==='大量発生'&&x.game==='SV')?`<div class="special-odds"><select onchange="setHunt('${esc(p.id)}','outbreak',this.value);renderCurrentHunt()"><option value="0" ${String(x.outbreak||'0')==='0'?'selected':''}>大量発生：0～29匹</option><option value="30" ${String(x.outbreak)==='30'?'selected':''}>大量発生：30～59匹</option><option value="60" ${String(x.outbreak)==='60'?'selected':''}>大量発生：60匹以上</option></select><select onchange="setHunt('${esc(p.id)}','sparkling',this.value);renderCurrentHunt()"><option value="0" ${String(x.sparkling||'0')==='0'?'selected':''}>かがやきパワー：なし</option><option value="1" ${String(x.sparkling)==='1'?'selected':''}>かがやきパワー Lv1</option><option value="2" ${String(x.sparkling)==='2'?'selected':''}>かがやきパワー Lv2</option><option value="3" ${String(x.sparkling)==='3'?'selected':''}>かがやきパワー Lv3</option></select></div>`:''}
+      ${(()=>{const o=shinyOdds(x.game||'',x.method||'',x.charm||'',x);return `<div class="odds-box"><span>現在の1回あたり色違い確率</span><strong>${o.text}</strong><span class="odds-note">${esc(o.note)} ／ 累積確率は現在の1回あたり確率での概算</span></div>`})()}
+      ${supportsAlternateCatch(x.method||'')?`<details class="alt-catch"><summary>✨ 別のポケモンが光った</summary><div class="alt-catch-row"><input id="alt-q-${safeId(p.id)}" type="text" placeholder="名前または図鑑No.で検索" oninput="altCatchSearch('${esc(p.id)}')"></div><div id="alt-r-${safeId(p.id)}" class="alt-results"></div><div id="alt-c-${safeId(p.id)}" class="alt-confirm"></div></details>`:''}
       <div class="hunt-journal"><div class="counter-row"><button class="hunt-action" onclick="addHuntJournal('${esc(p.id)}')">＋ 厳選日記</button>${x.start?`<span class="hunt-days">${huntElapsedDays(x.start)}</span>`:''}</div><div class="hunt-journal-list">${(Array.isArray(x.journal)?x.journal:[]).slice().reverse().map(j=>`<div class="hunt-journal-entry">${new Date(j.at).toLocaleString('ja-JP')}　${Number(j.count)||0}回　${esc(j.text||'')}</div>`).join('')||'<div class="hunt-journal-entry">途中経過を残せます</div>'}</div></div>
-      <div class="counter-row"><button class="hunt-action danger" onclick="stopHunt('${esc(p.id)}')">厳選終了</button>${x.start?`<span style="color:var(--muted);font-size:11px">開始日 ${esc(x.start)}</span>`:''}${x.method?`<span style="color:var(--muted);font-size:11px">${esc(x.method)}</span>`:''}</div>
-    </div>`;
-  }).join('');
+      <div class="counter-row"><button class="hunt-action danger" onclick="stopHunt('${esc(p.id)}')">厳選終了</button>${x.start?`<span style="color:var(--muted);font-size:11px">開始日 ${esc(x.start)}</span>`:''}${x.method?`<span style="color:var(--muted);font-size:11px">${esc(x.method)}</span>`:''}</div></div>`}).join('');
+  enableHuntDrag(wrap,'.hunt-chip');
 }
 function updateStats(visible){
   renderCurrentHunt();
   const collectible=data.filter(p=>!p.locked),owned=collectible.filter(p=>ownedCountFor(p.id)>0).length,total=collectible.length,pct=total?owned/total*100:0;
   el('ownedCount').textContent=owned;el('totalCount').textContent=total;el('targetCount').textContent=total;el('missingCount').textContent=total-owned;el('visibleCount').textContent=visible;el('percent').textContent=pct.toFixed(1)+'%';el('bar').style.width=pct+'%';
   const setCategoryStat=(kind,statId,detailId,isBase=false)=>{const items=data.filter(p=>!p.locked&&(isBase?p.section==='base':p.baseKind===kind));const have=items.filter(p=>ownedCountFor(p.id)>0).length;const all=items.length;const percent=all?have/all*100:0;el(statId).textContent=percent.toFixed(1)+'%';el(detailId).textContent=`${have} / ${all}`;};
-  setCategoryStat('normal','normalStat','normalDetail',true);setCategoryStat('region','regionStat','regionDetail');setCategoryStat('gender','genderStat','genderDetail');setCategoryStat('form','formStat','formDetail');setCategoryStat('gmax','gmaxStat','gmaxDetail');for(let gen=1;gen<=9;gen++){const items=data.filter(p=>!p.locked&&p.gen===gen);const have=items.filter(p=>ownedCountFor(p.id)>0).length;const all=items.length;el('gen'+gen+'Stat').textContent=(all?have/all*100:0).toFixed(1)+'%';el('gen'+gen+'Detail').textContent=`${have} / ${all}`;}el('lockedStat').textContent=data.filter(p=>p.locked).length;
+  setCategoryStat('normal','normalStat','normalDetail',true);setCategoryStat('region','regionStat','regionDetail');setCategoryStat('gender','genderStat','genderDetail');setCategoryStat('form','formStat','formDetail');setCategoryStat('gmax','gmaxStat','gmaxDetail');const dashSet=(pred,id,detail)=>{const a=data.filter(p=>!p.locked&&pred(p)),h=a.filter(p=>ownedCountFor(p.id)>0).length,pct=a.length?h/a.length*100:0;if(el(id))el(id).textContent=pct.toFixed(1)+'%';if(el(detail))el(detail).textContent=`${h} / ${a.length}`};dashSet(p=>p.section==='base','dashBase','dashBaseDetail');dashSet(p=>p.baseKind==='region','dashRegion','dashRegionDetail');dashSet(p=>p.baseKind==='gender','dashGender','dashGenderDetail');dashSet(p=>p.baseKind==='form','dashForms','dashFormsDetail');for(let gen=1;gen<=9;gen++){const items=data.filter(p=>!p.locked&&p.gen===gen);const have=items.filter(p=>ownedCountFor(p.id)>0).length;const all=items.length;el('gen'+gen+'Stat').textContent=(all?have/all*100:0).toFixed(1)+'%';el('gen'+gen+'Detail').textContent=`${have} / ${all}`;}el('lockedStat').textContent=data.filter(p=>p.locked).length;
   const allInds=Object.values(individualState).flatMap(a=>Array.isArray(a)?a:[]), totalIndividuals=allInds.length;el('individualCount').textContent=totalIndividuals;el('dashIndividuals').textContent=totalIndividuals;
   const gc={};for(const x of allInds){if(x.game)gc[x.game]=(gc[x.game]||0)+1;}const games=Object.entries(gc).sort((a,b)=>b[1]-a[1]);el('softwareStats').innerHTML=games.length?games.map(([g,c])=>`<div class="software-chip"><span>${esc(g)}</span><b>${c}</b></div>`).join(''):'<span class="section-count">入手ソフトを登録するとここに集計されます</span>';
   renderExtraPanels();
@@ -2870,14 +2877,14 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 // ===== v56 automatic update / cache repair =====
 (function(){
-  const APP_VERSION='v77';
+  const APP_VERSION='v78';
   const UPDATE_KEY='shinyHomeReloadedForSW_'+APP_VERSION;
 
   async function registerFreshWorker(){
     if(!('serviceWorker' in navigator) || location.protocol==='file:') return;
     try{
       const reg = await navigator.serviceWorker.register(
-        './service-worker.js?v=77',
+        './service-worker.js?v=78',
         {updateViaCache:'none'}
       );
 
@@ -2924,7 +2931,7 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 
 
-// ===== v77 travel sync: local-first + hunt-session cloud sync =====
+// ===== v78 travel sync: local-first + hunt-session cloud sync =====
 (function(){
   const CLOUD_KEY='shinyHomeCloudSettings_v2', COUNTER_TABLE='shiny_home_hunt_counters';
   const EDIT_KEY='shinyHomeCounterLocalEdits_v1', SYNC_KEY='shinyHomeCounterLastSync_v1';
@@ -2933,7 +2940,7 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
   function cfg(){const fallback={url:'https://litkisamojglstbjwloo.supabase.co',key:'sb_publishable_pc-8E8ETM6yZ3OcB1cNkjA_OzVjc-Rh',userId:'pokemon-shiny-home'};try{return {...fallback,...(JSON.parse(localStorage.getItem(CLOUD_KEY)||localStorage.getItem('shinyHomeCloudSettings_v1')||'{}')||{})}}catch{return fallback}}
   function headers(c){return {apikey:c.key,Authorization:'Bearer '+c.key,'Content-Type':'application/json'}}
   function readMap(k){try{return JSON.parse(localStorage.getItem(k)||'{}')||{}}catch{return {}}} function writeMap(k,o){try{localStorage.setItem(k,JSON.stringify(o))}catch(_){}}
-  function setStatus(msg,kind){const e=$('auto-sync-status');if(e){e.textContent='同期：'+msg;e.style.color=kind==='ok'?'#8fe6b0':kind==='err'?'#ff9c9c':''}const m=$('mobile-sync-status');if(m){m.textContent='☁️ '+msg+' ・ v77';m.style.color=kind==='ok'?'#8fe6b0':kind==='err'?'#ff9c9c':''}}
+  function setStatus(msg,kind){const e=$('auto-sync-status');if(e){e.textContent='同期：'+msg;e.style.color=kind==='ok'?'#8fe6b0':kind==='err'?'#ff9c9c':''}const m=$('mobile-sync-status');if(m){m.textContent='☁️ '+msg+' ・ v78';m.style.color=kind==='ok'?'#8fe6b0':kind==='err'?'#ff9c9c':''}}
   function hunts(){try{return typeof huntState==='object'&&huntState?huntState:JSON.parse(localStorage.getItem('shinyHomeHunts_v1')||'{}')}catch{return {}}} function targets(){try{return typeof targetState==='object'&&targetState?targetState:JSON.parse(localStorage.getItem('shinyHomeTargets_v1')||'{}')}catch{return {}}}
   function persist(h,t){localStorage.setItem('shinyHomeHunts_v1',JSON.stringify(h));localStorage.setItem('shinyHomeTargets_v1',JSON.stringify(t));try{if(typeof save==='function')save()}catch(_){}}
   function markEdit(id,at){const m=readMap(EDIT_KEY);m[id]=at;writeMap(EDIT_KEY,m)} function editAt(id){return Number(readMap(EDIT_KEY)[id]||0)||0} function markSync(id,at){const m=readMap(SYNC_KEY);m[id]=at;writeMap(SYNC_KEY,m)}
@@ -2943,9 +2950,11 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
   function queueSession(){sessionDirty=true;const at=Date.now(),t=targets();for(const id of Object.keys(t))if(t[id])markEdit(id,at);setStatus('端末内に保存済み');schedule()}
   async function flush(keepalive=false){if(!dirty.size&&!sessionDirty)return;const c=cfg();if(!c.url||!c.key||!c.userId)return;const h=hunts(),t=targets(),ids=new Set([...dirty.keys(),...Object.keys(h),...Object.keys(t)]),edits=readMap(EDIT_KEY),now=Date.now();const rows=[...ids].map(id=>{const x=h[id]||{},count=Number(x.count??x.huntCount??x.encounters??0)||0,at=Number(dirty.get(id)?.at||edits[id]||now)||now;return {user_id:c.userId,pokemon_id:id,count,active:!!t[id],hunt:x,updated_at:new Date(at).toISOString()}});if(!rows.length)return;try{const r=await fetch(c.url.replace(/\/$/,'')+'/rest/v1/'+COUNTER_TABLE,{method:'POST',headers:{...headers(c),Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify(rows),keepalive});if(!r.ok)throw Error(await r.text());for(const row of rows){dirty.delete(row.pokemon_id);markSync(row.pokemon_id,Date.parse(row.updated_at)||Date.now())}sessionDirty=false;showSynced()}catch(e){setStatus('端末内に保存済み（次回再送）','err')}}
   window.updateCounterDOM=function(id,count){const safe=window.CSS&&CSS.escape?CSS.escape(id):String(id);document.querySelectorAll('.mobile-hunt-card[data-key="'+safe+'"]').forEach(card=>{const n=card.querySelector('.mobile-hunt-count');if(n)n.textContent=count});document.querySelectorAll('.hunt-chip[data-key="'+safe+'"]').forEach(card=>{const n=card.querySelector('.counter-value');if(n)n.textContent=count+'回'})};
-  async function pull(){if(pulling)return;const c=cfg();if(!c.url||!c.key||!c.userId)return;pulling=true;try{const r=await fetch(c.url.replace(/\/$/,'')+'/rest/v1/'+COUNTER_TABLE+'?user_id=eq.'+encodeURIComponent(c.userId)+'&select=pokemon_id,count,active,hunt,updated_at',{headers:headers(c),cache:'no-store'});if(!r.ok)throw Error(await r.text());const rows=await r.json(),h=hunts(),t=targets();let structural=false;for(const row of rows){const id=row.pokemon_id;if(dirty.has(id))continue;const ra=Date.parse(row.updated_at||'')||0,la=editAt(id);if(ra&&la&&ra<=la)continue;const was=!!t[id],active=row.active!==false;if(active)t[id]=true;else delete t[id];if(was!==active)structural=true;const rh=row.hunt&&typeof row.hunt==='object'?row.hunt:{};h[id]={...(h[id]||{}),...rh};const x=h[id],f=('count' in x)?'count':(('huntCount' in x)?'huntCount':'count');x[f]=Number(row.count)||0;if(ra){markEdit(id,ra);markSync(id,ra)}if(typeof updateCounterDOM==='function')updateCounterDOM(id,x[f])}persist(h,t);if(structural){try{if(typeof renderMobileMultiHunts==='function')renderMobileMultiHunts()}catch(_){}try{if(typeof renderCurrentHunt==='function')renderCurrentHunt()}catch(_){}}showSynced()}catch(e){setStatus('オフライン／次回確認','err')}finally{pulling=false}}
+  function applyCaptureEvents(rh){let changed=false;const events=Array.isArray(rh?.captureEvents)?rh.captureEvents:[];for(const ev of events){const caughtId=ev?.caughtId,raw=ev?.ind;if(!caughtId||!raw?.uid)continue;individualState[caughtId]=individualState[caughtId]||[];if(individualState[caughtId].some(x=>x.uid===raw.uid))continue;individualState[caughtId].push(newIndividual(raw));state[caughtId]=true;changed=true}if(changed)save();return changed}
+  async function pull(){if(pulling)return;const c=cfg();if(!c.url||!c.key||!c.userId)return;pulling=true;try{const r=await fetch(c.url.replace(/\/$/,'')+'/rest/v1/'+COUNTER_TABLE+'?user_id=eq.'+encodeURIComponent(c.userId)+'&select=pokemon_id,count,active,hunt,updated_at',{headers:headers(c),cache:'no-store'});if(!r.ok)throw Error(await r.text());const rows=await r.json(),h=hunts(),t=targets();let structural=false,collectionChanged=false;for(const row of rows){const id=row.pokemon_id;const rh0=row.hunt&&typeof row.hunt==='object'?row.hunt:{};if(applyCaptureEvents(rh0))collectionChanged=true;if(dirty.has(id))continue;const ra=Date.parse(row.updated_at||'')||0,la=editAt(id);if(ra&&la&&ra<=la)continue;const was=!!t[id],active=row.active!==false;if(active)t[id]=true;else delete t[id];if(was!==active)structural=true;const rh=rh0;h[id]={...(h[id]||{}),...rh};const x=h[id],f=('count' in x)?'count':(('huntCount' in x)?'huntCount':'count');x[f]=Number(row.count)||0;if(ra){markEdit(id,ra);markSync(id,ra)}if(typeof updateCounterDOM==='function')updateCounterDOM(id,x[f])}persist(h,t);if(collectionChanged){try{if(typeof render==='function')render()}catch(_){}try{if(typeof renderExtraPanels==='function')renderExtraPanels()}catch(_){}}if(structural){try{if(typeof renderMobileMultiHunts==='function')renderMobileMultiHunts()}catch(_){}try{if(typeof renderCurrentHunt==='function')renderCurrentHunt()}catch(_){}}showSynced()}catch(e){setStatus('オフライン／次回確認','err')}finally{pulling=false}}
   window.syncHuntCounterValue=(id,count)=>queueCounter(id,count);window.syncHuntSessionState=()=>queueSession();window.shinyCounterSyncNow=()=>flush(false);window.shinyAutoSyncNow=async()=>{await flush(false);await pull()};
-  function init(){setStatus('端末内で待機中');pull();setInterval(()=>{if(document.visibilityState==='visible')pull()},30000)}
+  function updateNetwork(){const e=$('network-status');if(e){e.textContent=navigator.onLine?'● オンライン':'● オフライン（端末内に保存）';e.className='net-pill '+(navigator.onLine?'online':'offline')}} function init(){setStatus('端末内で待機中');updateNetwork();pull();setInterval(()=>{if(document.visibilityState==='visible')pull()},30000)}
+  window.addEventListener('online',async()=>{updateNetwork();await flush(false);pull()});window.addEventListener('offline',updateNetwork);
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')flush(true);else pull()});window.addEventListener('pagehide',()=>flush(true));window.addEventListener('focus',pull);window.addEventListener('pageshow',pull);if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
 
@@ -2991,7 +3000,7 @@ function requestAutoSyncAfterDataChange(){try{if(typeof syncHuntSessionState==='
       const count=Number(hv.count??hv.huntCount??hv.encounters??0)||0;
       entries.push({key,p,count,hunt:hv});
     });
-    return entries;
+    return entries.sort((a,b)=>(Number(a.hunt.order)??999)-(Number(b.hunt.order)??999)||a.p.no-b.p.no);
   }
 
   function pokemonSprite(p){
@@ -3000,39 +3009,9 @@ function requestAutoSyncAfterDataChange(){try{if(typeof syncHuntSessionState==='
     return 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/'+p.no+'.png';
   }
 
-  function mutateCount(key,delta){
-    const h=allHunts();
-    const hv=h[key]||{};
-    const field = ('count' in hv) ? 'count' : (('huntCount' in hv)?'huntCount':(('encounters' in hv)?'encounters':'count'));
-    hv[field]=Math.max(0,(Number(hv[field])||0)+delta);
-    h[key]=hv;
-    saveHunts(h);
-    if(typeof syncHuntCounterValue==='function')syncHuntCounterValue(key,hv[field]);
-    const card=document.querySelector('.mobile-hunt-card[data-key="'+CSS.escape(key)+'"]');
-    const num=card&&card.querySelector('.mobile-hunt-count');
-    if(num) num.textContent=hv[field];
-  }
+  function mutateCount(key,delta){const h=allHunts(),hv=h[key]||{},field=('count' in hv)?'count':(('huntCount' in hv)?'huntCount':(('encounters' in hv)?'encounters':'count')),old=Math.max(0,Number(hv[field])||0),next=Math.max(0,old+delta),applied=next-old;hv[field]=next;hv.daily=hv.daily&&typeof hv.daily==='object'?hv.daily:{};const day=new Date().toISOString().slice(0,10);hv.daily[day]=Math.max(0,(Number(hv.daily[day])||0)+applied);if(!hv.start)hv.start=day;h[key]=hv;saveHunts(h);if(typeof syncHuntCounterValue==='function')syncHuntCounterValue(key,hv[field]);const card=document.querySelector('.mobile-hunt-card[data-key="'+CSS.escape(key)+'"]'),num=card&&card.querySelector('.mobile-hunt-count');if(num)num.textContent=hv[field];if(typeof updateHuntMetaDOM==='function')updateHuntMetaDOM(key)}
 
-  function finishHunt(key,captured){
-    const p=(typeof data!=='undefined'?data.find(x=>x.id===key):null);
-    const label=p?.name||'このポケモン';
-    if(!confirm(captured?`${label}を「捕獲した」として終了しますか？`:`${label}の厳選を終了しますか？`))return;
-    const t=allTargets();
-    if(key in t) delete t[key];
-    saveTargets(t);
-    if(typeof requestAutoSyncAfterDataChange==='function')requestAutoSyncAfterDataChange();
-    const h=allHunts();
-    if(h[key]){
-      h[key].active=false;
-      h[key].status=captured?'captured':'ended';
-      h[key].endedAt=new Date().toISOString();
-      h[key].captured=!!captured;
-      saveHunts(h);
-    }
-    if(typeof requestAutoSyncAfterDataChange==='function')requestAutoSyncAfterDataChange();
-    renderMultiHunts();
-    if(typeof render==='function') try{render()}catch(e){}
-  }
+  function finishHunt(key,captured){const p=(typeof data!=='undefined'?data.find(x=>x.id===key):null),label=p?.name||'このポケモン';if(!confirm(captured?`${label}を「捕獲した」として登録し、厳選を終了しますか？`:`${label}の厳選を終了しますか？`))return;if(captured&&typeof window.captureHunt==='function'){window.captureHunt(key);setTimeout(renderMultiHunts,50);return}const t=allTargets();if(key in t)delete t[key];saveTargets(t);const h=allHunts();if(h[key]){h[key].active=false;h[key].status='ended';h[key].endedAt=new Date().toISOString();saveHunts(h)}if(typeof requestAutoSyncAfterDataChange==='function')requestAutoSyncAfterDataChange();renderMultiHunts();if(typeof render==='function')try{render()}catch(e){}}
 
   function focusHunt(key){
     try{
@@ -3059,7 +3038,7 @@ function requestAutoSyncAfterDataChange(){try{if(typeof syncHuntSessionState==='
     }
     if(typeof targetState==='object')targetState[p.id]=true;
     const h=allHunts(),hv=h[p.id]||{};
-    if(!hv.start)hv.start=new Date().toISOString().slice(0,10);
+    if(!hv.start)hv.start=new Date().toISOString().slice(0,10);if(!hv.daily)hv.daily={};if(hv.order==null)hv.order=Object.keys(allTargets()).length;
     h[p.id]=hv;
     saveHunts(h);
     if(typeof save==='function')save();
@@ -3086,7 +3065,7 @@ function requestAutoSyncAfterDataChange(){try{if(typeof syncHuntSessionState==='
         <div class="mobile-hunt-card-top">
           <img class="mobile-hunt-thumb" src="${pokemonSprite(e.p)}" alt="" onerror="if(typeof baseSpriteURL==='function')this.src=baseSpriteURL(e.p)">
           <div style="min-width:0">
-            <div class="mobile-hunt-name">${e.p.name}</div>
+            <div class="hunt-title-row"><div class="mobile-hunt-name">${e.p.name}</div><span class="drag-handle" title="ドラッグで並び替え">☰</span></div>
             <div class="mobile-hunt-meta">No.${String(e.p.no).padStart(4,'0')}${e.p.form&&e.p.form!=='通常'?' ・ '+e.p.form:''}</div>
             <div class="mobile-hunt-settings">
               ${e.hunt.game?`<span>${e.hunt.game}</span>`:''}
@@ -3096,6 +3075,7 @@ function requestAutoSyncAfterDataChange(){try{if(typeof syncHuntSessionState==='
           </div>
           <div class="mobile-hunt-count">${e.count}</div>
         </div>
+        <div class="mobile-hunt-substats"><span>本日 <b data-hunt-today>${typeof todayHuntCount==='function'?todayHuntCount(e.key):0}回</b></span><span><b data-hunt-elapsed>${typeof huntElapsedText==='function'?huntElapsedText(e.hunt.start):'開始日未設定'}</b></span><span class="prob">1匹以上 <b data-hunt-prob>${typeof huntCumulativeProbability==='function'?huntCumulativeProbability(e.key).text:'—'}</b></span></div>
         <div class="mobile-hunt-actions">
           <button class="btn" data-delta="1">+1</button>
           <button class="btn" data-delta="5">+5</button>
@@ -3119,6 +3099,7 @@ function requestAutoSyncAfterDataChange(){try{if(typeof syncHuntSessionState==='
       });
       wrap.appendChild(card);
     });
+    if(typeof enableHuntDrag==='function')enableHuntDrag(wrap,'.mobile-hunt-card');
   }
 
   function init(){
@@ -3135,6 +3116,8 @@ function requestAutoSyncAfterDataChange(){try{if(typeof syncHuntSessionState==='
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init,{once:true});
   else init();
 })();
+
+document.addEventListener('DOMContentLoaded',()=>{const rf=el('regionFormFilter');if(rf&&!rf.dataset.bound){rf.dataset.bound='1';rf.addEventListener('change',render)}});
 </script>
 <div class="shot-lightbox" id="shot-lightbox" onclick="if(event.target===this)closeShotLightbox()">
 <button class="shot-lightbox-close" onclick="closeShotLightbox()" type="button">✕</button>
