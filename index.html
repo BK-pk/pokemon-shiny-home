@@ -837,7 +837,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 </section>
 
 <script>
-const DATA_VERSION='full-2026-09-09-v95';
+const DATA_VERSION='full-2026-09-09-v96';
 const SPECIES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species.csv';
 const NAMES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
 const MAX_DEX=1025;
@@ -1085,7 +1085,7 @@ function safeLocalSet(key,value){
   catch(e){console.warn('localStorage save skipped:',key,e);return false}
 }
 function save(){
-  // v95: 保存容量不足が起きても、ボタン操作や画面更新を止めない。
+  // v96: 保存容量不足が起きても、ボタン操作や画面更新を止めない。
   // 画像(base64)を自動バックアップへ複製すると容量を急激に消費するため、バックアップ対象から除外する。
   if(!backupRestoring){
     try{
@@ -1176,7 +1176,7 @@ function individualBadges(id,uid){
   }
   return badges;
 }
-// v95: keep individual editors open across collection rerenders.
+// v96: keep individual editors open across collection rerenders.
 // This prevents the newly added editor from disappearing after saving fields
 // or after another panel/stat refresh.
 const openIndividualPanels=new Set();
@@ -1207,13 +1207,13 @@ function individualRowHTML(p,ind,i){
       <div class="detail-nav">${(individualState[p.id]||[]).length>1?`<button type="button" onclick="focusAdjacentIndividual('${esc(p.id)}','${esc(ind.uid)}',-1)">← 前の個体</button><button type="button" onclick="focusAdjacentIndividual('${esc(p.id)}','${esc(ind.uid)}',1)">次の個体 →</button>`:''}<button class="deletebtn" onclick="deleteIndividual('${esc(p.id)}',${i})">削除</button></div>
     </div>
     <div class="detail-fields">
-      <div class="detail-field"><label>捕獲日</label><input type="date" value="${esc(ind.date||'')}" onchange="setIndividual('${esc(p.id)}',${i},'date',this.value)"></div>
+      <div class="detail-field"><label>捕獲日</label><input type="date" value="${esc(ind.date||'')}" oninput="setIndividualLive('${esc(p.id)}',${i},'date',this.value)" onchange="setIndividual('${esc(p.id)}',${i},'date',this.value)"></div>
       <div class="detail-field"><label>ゲーム</label><select onchange="setIndividual('${esc(p.id)}',${i},'game',this.value)">${gameOptionsHTML(ind.game||'')}</select></div>
       <div class="detail-field"><label>ボール</label><div class="ball-select-wrap"><img id="ball-${encodeURIComponent(p.id)}-${i}" src="${ballIcon(ind.ball)}" alt=""><select onchange="setIndividual('${esc(p.id)}',${i},'ball',this.value);document.getElementById('ball-${encodeURIComponent(p.id)}-${i}').src=ballIcon(this.value)">${ballOptions(ind.ball)}</select></div></div>
       <div class="detail-field"><label>厳選方法</label><select onchange="setIndividual('${esc(p.id)}',${i},'huntMethod',this.value)">${huntMethodOptions(ind.huntMethod||'')}</select></div>
-      <div class="detail-field"><label>${esc(counterLabel(ind.huntMethod||''))}</label><input type="number" min="0" value="${Number(ind.huntCount||0)}" onchange="setManualHuntCount('${esc(p.id)}','${esc(ind.uid)}',this.value)"></div>
+      <div class="detail-field"><label>${esc(counterLabel(ind.huntMethod||''))}</label><input type="number" min="0" value="${Number(ind.huntCount||0)}" oninput="setManualHuntCountLive('${esc(p.id)}','${esc(ind.uid)}',this.value)" onchange="setManualHuntCount('${esc(p.id)}','${esc(ind.uid)}',this.value)"></div>
       <div class="detail-field"><label>入手区分</label><select onchange="setIndividual('${esc(p.id)}',${i},'source',this.value)"><option value="">入手区分</option><option ${ind.source==='自己産'?'selected':''}>自己産</option><option ${ind.source==='交換'?'selected':''}>交換</option><option ${ind.source==='配布'?'selected':''}>配布</option><option ${ind.source==='その他'?'selected':''}>その他</option></select></div>
-      <div class="detail-field"><label>開始日</label><input type="date" value="${esc(ind.huntStart||'')}" onchange="setIndividual('${esc(p.id)}',${i},'huntStart',this.value)"></div>
+      <div class="detail-field"><label>開始日</label><input type="date" value="${esc(ind.huntStart||'')}" oninput="setIndividualLive('${esc(p.id)}',${i},'huntStart',this.value)" onchange="setIndividual('${esc(p.id)}',${i},'huntStart',this.value)"></div>
     </div>
     <div class="ind-shot-wrap">
       <div class="ind-shot-actions">
@@ -1225,7 +1225,7 @@ function individualRowHTML(p,ind,i){
       </div>
       ${individualScreenshot(p.id,ind.uid)?`<div class="detail-shot"><img src="${individualScreenshot(p.id,ind.uid)}" alt="捕獲スクショ"></div>`:''}
     </div>
-    <input class="detail-note" value="${esc(ind.memo||'')}" placeholder="メモ" onchange="setIndividual('${esc(p.id)}',${i},'memo',this.value)">
+    <input class="detail-note" value="${esc(ind.memo||'')}" placeholder="メモ" oninput="setIndividualLive('${esc(p.id)}',${i},'memo',this.value)" onchange="setIndividual('${esc(p.id)}',${i},'memo',this.value)">
   </div>`;
 }
 
@@ -1260,7 +1260,7 @@ window.addIndividual=id=>{
   if(!Array.isArray(individualState[id]))individualState[id]=[];
   const ind=newIndividual(); individualState[id].push(ind); openIndividualPanels.add(id);
   syncOwned(id);
-  // v95: do not rebuild the whole collection. Rebuilding was making the click appear to do nothing.
+  // v96: do not rebuild the whole collection. Rebuilding was making the click appear to do nothing.
   if(!refreshSingleCollectionCard(id,{openIndividuals:true,focusUid:ind.uid})){
     pendingIndividualFocus={id,uid:ind.uid}; try{render()}catch(e){console.error('individual render',e)}
   }
@@ -1271,12 +1271,48 @@ window.deleteIndividual=(id,i)=>{
   if(!refreshSingleCollectionCard(id,{openIndividuals:(individualState[id]||[]).length>0}))try{render()}catch(e){console.error(e)}
 };
 window.setIndividual=(id,i,key,val)=>{if(!individualState[id]||!individualState[id][i])return;individualState[id][i][key]=val;openIndividualPanels.add(id);syncOwned(id);try{renderExtraPanels()}catch(e){console.warn(e)}};
+
+// v96: 入力途中の値もその場で localStorage へ保存する。
+// バージョン更新・再読み込み・タブ終了の前にフォーカスを外さなくても内容が残る。
+window.setIndividualLive=(id,i,key,val)=>{
+  if(!individualState[id]||!individualState[id][i])return;
+  individualState[id][i][key]=val;
+  openIndividualPanels.add(id);
+  state[id]=true;
+  if(i===0){
+    if(key==='date')dateState[id]=val||'';
+    if(key==='game')gameState[id]=val||'';
+    if(key==='box')boxState[id]=val||'';
+  }
+  safeLocalSet('shinyHomeIndividuals_v1',JSON.stringify(individualState));
+  safeLocalSet('shinyHomeState_v1',JSON.stringify(state));
+  if(key==='date')safeLocalSet('shinyHomeDates_v1',JSON.stringify(dateState));
+  if(key==='game')safeLocalSet('shinyHomeGames_v1',JSON.stringify(gameState));
+  if(key==='box')safeLocalSet('shinyHomeBoxes_v1',JSON.stringify(boxState));
+};
+window.setManualHuntCountLive=(id,uid,val)=>{
+  const arr=individualState[id]||[],ind=arr.find(x=>x.uid===uid);if(!ind)return;
+  ind.huntCount=Math.max(0,Number(val)||0);openIndividualPanels.add(id);
+  safeLocalSet('shinyHomeIndividuals_v1',JSON.stringify(individualState));
+};
+window.addEventListener('beforeunload',()=>{
+  try{
+    safeLocalSet('shinyHomeState_v1',JSON.stringify(state));
+    safeLocalSet('shinyHomeBoxes_v1',JSON.stringify(boxState));
+    safeLocalSet('shinyHomeDates_v1',JSON.stringify(dateState));
+    safeLocalSet('shinyHomeGames_v1',JSON.stringify(gameState));
+    safeLocalSet('shinyHomeIndividuals_v1',JSON.stringify(individualState));
+    safeLocalSet('shinyHomeTargets_v1',JSON.stringify(targetState));
+    safeLocalSet('shinyHomeHunts_v1',JSON.stringify(huntState));
+  }catch(_){ }
+});
+
 window.toggleTarget=id=>{
   targetState[id]=!targetState[id];
   if(targetState[id]&&!huntState[id]) huntState[id]={count:0,start:new Date().toISOString().slice(0,10),method:'',ball:'',game:'',charm:'',outbreak:'0',sparkling:'0',daily:{}};
   else if(targetState[id]&&!huntState[id].start) huntState[id].start=new Date().toISOString().slice(0,10);
   save(); if(typeof requestAutoSyncAfterDataChange==='function')requestAutoSyncAfterDataChange();
-  // v95: update only the clicked card and hunt panel so the button always responds.
+  // v96: update only the clicked card and hunt panel so the button always responds.
   refreshSingleCollectionCard(id,{openIndividuals:openIndividualPanels.has(id)});
   try{renderCurrentHunt()}catch(e){console.error('hunt render',e)}
 };
@@ -2977,7 +3013,7 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 // ===== v56 automatic update / cache repair =====
 (function(){
-  const APP_VERSION='v95';
+  const APP_VERSION='v96';
   const UPDATE_KEY='shinyHomeReloadedForSW_'+APP_VERSION;
 
   async function registerFreshWorker(){
