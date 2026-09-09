@@ -503,7 +503,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
   -webkit-tap-highlight-color:transparent;
 }
 
-/* ===== v88 hunt UX / dashboard / drag / offline ===== */
+/* ===== v89 hunt UX / dashboard / drag / offline ===== */
 .hunt-progress-strip{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:2px}
 .hunt-mini-stat{background:#091522;border:1px solid #263c53;border-radius:10px;padding:8px 10px}.hunt-mini-stat span{display:block;color:var(--muted);font-size:9px;margin-bottom:2px}.hunt-mini-stat strong{font-size:13px;color:#eef7ff}.hunt-mini-stat.prob strong{color:var(--gold)}
 .drag-handle{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border:1px solid #36516d;border-radius:9px;color:#9db5c9;cursor:grab;user-select:none;touch-action:none;background:#0b1b2b;font-size:17px}.drag-handle:active{cursor:grabbing}.hunt-chip.dragging,.mobile-hunt-card.dragging{opacity:.62;outline:2px solid var(--cyan);transform:scale(.99)}
@@ -559,7 +559,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
   </div>
 
   <div id="mobile-active-hunt" class="mobile-active-hunt" style="display:none">
-    <div id="mobile-sync-status" class="mobile-hunt-meta" style="text-align:center;margin:4px 0 8px">☁️ 端末内に保存済み ・ v88</div>
+    <div id="mobile-sync-status" class="mobile-hunt-meta" style="text-align:center;margin:4px 0 8px">☁️ 端末内に保存済み ・ v89</div>
     <div id="mobile-multi-hunt-list" class="mobile-hunt-list"></div>
     <button id="mobile-multi-add" class="btn" type="button">＋ 厳選を追加</button>
   </div>
@@ -812,7 +812,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
     <div class="extra-panel">
       <div class="extra-head">
         <div><h2 style="margin:0">☁️ Supabase 同期</h2>
-        <span class="section-count">PC・iPhoneで同じデータを共有 ・ build v88</span></div>
+        <span class="section-count">PC・iPhoneで同じデータを共有 ・ build v89</span></div>
       </div>
       <div class="sync-fields">
         <label>Supabase URL<input id="supabase-url" autocomplete="off" placeholder="https://xxxx.supabase.co"></label>
@@ -827,9 +827,9 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
         <button class="btn" id="cloud-check" type="button">クラウド確認</button>
       </div>
       <div id="cloud-status" class="home-help">未設定です。</div>
-      <div id="auto-sync-status" class="home-help" style="margin-top:8px">同期：v88 外出向け省通信</div><div id="network-status" class="net-pill">● 通信状態を確認中</div>
+      <div id="auto-sync-status" class="home-help" style="margin-top:8px">同期：v89 外出向け省通信</div><div id="network-status" class="net-pill">● 通信状態を確認中</div>
       <div class="home-help" style="margin-top:8px">
-        v88ではカウンター操作中は通信せず端末内へ即保存します。10秒操作がなければクラウドへ保存し、他端末は最新時刻の値だけを取り込みます。所持状況・HOME BOXなどのフルデータは上のボタンで手動同期します。
+        v89ではカウンター操作中は通信せず端末内へ即保存します。10秒操作がなければクラウドへ保存し、他端末は最新時刻の値だけを取り込みます。所持状況・HOME BOXなどのフルデータは上のボタンで手動同期します。
       </div>
       <div class="home-help" style="margin-top:10px">初回は「設定保存」→「接続テスト」の順に確認してください。既存データがある場合、確認前にクラウドへ保存しないでください。</div>
     </div>
@@ -837,11 +837,13 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 </section>
 
 <script>
-const DATA_VERSION='full-2026-09-09-v88';
+const DATA_VERSION='full-2026-09-09-v89';
 const SPECIES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species.csv';
 const NAMES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
 const SPECIES_URLS=[SPECIES_URL,'https://cdn.jsdelivr.net/gh/PokeAPI/pokeapi@master/data/v2/csv/pokemon_species.csv'];
 const NAMES_URLS=[NAMES_URL,'https://cdn.jsdelivr.net/gh/PokeAPI/pokeapi@master/data/v2/csv/pokemon_species_names.csv'];
+const JA_NAMES_URLS=['https://raw.githubusercontent.com/sindresorhus/pokemon/main/data/ja.json','https://cdn.jsdelivr.net/gh/sindresorhus/pokemon@main/data/ja.json','https://unpkg.com/pokemon@3.3.0/data/ja.json'];
+const EN_NAMES_URLS=['https://raw.githubusercontent.com/sindresorhus/pokemon/main/data/en.json','https://cdn.jsdelivr.net/gh/sindresorhus/pokemon@main/data/en.json','https://unpkg.com/pokemon@3.3.0/data/en.json'];
 const MAX_DEX=1025;
 let data=[];
 const state=JSON.parse(localStorage.getItem('shinyHomeState_v1')||'{}');
@@ -1014,57 +1016,85 @@ function offlineSpeciesFallback(){
   });
 }
 async function loadSpecies(){
-  const isGoodSpeciesCache=(parsed)=>Array.isArray(parsed)&&parsed.length>=MAX_DEX&&parsed.slice(0,MAX_DEX).every(x=>x&&x.name&&!/^No\.\d{4}$/.test(x.name));
-  const rememberSpecies=(species)=>{try{const raw=JSON.stringify(species);localStorage.setItem('shinyHomeSpeciesCache_stable',raw);localStorage.setItem('shinyHomeSpeciesCache_'+DATA_VERSION,raw);}catch(e){}};
+  // v89: 日本語名は「必須の内蔵データ」として扱う。
+  // 重いPokeAPI CSV 2本の同時取得を起動条件にしない。
+  const stableKey='shinyHomeSpeciesCache_stable_v2';
+  const jaKey='shinyHomeJapaneseNames_stable_v2';
+  const enKey='shinyHomeEnglishNames_stable_v2';
+  const goodNames=a=>Array.isArray(a)&&a.length>=MAX_DEX&&a.slice(0,MAX_DEX).every(Boolean);
+  const goodSpecies=a=>Array.isArray(a)&&a.length>=MAX_DEX&&a.slice(0,MAX_DEX).every(x=>x&&x.name&&!/^No\.\d+$/.test(String(x.name)));
 
-  // まず過去を含む正常な日本語名キャッシュを使う。
-  const cacheKeys=['shinyHomeSpeciesCache_stable'];
-  try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i)||'';if(k.startsWith('shinyHomeSpeciesCache_')&&!cacheKeys.includes(k))cacheKeys.push(k)}}catch(e){}
-  for(const key of cacheKeys){
-    try{const parsed=JSON.parse(localStorage.getItem(key)||'null');if(isGoodSpeciesCache(parsed)){rememberSpecies(parsed);return parsed}}catch(e){}
+  // 以前の正常キャッシュはバージョンに関係なく回収する。
+  const keys=[stableKey,'shinyHomeSpeciesCache_stable','shinyHomeSpeciesCache_stable_v1'];
+  try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i)||'';if(k.startsWith('shinyHomeSpeciesCache_')&&!keys.includes(k))keys.push(k)}}catch(_){ }
+  for(const key of keys){
+    try{const x=JSON.parse(localStorage.getItem(key)||'null');if(goodSpecies(x)){localStorage.setItem(stableKey,JSON.stringify(x));return x}}catch(_){ }
   }
 
-  // 名前が無い状態では No.0001 の仮画面を先に描画しない。
-  // 起動直後はSW更新と外部CSV取得が競合することがあるため、自動で再試行する。
-  const fetchAny=async(urls,attempt)=>{
+  let ja=[],en=[];
+  for(const [key,target] of [[jaKey,'ja'],[enKey,'en']]){
+    try{const x=JSON.parse(localStorage.getItem(key)||'[]');if(goodNames(x)){if(target==='ja')ja=x;else en=x}}catch(_){ }
+  }
+  // v85系の旧・日本語名専用キャッシュも引き継ぐ。
+  if(!goodNames(ja))try{const x=JSON.parse(localStorage.getItem('shinyHomeJapaneseNames_stable_v1')||'[]');if(goodNames(x))ja=x}catch(_){ }
+
+  const fetchJSONAny=async urls=>{
     let last;
     for(const url of urls){
       try{
-        const sep=url.includes('?')?'&':'?';
-        const r=await fetch(url+sep+'shinyhome='+Date.now()+'-'+attempt,{cache:'no-store'});
+        const r=await fetch(url,{cache:'force-cache'});
         if(!r.ok)throw Error('HTTP '+r.status);
-        const text=await r.text();
-        if(text.length<1000)throw Error('short response');
-        return text;
+        const x=await r.json();
+        if(goodNames(x))return x.slice(0,MAX_DEX);
+        throw Error('name data incomplete');
       }catch(e){last=e}
     }
-    throw last||Error('fetch failed');
+    throw last||Error('name fetch failed');
   };
-  let lastErr=null;
-  for(let attempt=1;attempt<=8;attempt++){
+
+  // まず約10KBの名前JSONだけを取得。これが取れれば画面は必ず日本語で起動できる。
+  for(let attempt=1;attempt<=20 && (!goodNames(ja)||!goodNames(en));attempt++){
+    const loading=el('loading');
+    if(loading){loading.style.display='block';loading.innerHTML=`📡 ポケモン名を読み込み中…<br><small>自動接続 ${attempt}/20</small>`;}
     try{
-      const [st,nt]=await Promise.all([fetchAny(SPECIES_URLS,attempt),fetchAny(NAMES_URLS,attempt)]);
-      const sr=parseCSV(st), nr=parseCSV(nt);
-      const sh=sr[0], si=Object.fromEntries(sh.map((x,i)=>[x,i]));
-      const names=new Map();
-      for(let i=1;i<nr.length;i++){if(nr[i][1]==='1')names.set(Number(nr[i][0]),nr[i][2]);}
-      const species=[];
-      for(let i=1;i<sr.length;i++){
-        const no=Number(sr[i][si.id]); if(!no||no>MAX_DEX)continue;
-        species.push({no,en:sr[i][si.identifier],name:names.get(no)||sr[i][si.identifier],gen:Number(sr[i][si.generation_id])||genFor(no),genderDiff:sr[i][si.has_gender_differences]==='1'});
-      }
-      if(isGoodSpeciesCache(species)){rememberSpecies(species);return species;}
-      throw Error('Japanese species data incomplete');
-    }catch(err){
-      lastErr=err;
-      console.warn('ポケモン名データ取得 再試行 '+attempt+'/8',err);
-      const loading=el('loading');
-      if(loading)loading.innerHTML='📡 ポケモン名を読み込み中…<br><small>自動で再接続しています（'+attempt+'/8）</small>';
-      if(attempt<8)await new Promise(r=>setTimeout(r,1200*attempt));
+      if(!goodNames(ja))ja=await fetchJSONAny(JA_NAMES_URLS);
+      if(!goodNames(en))en=await fetchJSONAny(EN_NAMES_URLS);
+      if(goodNames(ja))localStorage.setItem(jaKey,JSON.stringify(ja));
+      if(goodNames(en))localStorage.setItem(enKey,JSON.stringify(en));
+    }catch(e){
+      console.warn('名前データ取得 再試行 '+attempt,e);
+      if(attempt<20)await new Promise(r=>setTimeout(r,600+attempt*250));
     }
   }
-  console.warn('ポケモン名データを取得できませんでした。',lastErr);
-  return null;
+
+  if(!goodNames(ja))return null;
+  // 英語名が取れない場合でも日本語表示・日本語検索を優先して起動する。
+  if(!goodNames(en))en=Array.from({length:MAX_DEX},(_,i)=>`pokemon-${i+1}`);
+
+  // 名前だけで即座に完全な全国図鑑を組む。世代は番号から確定できる。
+  let species=Array.from({length:MAX_DEX},(_,i)=>({
+    no:i+1,en:String(en[i]||`pokemon-${i+1}`).toLowerCase(),name:ja[i],gen:genFor(i+1),genderDiff:false
+  }));
+
+  // PokeAPIの種メタデータは補助情報。取れた時だけ英語slug/性別差を上書きする。
+  try{
+    let text=null;
+    for(const url of SPECIES_URLS){
+      try{const r=await fetch(url,{cache:'force-cache'});if(r.ok){text=await r.text();if(text.length>1000)break}}catch(_){ }
+    }
+    if(text){
+      const sr=parseCSV(text),sh=sr[0],si=Object.fromEntries(sh.map((x,i)=>[x,i]));
+      const byNo=new Map();
+      for(let i=1;i<sr.length;i++){
+        const no=Number(sr[i][si.id]);if(!no||no>MAX_DEX)continue;
+        byNo.set(no,{en:sr[i][si.identifier],gen:Number(sr[i][si.generation_id])||genFor(no),genderDiff:sr[i][si.has_gender_differences]==='1'});
+      }
+      species=species.map(x=>({...x,...(byNo.get(x.no)||{}),name:x.name}));
+    }
+  }catch(e){console.warn('種メタデータは後回しにします',e)}
+
+  try{localStorage.setItem(stableKey,JSON.stringify(species));localStorage.setItem('shinyHomeSpeciesCache_'+DATA_VERSION,JSON.stringify(species));}catch(_){ }
+  return species;
 }
 let backupRestoring=false;
 function currentDataSnapshot(){
@@ -1149,7 +1179,7 @@ function individualBadges(id,uid){
   }
   return badges;
 }
-// v88: keep individual editors open across collection rerenders.
+// v89: keep individual editors open across collection rerenders.
 // This prevents the newly added editor from disappearing after saving fields
 // or after another panel/stat refresh.
 const openIndividualPanels=new Set();
@@ -2769,12 +2799,8 @@ for(const g of gameOptions.filter(Boolean)){const o=document.createElement('opti
     render();
   }catch(err){
     console.error(err);
-    // 最終保険：通信やキャッシュに問題があっても画面を起動する。
-    data=buildData(offlineSpeciesFallback());
-    ensureLegacyIndividuals();
-    render();
     const loading=el('loading');
-    if(loading)loading.innerHTML='📱 オフライン表示で起動しました。';
+    if(loading){loading.style.display='block';loading.innerHTML='📡 ポケモン名を読み込めませんでした。<br><small>数秒後に自動で再接続します。</small>';setTimeout(()=>location.reload(),5000);}
   }
 })();
 
@@ -2926,7 +2952,7 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 // ===== v56 automatic update / cache repair =====
 (function(){
-  const APP_VERSION='v88';
+  const APP_VERSION='v89';
   const UPDATE_KEY='shinyHomeReloadedForSW_'+APP_VERSION;
 
   async function registerFreshWorker(){
@@ -2980,7 +3006,7 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 
 
-// ===== v88 travel sync: local-first + hunt-session cloud sync =====
+// ===== v89 travel sync: local-first + hunt-session cloud sync =====
 (function(){
   const CLOUD_KEY='shinyHomeCloudSettings_v2', COUNTER_TABLE='shiny_home_hunt_counters';
   const EDIT_KEY='shinyHomeCounterLocalEdits_v1', SYNC_KEY='shinyHomeCounterLastSync_v1';
@@ -2989,7 +3015,7 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
   function cfg(){const fallback={url:'https://litkisamojglstbjwloo.supabase.co',key:'sb_publishable_pc-8E8ETM6yZ3OcB1cNkjA_OzVjc-Rh',userId:'pokemon-shiny-home'};try{return {...fallback,...(JSON.parse(localStorage.getItem(CLOUD_KEY)||localStorage.getItem('shinyHomeCloudSettings_v1')||'{}')||{})}}catch{return fallback}}
   function headers(c){return {apikey:c.key,Authorization:'Bearer '+c.key,'Content-Type':'application/json'}}
   function readMap(k){try{return JSON.parse(localStorage.getItem(k)||'{}')||{}}catch{return {}}} function writeMap(k,o){try{localStorage.setItem(k,JSON.stringify(o))}catch(_){}}
-  function setStatus(msg,kind){const e=$('auto-sync-status');if(e){e.textContent='同期：'+msg;e.style.color=kind==='ok'?'#8fe6b0':kind==='err'?'#ff9c9c':''}const m=$('mobile-sync-status');if(m){m.textContent='☁️ '+msg+' ・ v88';m.style.color=kind==='ok'?'#8fe6b0':kind==='err'?'#ff9c9c':''}}
+  function setStatus(msg,kind){const e=$('auto-sync-status');if(e){e.textContent='同期：'+msg;e.style.color=kind==='ok'?'#8fe6b0':kind==='err'?'#ff9c9c':''}const m=$('mobile-sync-status');if(m){m.textContent='☁️ '+msg+' ・ v89';m.style.color=kind==='ok'?'#8fe6b0':kind==='err'?'#ff9c9c':''}}
   function hunts(){try{return typeof huntState==='object'&&huntState?huntState:JSON.parse(localStorage.getItem('shinyHomeHunts_v1')||'{}')}catch{return {}}} function targets(){try{return typeof targetState==='object'&&targetState?targetState:JSON.parse(localStorage.getItem('shinyHomeTargets_v1')||'{}')}catch{return {}}}
   function persist(h,t){localStorage.setItem('shinyHomeHunts_v1',JSON.stringify(h));localStorage.setItem('shinyHomeTargets_v1',JSON.stringify(t));try{if(typeof save==='function')save()}catch(_){}}
   function markEdit(id,at){const m=readMap(EDIT_KEY);m[id]=at;writeMap(EDIT_KEY,m)} function editAt(id){return Number(readMap(EDIT_KEY)[id]||0)||0} function markSync(id,at){const m=readMap(SYNC_KEY);m[id]=at;writeMap(SYNC_KEY,m)}
