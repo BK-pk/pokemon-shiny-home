@@ -120,6 +120,15 @@
 .detail-field{background:#0e2133;border:1px solid #213b53;border-radius:9px;padding:7px}
 .detail-field label{display:block;font-size:10px;color:#8ea8bd;margin-bottom:4px}
 .detail-field input,.detail-field select{width:100%}
+.individual-advanced{margin-top:9px;border:1px solid #29445f;border-radius:10px;background:#08131f;overflow:hidden}
+.individual-advanced summary{cursor:pointer;list-style:none;padding:9px 11px;font-size:11px;font-weight:900;color:#cfefff;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.individual-advanced summary::-webkit-details-marker{display:none}
+.individual-advanced summary::after{content:"＋";font-size:14px;color:#7fcfff}
+.individual-advanced[open] summary::after{content:"－"}
+.individual-advanced-body{padding:0 9px 9px}
+.detail-check{display:flex;align-items:center;gap:8px;min-height:34px}
+.detail-check input{width:auto!important;transform:scale(1.15)}
+
 .detail-shot{margin-top:8px}
 .detail-shot img{width:100%;max-height:300px;object-fit:contain;background:#06111d;border-radius:10px;border:1px solid #29445f}
 .detail-note{margin-top:8px;width:100%}
@@ -826,7 +835,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
     <div class="extra-panel">
       <div class="extra-head">
         <div><h2 style="margin:0">☁️ Supabase 同期</h2>
-        <span class="section-count">PC・iPhoneで同じデータを共有 ・ build v106</span></div>
+        <span class="section-count">PC・iPhoneで同じデータを共有 ・ build v107</span></div>
       </div>
       <div class="sync-fields">
         <label>Supabase URL<input id="supabase-url" autocomplete="off" placeholder="https://xxxx.supabase.co"></label>
@@ -848,7 +857,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
       <div id="cloud-status" class="home-help">未設定です。</div>
       <div id="auto-sync-status" class="home-help" style="margin-top:8px">同期：v95 外出向け省通信</div><div id="network-status" class="net-pill">● 通信状態を確認中</div>
       <div class="home-help" style="margin-top:8px">
-        v106ではカウンター操作中は通信せず端末内へ即保存します。10秒操作がなければクラウドへ保存し、他端末は最新時刻の値だけを取り込みます。所持状況・HOME BOXなどのフルデータは上のボタンで手動同期します。
+        v107ではカウンター操作中は通信せず端末内へ即保存します。10秒操作がなければクラウドへ保存し、他端末は最新時刻の値だけを取り込みます。所持状況・HOME BOXなどのフルデータは上のボタンで手動同期します。
       </div>
       <div class="home-help" style="margin-top:10px">初回は「設定保存」→「接続テスト」の順に確認してください。既存データがある場合、確認前にクラウドへ保存しないでください。</div>
     </div>
@@ -1126,7 +1135,7 @@ function save(){
   safeLocalSet('shinyHomeMonthImages_v1',JSON.stringify(monthImages));
   safeLocalSet('shinyHomeIndividualScreenshots_v1',JSON.stringify(individualScreenshots));
 }
-function newIndividual(seed={}){return {uid:seed.uid||Date.now().toString(36)+Math.random().toString(36).slice(2,7),date:seed.date||'',game:seed.game||'',box:seed.box||'',nickname:seed.nickname||'',source:seed.source||'',ball:seed.ball||'',memo:seed.memo||'',favorite:!!seed.favorite,huntCount:Number(seed.huntCount)||0,huntStart:seed.huntStart||'',huntMethod:seed.huntMethod||'',huntCharm:seed.huntCharm||'',huntTargetId:seed.huntTargetId||'',huntTargetName:seed.huntTargetName||'',huntJournal:Array.isArray(seed.huntJournal)?seed.huntJournal:[]};}
+function newIndividual(seed={}){return {uid:seed.uid||Date.now().toString(36)+Math.random().toString(36).slice(2,7),date:seed.date||'',game:seed.game||'',box:seed.box||'',nickname:seed.nickname||'',source:seed.source||'',ball:seed.ball||'',memo:seed.memo||'',favorite:!!seed.favorite,huntCount:Number(seed.huntCount)||0,huntStart:seed.huntStart||'',huntMethod:seed.huntMethod||'',huntCharm:seed.huntCharm||'',huntTargetId:seed.huntTargetId||'',huntTargetName:seed.huntTargetName||'',huntJournal:Array.isArray(seed.huntJournal)?seed.huntJournal:[],nature:seed.nature||'',ability:seed.ability||'',teraType:seed.teraType||'',ribbons:seed.ribbons||'',otName:seed.otName||'',trainerId:seed.trainerId||'',catchLocation:seed.catchLocation||'',catchLevel:seed.catchLevel==null?'':seed.catchLevel,isAlpha:!!seed.isAlpha,size:seed.size||''};}
 function ensureLegacyIndividuals(){for(const id of Object.keys(state)){if(state[id]&&(!Array.isArray(individualState[id])||individualState[id].length===0)){individualState[id]=[newIndividual({date:dateState[id]||'',game:gameState[id]||'',box:boxState[id]||''})];}}}
 function ownedCountFor(id){return Array.isArray(individualState[id])?individualState[id].length:0}
 function syncOwned(id){const arr=individualState[id]||[];state[id]=arr.length>0;if(arr.length){dateState[id]=arr[0].date||'';gameState[id]=arr[0].game||'';boxState[id]=arr[0].box||'';}else{dateState[id]='';gameState[id]='';boxState[id]='';}save();}
@@ -1172,6 +1181,11 @@ function sectionRank(p){return {base:0,region:1,gender:2,form:3,gmax:4}[p.sectio
 
 const gameOptions=['','赤・緑・青・ピカチュウ','金・銀・クリスタル','ルビー・サファイア・エメラルド','FRLG','DP・Pt','HGSS','BW','BW2','XY','ORAS','SM','USUM','Let’s Go','剣盾','BDSP','Pokémon LEGENDS アルセウス','SV','Pokémon GO','交換・その他'];
 function gameOptionsHTML(selected=''){return gameOptions.map(g=>`<option value="${esc(g)}" ${selected===g?'selected':''}>${g||'入手ソフト'}</option>`).join('')}
+const NATURES=['','がんばりや','さみしがり','ゆうかん','いじっぱり','やんちゃ','ずぶとい','すなお','のんき','わんぱく','のうてんき','おくびょう','せっかち','まじめ','ようき','むじゃき','ひかえめ','おっとり','れいせい','てれや','うっかりや','おだやか','おとなしい','なまいき','しんちょう','きまぐれ'];
+const TERA_TYPES=['','ノーマル','ほのお','みず','でんき','くさ','こおり','かくとう','どく','じめん','ひこう','エスパー','むし','いわ','ゴースト','ドラゴン','あく','はがね','フェアリー','ステラ'];
+const SIZE_OPTIONS=['','最小','小さめ','標準','大きめ','最大'];
+function simpleOptionsHTML(values,selected='',emptyLabel='未設定'){return values.map((v,i)=>`<option value="${esc(v)}" ${selected===v?'selected':''}>${i===0?emptyLabel:v}</option>`).join('')}
+
 function duplicateOrdinal(id,uid){
   const arr=individualState[id]||[];
   const idx=arr.findIndex(x=>x.uid===uid);
@@ -1234,6 +1248,23 @@ function individualRowHTML(p,ind,i){
       <div class="detail-field"><label>入手区分</label><select oninput="setIndividualLive('${esc(p.id)}',${i},'source',this.value)" onchange="setIndividual('${esc(p.id)}',${i},'source',this.value)"><option value="">入手区分</option><option ${ind.source==='自己産'?'selected':''}>自己産</option><option ${ind.source==='交換'?'selected':''}>交換</option><option ${ind.source==='配布'?'selected':''}>配布</option><option ${ind.source==='その他'?'selected':''}>その他</option></select></div>
       <div class="detail-field"><label>開始日</label><input type="date" value="${esc(ind.huntStart||'')}" oninput="setIndividualLive('${esc(p.id)}',${i},'huntStart',this.value)" onchange="setIndividual('${esc(p.id)}',${i},'huntStart',this.value)"></div>
     </div>
+    <details class="individual-advanced">
+      <summary>🧬 詳細情報</summary>
+      <div class="individual-advanced-body">
+        <div class="detail-fields">
+          <div class="detail-field"><label>性格</label><select oninput="setIndividualLive('${esc(p.id)}',${i},'nature',this.value)" onchange="setIndividual('${esc(p.id)}',${i},'nature',this.value)">${simpleOptionsHTML(NATURES,ind.nature||'','性格未設定')}</select></div>
+          <div class="detail-field"><label>特性</label><input value="${esc(ind.ability||'')}" placeholder="例：いかく" oninput="setIndividualLive('${esc(p.id)}',${i},'ability',this.value)" onchange="setIndividual('${esc(p.id)}',${i},'ability',this.value)"></div>
+          <div class="detail-field"><label>テラスタイプ</label><select oninput="setIndividualLive('${esc(p.id)}',${i},'teraType',this.value)" onchange="setIndividual('${esc(p.id)}',${i},'teraType',this.value)">${simpleOptionsHTML(TERA_TYPES,ind.teraType||'','テラスタイプ未設定')}</select></div>
+          <div class="detail-field"><label>証・リボン</label><input value="${esc(ind.ribbons||'')}" placeholder="例：あかし / リボン" oninput="setIndividualLive('${esc(p.id)}',${i},'ribbons',this.value)" onchange="setIndividual('${esc(p.id)}',${i},'ribbons',this.value)"></div>
+          <div class="detail-field"><label>親名</label><input value="${esc(ind.otName||'')}" placeholder="親名" oninput="setIndividualLive('${esc(p.id)}',${i},'otName',this.value)" onchange="setIndividual('${esc(p.id)}',${i},'otName',this.value)"></div>
+          <div class="detail-field"><label>ID</label><input value="${esc(ind.trainerId||'')}" inputmode="numeric" placeholder="トレーナーID" oninput="setIndividualLive('${esc(p.id)}',${i},'trainerId',this.value)" onchange="setIndividual('${esc(p.id)}',${i},'trainerId',this.value)"></div>
+          <div class="detail-field"><label>捕獲場所</label><input value="${esc(ind.catchLocation||'')}" placeholder="例：黒曜の原野" oninput="setIndividualLive('${esc(p.id)}',${i},'catchLocation',this.value)" onchange="setIndividual('${esc(p.id)}',${i},'catchLocation',this.value)"></div>
+          <div class="detail-field"><label>捕獲レベル</label><input type="number" min="1" max="100" value="${esc(ind.catchLevel??'')}" placeholder="Lv." oninput="setIndividualLive('${esc(p.id)}',${i},'catchLevel',this.value)" onchange="setIndividual('${esc(p.id)}',${i},'catchLevel',this.value)"></div>
+          <div class="detail-field"><label>サイズ</label><select oninput="setIndividualLive('${esc(p.id)}',${i},'size',this.value)" onchange="setIndividual('${esc(p.id)}',${i},'size',this.value)">${simpleOptionsHTML(SIZE_OPTIONS,ind.size||'','サイズ未設定')}</select></div>
+          <div class="detail-field"><label>オヤブン</label><label class="detail-check"><input type="checkbox" ${ind.isAlpha?'checked':''} oninput="setIndividualLive('${esc(p.id)}',${i},'isAlpha',this.checked)" onchange="setIndividual('${esc(p.id)}',${i},'isAlpha',this.checked)"> オヤブン個体</label></div>
+        </div>
+      </div>
+    </details>
     <div class="ind-shot-wrap">
       <div class="ind-shot-actions">
         <input id="shot-${safeId(p.id)}-${safeId(ind.uid)}" type="file" accept="image/*" style="display:none" onchange="setIndividualScreenshot('${esc(p.id)}','${esc(ind.uid)}',this.files?.[0])">
@@ -3201,14 +3232,14 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 // ===== v56 automatic update / cache repair =====
 (function(){
-  const APP_VERSION='v106';
+  const APP_VERSION='v107';
   const UPDATE_KEY='shinyHomeReloadedForSW_'+APP_VERSION;
 
   async function registerFreshWorker(){
     if(!('serviceWorker' in navigator) || location.protocol==='file:') return;
     try{
       const reg = await navigator.serviceWorker.register(
-        './service-worker.js?v=106',
+        './service-worker.js?v=107',
         {updateViaCache:'none'}
       );
 
