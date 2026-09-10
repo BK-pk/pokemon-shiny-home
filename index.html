@@ -564,6 +564,24 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 .dh-hunt{padding:14px}.dh-hunt-top{display:flex;gap:10px;align-items:center}.dh-hunt-top img{width:70px;height:70px;object-fit:contain;background:#0b2135;border-radius:12px}.dh-hunt-top h3{margin:0 0 4px}.dh-hunt-count{font-size:32px;color:#ffd14c;font-weight:900;margin:12px 0}.dh-hunt-buttons{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.dh-hunt-buttons button{padding:10px 5px;border-radius:9px;background:#0f3150;border:1px solid #2b5b7e;color:white;font-weight:800;cursor:pointer}.dh-capture{width:100%;margin-top:10px;padding:14px;border:1px solid #27b86f;border-radius:11px;background:linear-gradient(90deg,#0a9a54,#22c86e);color:white;font-size:18px;font-weight:900;cursor:pointer}.dh-odds{margin-top:10px;padding:11px;background:#091b2d;border:1px solid #1f4159;border-radius:10px}.dh-odds strong{display:block;font-size:23px;color:#ffd45a;margin-top:3px}
 @media (max-width:1250px) and (min-width:1000px){.desktop-home .dh-grid{grid-template-columns:minmax(0,1.45fr) minmax(310px,.75fr)}.dh-right{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:12px}.dh-recent{grid-template-columns:repeat(3,1fr)}}
 
+/* ===== v110 visual polish: clean header + richer showcase ===== */
+.desktop-top-actions{display:none}
+.sync-local-tools{margin:0 0 18px;padding:16px;border:1px solid #264965;border-radius:14px;background:linear-gradient(180deg,#0a1d30,#081725)}
+.sync-local-head{display:flex;justify-content:space-between;gap:14px;align-items:center;margin-bottom:12px}.sync-local-head strong{font-size:15px}.sync-local-head small{display:block;color:#7fa4bd;margin-top:3px}
+@media (min-width:1000px){
+  .topbar{min-height:70px;display:flex;align-items:center;justify-content:space-between}.desktop-top-actions{display:flex;align-items:center;gap:10px;margin-left:auto}.desktop-global-search{width:min(330px,25vw);display:flex;align-items:center;gap:8px;padding:0 12px;height:42px;background:#071827;border:1px solid #24516f;border-radius:12px;box-shadow:inset 0 0 0 1px rgba(67,162,225,.05)}.desktop-global-search span{font-size:20px;color:#7ebee8}.desktop-global-search input{width:100%;border:0!important;background:transparent!important;padding:0!important;outline:0;color:#edf8ff}.desktop-settings-btn{width:42px;height:42px;border-radius:12px;border:1px solid #2c5875;background:#0b2134;color:#dff5ff;font-size:19px;cursor:pointer}.desktop-settings-btn:hover{background:#123656}.topbar>.backup,.topbar>.undo-bar{display:none!important}
+  .desktop-home .dh-grid{grid-template-columns:minmax(0,1.62fr) minmax(340px,.78fr) minmax(300px,.66fr);gap:16px}
+  .dh-card{border-color:#24516f;box-shadow:0 18px 55px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.025)}
+  .dh-hero{min-height:305px;padding:30px;background:linear-gradient(90deg,rgba(2,10,22,.96),rgba(5,24,49,.72) 42%,rgba(4,22,45,.15)),radial-gradient(circle at 78% 18%,#fbf2cb 0 4.5%,rgba(248,229,172,.18) 5% 13%,transparent 14%),radial-gradient(circle at 72% 65%,rgba(61,160,255,.25),transparent 32%),linear-gradient(155deg,#0d2147,#153e78 50%,#061522)}
+  .dh-hero:before{content:"✦   ·     ✧    ·   ✦       ·      ✧";position:absolute;inset:16px 20px auto 36%;color:rgba(174,219,255,.54);font-size:20px;letter-spacing:14px;white-space:nowrap;pointer-events:none}
+  .dh-hero-copy{max-width:62%}.dh-hero-copy h2{font-size:34px;line-height:1.22;text-shadow:0 2px 18px rgba(70,157,255,.16)}.dh-hero-copy p{font-size:14px;max-width:520px}.dh-hero-sprite{right:4%;width:42%;height:96%;filter:drop-shadow(0 20px 34px rgba(0,0,0,.58)) drop-shadow(0 0 18px rgba(70,160,255,.15))}
+  .dh-statrow{gap:12px}.dh-kpi{padding:17px 18px}.dh-kpi strong{font-size:29px}
+  .dh-recent{gap:10px;padding:10px 14px 16px}.dh-recent-card{padding:10px;background:linear-gradient(180deg,#0b2138,#081827)}.dh-recent-card img{height:102px;background:radial-gradient(circle at 50% 56%,rgba(54,151,218,.24),transparent 58%)}
+  .dh-feature-art{height:305px;background:radial-gradient(circle at 75% 15%,#fff3c8 0 5%,rgba(255,239,188,.18) 6% 14%,transparent 15%),radial-gradient(circle at 45% 65%,rgba(55,157,255,.18),transparent 44%),linear-gradient(160deg,#17386b,#0b2a55 54%,#071320)}.dh-feature-art:after{content:"✦  ✧   ·   ✦    ·   ✧";position:absolute;right:12px;top:78px;color:rgba(255,220,128,.74);letter-spacing:9px}.dh-feature-art img{height:91%;width:84%}
+  .dh-box-grid{gap:6px}.dh-box-slot{border-color:#28506e;background:linear-gradient(180deg,#0d2942,#091b2c)}
+  .dh-hunt-count{font-size:38px}.dh-capture{min-height:58px;font-size:20px;box-shadow:0 10px 26px rgba(21,186,104,.17)}
+}
+
 </style>
 
 <style>
@@ -618,19 +636,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 </div>
 
 <div class="app">
-<div class="topbar"><button id="mobile-return-counter" class="btn" style="display:none" onclick="returnToMobileCounter()">🎯 カウンターへ戻る</button><div class="brand"><div class="logo"></div><div><h1>SHINY HOME COLLECTION</h1><p>色違い Living Form Dex / PC Collection Tracker</p></div></div><div class="backup">
-<button class="btn" id="exportBtn">バックアップ</button>
-<button class="btn" id="importBtn">読込</button>
-<button class="btn" id="exportImagesBtn">画像だけ保存</button>
-<button class="btn" id="importImagesBtn">画像だけ読込</button>
-<button class="btn" id="restorePreUpdateBtn" type="button" onclick="restorePreUpdateBackup()">🛟 更新前に戻す</button>
-<button class="btn" id="backupHistoryBtn" type="button" onclick="openBackupHistory()">🗂 履歴</button>
-<input accept="application/json" hidden="" id="fileInput" type="file"/>
-<input accept="application/json" hidden="" id="imageBackupInput" type="file"/>
-</div><div class="undo-bar">
-<button onclick="undoLastChange()" type="button">↶ 1つ前に戻す</button>
-<button onclick="showBackupInfo()" type="button">自動バックアップ</button>
-</div></div>
+<div class="topbar"><button id="mobile-return-counter" class="btn" style="display:none" onclick="returnToMobileCounter()">🎯 カウンターへ戻る</button><div class="brand"><div class="logo"></div><div><h1>SHINY HOME COLLECTION</h1><p>色違い Living Form Dex / PC Collection Tracker</p></div></div><div class="desktop-top-actions"><div class="desktop-global-search"><span>⌕</span><input id="desktopGlobalSearch" placeholder="ポケモンを検索…" onkeydown="if(event.key==='Enter')desktopQuickSearch()"></div><button class="desktop-settings-btn" type="button" onclick="switchAppTab('sync',document.querySelector('.app-tab[data-tab=sync]'))">⚙</button></div></div>
 <div id="backupHistoryModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.72);padding:20px;overflow:auto" onclick="if(event.target===this)closeBackupHistory()">
   <div style="max-width:760px;margin:5vh auto;background:#0c1726;border:1px solid #29445d;border-radius:18px;padding:20px;box-shadow:0 20px 70px rgba(0,0,0,.5)">
     <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px"><div><strong style="font-size:20px">🗂 更新前バックアップ履歴</strong><div style="font-size:12px;color:#87a0b8;margin-top:4px">復元したい時点を選べます。復元するまで現在のデータは変更されません。</div></div><button class="btn" type="button" onclick="closeBackupHistory()">閉じる</button></div>
@@ -906,7 +912,21 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
     <div class="extra-panel">
       <div class="extra-head">
         <div><h2 style="margin:0">☁️ Supabase 同期</h2>
-        <span class="section-count">PC・iPhoneで同じデータを共有 ・ build v109</span></div>
+        <span class="section-count">PC・iPhoneで同じデータを共有 ・ build v110</span></div>
+      </div>
+      <div class="sync-local-tools">
+        <div class="sync-local-head"><div><strong>🛟 データ保護・バックアップ</strong><small>普段はここだけで管理します</small></div><button class="btn" onclick="undoLastChange()" type="button">↶ 1つ前に戻す</button></div>
+        <div class="counter-row">
+          <button class="btn" id="exportBtn">バックアップ</button>
+          <button class="btn" id="importBtn">読込</button>
+          <button class="btn" id="exportImagesBtn">画像だけ保存</button>
+          <button class="btn" id="importImagesBtn">画像だけ読込</button>
+          <button class="btn" id="restorePreUpdateBtn" type="button" onclick="restorePreUpdateBackup()">🛟 更新前に戻す</button>
+          <button class="btn" id="backupHistoryBtn" type="button" onclick="openBackupHistory()">🗂 履歴</button>
+          <button class="btn" onclick="showBackupInfo()" type="button">自動バックアップ</button>
+        </div>
+        <input accept="application/json" hidden id="fileInput" type="file">
+        <input accept="application/json" hidden id="imageBackupInput" type="file">
       </div>
       <div class="sync-fields">
         <label>Supabase URL<input id="supabase-url" autocomplete="off" placeholder="https://xxxx.supabase.co"></label>
@@ -928,7 +948,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
       <div id="cloud-status" class="home-help">未設定です。</div>
       <div id="auto-sync-status" class="home-help" style="margin-top:8px">同期：v95 外出向け省通信</div><div id="network-status" class="net-pill">● 通信状態を確認中</div>
       <div class="home-help" style="margin-top:8px">
-        v109ではスマホ起動時に安全クラウドバックアップからコレクションを一方向で取り込み、厳選カウンターは従来どおり専用同期します。10秒操作がなければクラウドへ保存し、他端末は最新時刻の値だけを取り込みます。所持状況・HOME BOXなどのフルデータは上のボタンで手動同期します。
+        v110ではスマホ起動時に安全クラウドバックアップからコレクションを一方向で取り込み、厳選カウンターは従来どおり専用同期します。10秒操作がなければクラウドへ保存し、他端末は最新時刻の値だけを取り込みます。所持状況・HOME BOXなどのフルデータは上のボタンで手動同期します。
       </div>
       <div class="home-help" style="margin-top:10px">初回は「設定保存」→「接続テスト」の順に確認してください。既存データがある場合、確認前にクラウドへ保存しないでください。</div>
     </div>
@@ -2889,6 +2909,15 @@ function renderDesktopHome(){
   const box=el('dhBox');if(box)box.innerHTML=Array.from({length:30},(_,i)=>{const id=boxIds[i],p=data.find(x=>x.id===id);return `<div class="dh-box-slot">${p?`<img loading="lazy" src="${spriteURL(p)}" onerror="this.src='${baseSpriteURL(p)}'" title="${esc(p.name)}">`:''}</div>`}).join('');
   // hunt
   const hb=el('dhHuntBody');if(hb){const p=hunts[0];if(!p){hb.innerHTML='<div style="padding:26px 8px;color:#7da0b8;text-align:center">現在厳選中のポケモンはいません。</div>'}else{const h=huntData(p.id),od=shinyOdds(h.game||'',h.method||'',h.charm||'',h);hb.innerHTML=`<div class="dh-hunt-top"><img src="${spriteURL(p)}" onerror="this.src='${baseSpriteURL(p)}'"><div><h3>${esc(p.name)}</h3><small>${esc(h.game||'ゲーム未設定')} ・ ${esc(h.method||'方法未設定')}</small></div></div><div class="dh-hunt-count" id="dhHuntCount">${Number(h.count)||0}回</div><div class="dh-hunt-buttons"><button onclick="incHunt('${esc(p.id)}',-1);renderDesktopHome()">-1</button><button onclick="incHunt('${esc(p.id)}',1);renderDesktopHome()">+1</button><button onclick="incHunt('${esc(p.id)}',10);renderDesktopHome()">+10</button><button onclick="incHunt('${esc(p.id)}',100);renderDesktopHome()">+100</button></div><div class="dh-odds"><span>現在の1回あたり色違い確率</span><strong>${esc(od.text||'—')}</strong></div><button class="dh-capture" onclick="captureHunt('${esc(p.id)}');renderDesktopHome()">✨ 捕獲！</button>`}}
+}
+
+function desktopQuickSearch(){
+  const q=(el('desktopGlobalSearch')?.value||'').trim();
+  if(!q)return;
+  const target=el('search');if(target)target.value=q;
+  switchAppTab('collection',document.querySelector('.app-tab[data-tab=collection]'));
+  if(typeof render==='function')render();
+  setTimeout(()=>target?.focus(),50);
 }
 
 function switchAppTab(name,btn){
