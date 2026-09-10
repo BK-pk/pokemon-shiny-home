@@ -582,6 +582,20 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
   .dh-hunt-count{font-size:38px}.dh-capture{min-height:58px;font-size:20px;box-shadow:0 10px 26px rgba(21,186,104,.17)}
 }
 
+/* ===== v111 desktop sidebar layout fix =====
+   Keep the left navigation visually fixed, but reserve real page space for it.
+   This prevents the sidebar from covering/capturing clicks on Sync/Settings and other pages. */
+@media (min-width:1000px){
+  .app{max-width:none!important;padding:0 22px 34px 22px!important;min-height:100vh}
+  .app-tabs{left:14px!important;top:82px!important;bottom:18px!important;width:188px!important;z-index:60!important}
+  .app-tab{min-height:44px!important;padding:10px 10px!important;font-size:13px!important}
+  .topbar{margin-left:212px!important;padding:12px 0!important;width:auto!important}
+  .tab-page{margin-left:212px!important;width:calc(100% - 212px)!important;max-width:none!important;position:relative!important;z-index:1!important}
+  .tab-page.active{display:block}
+  #tab-home{overflow:visible}
+  #tab-sync .sync-grid,#tab-sync .extra-panel{max-width:100%!important}
+}
+
 </style>
 
 <style>
@@ -912,7 +926,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
     <div class="extra-panel">
       <div class="extra-head">
         <div><h2 style="margin:0">☁️ Supabase 同期</h2>
-        <span class="section-count">PC・iPhoneで同じデータを共有 ・ build v110</span></div>
+        <span class="section-count">PC・iPhoneで同じデータを共有 ・ build v111</span></div>
       </div>
       <div class="sync-local-tools">
         <div class="sync-local-head"><div><strong>🛟 データ保護・バックアップ</strong><small>普段はここだけで管理します</small></div><button class="btn" onclick="undoLastChange()" type="button">↶ 1つ前に戻す</button></div>
@@ -948,7 +962,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
       <div id="cloud-status" class="home-help">未設定です。</div>
       <div id="auto-sync-status" class="home-help" style="margin-top:8px">同期：v95 外出向け省通信</div><div id="network-status" class="net-pill">● 通信状態を確認中</div>
       <div class="home-help" style="margin-top:8px">
-        v110ではスマホ起動時に安全クラウドバックアップからコレクションを一方向で取り込み、厳選カウンターは従来どおり専用同期します。10秒操作がなければクラウドへ保存し、他端末は最新時刻の値だけを取り込みます。所持状況・HOME BOXなどのフルデータは上のボタンで手動同期します。
+        v111ではスマホ起動時に安全クラウドバックアップからコレクションを一方向で取り込み、厳選カウンターは従来どおり専用同期します。10秒操作がなければクラウドへ保存し、他端末は最新時刻の値だけを取り込みます。所持状況・HOME BOXなどのフルデータは上のボタンで手動同期します。
       </div>
       <div class="home-help" style="margin-top:10px">初回は「設定保存」→「接続テスト」の順に確認してください。既存データがある場合、確認前にクラウドへ保存しないでください。</div>
     </div>
