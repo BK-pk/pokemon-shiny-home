@@ -582,7 +582,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
   .dh-hunt-count{font-size:38px}.dh-capture{min-height:58px;font-size:20px;box-shadow:0 10px 26px rgba(21,186,104,.17)}
 }
 
-/* ===== v112 mobile hunt + shiny get =====
+/* ===== v113 mobile hunt + shiny get =====
    Keep the left navigation visually fixed, but reserve real page space for it.
    This prevents the sidebar from covering/capturing clicks on Sync/Settings and other pages. */
 @media (min-width:1000px){
@@ -597,7 +597,18 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 }
 
 
-/* ===== v112 mobile hunting UX ===== */
+/* ===== v113 desktop navigation/layout fix ===== */
+@media (min-width:1000px){
+  .app-tabs{width:232px!important;left:14px!important;padding:12px 10px!important;overflow-x:hidden!important}
+  .app-tab{font-size:13px!important;white-space:nowrap!important;word-break:keep-all!important;overflow:hidden!important;text-overflow:ellipsis!important;gap:8px!important}
+  .app-tab img{flex:0 0 auto!important}
+  .topbar{margin-left:256px!important}
+  .tab-page{margin-left:256px!important;width:calc(100% - 256px)!important}
+  #tab-sync{padding-top:0!important;margin-top:0!important}
+  #tab-sync .sync-grid{margin-top:0!important;padding-top:0!important}
+  #tab-sync .extra-panel:first-child{margin-top:0!important}
+}
+/* ===== v113 mobile hunting UX ===== */
 .mobile-day-total{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:8px 0 12px;padding:12px 14px;border:1px solid #2a4964;border-radius:14px;background:linear-gradient(135deg,#0a2034,#0d1727);box-shadow:0 8px 28px rgba(0,0,0,.18)}
 .mobile-day-total span{font-size:12px;color:#91a9bc}.mobile-day-total strong{font-size:24px;color:#ffd86b;font-variant-numeric:tabular-nums}.mobile-day-total small{font-size:11px;color:#6f8ba1}
 @media(max-width:800px){
@@ -610,7 +621,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
   .mobile-hunt-card{padding:14px!important}
   .mobile-hunt-count{font-size:38px!important;color:#ffd86b}
 }
-/* ===== v112 shiny result modal ===== */
+/* ===== v113 shiny result modal ===== */
 .shiny-result-overlay{position:fixed;inset:0;z-index:20000;background:rgba(2,7,18,.86);backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center;padding:18px;overflow:auto}
 .shiny-result-overlay.show{display:flex}
 .shiny-result-card{position:relative;width:min(920px,96vw);border:1px solid rgba(141,193,255,.35);border-radius:28px;overflow:hidden;background:radial-gradient(circle at 50% 22%,rgba(85,110,255,.28),transparent 35%),linear-gradient(180deg,#0b1730,#08111f 62%,#0b1725);box-shadow:0 30px 100px rgba(0,0,0,.62),0 0 50px rgba(103,80,255,.16)}
@@ -672,7 +683,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 
   <div id="mobile-active-hunt" class="mobile-active-hunt" style="display:none">
     <div class="mobile-day-total"><div><span>今日の厳選</span><br><small>厳選中すべての合計</small></div><strong id="mobile-today-total">0回</strong></div>
-    <div id="mobile-sync-status" class="mobile-hunt-meta" style="text-align:center;margin:4px 0 8px">☁️ 端末内に保存済み ・ v112</div>
+    <div id="mobile-sync-status" class="mobile-hunt-meta" style="text-align:center;margin:4px 0 8px">☁️ 端末内に保存済み ・ v113</div>
     <div id="mobile-multi-hunt-list" class="mobile-hunt-list"></div>
     <button id="mobile-multi-add" class="btn" type="button">＋ 厳選を追加</button>
   </div>
@@ -973,7 +984,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
     <div class="extra-panel">
       <div class="extra-head">
         <div><h2 style="margin:0">☁️ Supabase 同期</h2>
-        <span class="section-count">PC・iPhoneで同じデータを共有 ・ build v112</span></div>
+        <span class="section-count">PC・iPhoneで同じデータを共有 ・ build v113</span></div>
       </div>
       <div class="sync-local-tools">
         <div class="sync-local-head"><div><strong>🛟 データ保護・バックアップ</strong><small>普段はここだけで管理します</small></div><button class="btn" onclick="undoLastChange()" type="button">↶ 1つ前に戻す</button></div>
@@ -1009,7 +1020,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
       <div id="cloud-status" class="home-help">未設定です。</div>
       <div id="auto-sync-status" class="home-help" style="margin-top:8px">同期：v95 外出向け省通信</div><div id="network-status" class="net-pill">● 通信状態を確認中</div>
       <div class="home-help" style="margin-top:8px">
-        v112ではスマホ起動時に安全クラウドバックアップからコレクションを一方向で取り込み、厳選カウンターは従来どおり専用同期します。10秒操作がなければクラウドへ保存し、他端末は最新時刻の値だけを取り込みます。所持状況・HOME BOXなどのフルデータは上のボタンで手動同期します。
+        v113ではスマホ起動時に安全クラウドバックアップからコレクションを一方向で取り込み、厳選カウンターは従来どおり専用同期します。10秒操作がなければクラウドへ保存し、他端末は最新時刻の値だけを取り込みます。所持状況・HOME BOXなどのフルデータは上のボタンで手動同期します。
       </div>
       <div class="home-help" style="margin-top:10px">初回は「設定保存」→「接続テスト」の順に確認してください。既存データがある場合、確認前にクラウドへ保存しないでください。</div>
     </div>
@@ -3018,9 +3029,12 @@ function desktopQuickSearch(){
 }
 
 function switchAppTab(name,btn){
+  const previous=document.querySelector('.tab-page.active');
+  const isSwitch=previous && previous.id!==`tab-${name}`;
   document.querySelectorAll('.app-tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===name));
   document.querySelectorAll('.tab-page').forEach(p=>p.classList.toggle('active',p.id===`tab-${name}`));
   localStorage.setItem('shinyHomeActiveTab_v1',name);
+  if(isSwitch){requestAnimationFrame(()=>window.scrollTo({top:0,left:0,behavior:'auto'}));}
   if(name==='home'){renderDesktopHome()}
   if(name==='calendar'){renderMonthlyShinies();renderCaptureCalendar();renderCaptureTimeline();renderYearAlbum()}
   if(name==='stats'){renderYearSummary();renderHuntRankings();renderHuntStats();renderBallStats();renderMethodStats();renderCollectionTrend();populateYearImageSelect();renderDataQuality();renderBestRecords();renderRoadmap()}
@@ -3505,7 +3519,7 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 // ===== v56 automatic update / cache repair =====
 (function(){
-  const APP_VERSION='v112';
+  const APP_VERSION='v113';
   const UPDATE_KEY='shinyHomeReloadedForSW_'+APP_VERSION;
 
   async function registerFreshWorker(){
