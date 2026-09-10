@@ -526,6 +526,44 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 .history-toolbar{display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px;margin:10px 0}.history-page-wrap{overflow:auto}.history-summary{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0}.history-summary .dashcard{min-width:150px;flex:1}
 .net-pill{display:inline-flex;gap:6px;align-items:center;border:1px solid #29445d;border-radius:999px;padding:5px 8px;font-size:10px;color:var(--muted)}.net-pill.online{color:#8fe6b0}.net-pill.offline{color:#ffd36b}
 @media(max-width:700px){.hunt-progress-strip{grid-template-columns:1fr 1fr 1fr}.history-toolbar{grid-template-columns:1fr}.dashboard2{grid-template-columns:1fr 1fr}.drag-handle{width:34px;height:34px}}
+
+
+/* v109 desktop showcase dashboard — visual-only layer, existing data model untouched */
+.desktop-home{display:none}
+@media (min-width:1000px){
+  .app{max-width:none;padding:0 22px 34px 250px;min-height:100vh;background:
+    radial-gradient(circle at 35% 0%,rgba(0,122,255,.12),transparent 34%),
+    radial-gradient(circle at 88% 15%,rgba(123,72,255,.10),transparent 28%),#071320}
+  .topbar{margin-left:-228px;padding:12px 18px 12px 236px;position:sticky;top:0;z-index:70;border-bottom:1px solid #173a55;background:rgba(5,17,29,.92);backdrop-filter:blur(18px)}
+  .topbar .brand h1{font-size:20px;letter-spacing:.3px}.topbar .brand p{font-size:11px}
+  .backup,.undo-bar{opacity:.88}
+  .app-tabs{position:fixed;left:16px;top:78px;bottom:18px;width:208px;margin:0;padding:12px;display:flex;flex-direction:column;align-items:stretch;flex-wrap:nowrap;overflow:auto;border-radius:18px;background:linear-gradient(180deg,rgba(10,30,50,.98),rgba(5,19,33,.98));box-shadow:0 16px 50px rgba(0,0,0,.25);z-index:60}
+  .app-tab{width:100%;justify-content:flex-start;padding:11px 12px;min-height:46px;border-color:transparent;background:transparent}
+  .app-tab:hover{background:#0d2c45;border-color:#214d70}.app-tab.active{background:linear-gradient(90deg,#1068c5,#0a93e8);box-shadow:0 8px 25px rgba(0,128,255,.24)}
+  .app-tab img{width:24px;height:24px}
+  .desktop-home{display:block}
+}
+.desktop-home .dh-grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(330px,.78fr) minmax(290px,.62fr);gap:14px;align-items:start}
+.dh-card{background:linear-gradient(180deg,rgba(12,31,51,.97),rgba(7,21,35,.97));border:1px solid #204866;border-radius:18px;box-shadow:0 18px 55px rgba(0,0,0,.18);overflow:hidden}
+.dh-hero{position:relative;min-height:250px;padding:24px;display:flex;align-items:flex-end;background:
+ linear-gradient(90deg,rgba(2,12,25,.95),rgba(7,23,44,.60) 46%,rgba(8,33,60,.18)),
+ radial-gradient(circle at 72% 28%,rgba(179,211,255,.78) 0 4%,rgba(92,126,255,.17) 5% 13%,transparent 14%),
+ radial-gradient(circle at 80% 75%,rgba(60,205,255,.19),transparent 33%),
+ linear-gradient(155deg,#0c1b38,#153b6a 55%,#071320);
+}
+.dh-hero:after{content:"";position:absolute;inset:auto 0 0;height:42%;background:linear-gradient(180deg,transparent,rgba(1,10,19,.68));pointer-events:none}
+.dh-hero-copy{position:relative;z-index:2;max-width:58%}.dh-hero-copy h2{font-size:28px;margin:0 0 9px;line-height:1.25}.dh-hero-copy p{margin:0;color:#acd2ea;line-height:1.65}.dh-hero-sprite{position:absolute;right:6%;bottom:0;width:36%;height:90%;object-fit:contain;filter:drop-shadow(0 16px 28px rgba(0,0,0,.48));z-index:1}
+.dh-hero-date{position:absolute;right:18px;top:16px;font-size:12px;color:#d8f2ff;z-index:3;background:rgba(4,18,32,.55);padding:7px 10px;border-radius:999px;border:1px solid rgba(113,187,240,.24)}
+.dh-statrow{display:grid;grid-template-columns:1.45fr repeat(4,1fr);gap:10px;margin-top:12px}.dh-kpi{padding:15px 16px}.dh-kpi small{display:block;color:#87aac3;margin-bottom:6px}.dh-kpi strong{font-size:25px}.dh-kpi .sub{font-size:11px;color:#7fa0b9;margin-top:4px}.dh-progress{height:8px;background:#06121f;border-radius:99px;overflow:hidden;margin-top:10px}.dh-progress>span{display:block;height:100%;background:linear-gradient(90deg,#2ce5a7,#96ffd7);border-radius:99px}
+.dh-section{margin-top:12px}.dh-section-head{display:flex;justify-content:space-between;align-items:center;padding:14px 16px 6px}.dh-section-head h3{margin:0;font-size:16px}.dh-section-head button{border:0;background:transparent;color:#69c7ff;cursor:pointer}
+.dh-recent{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:9px;padding:8px 12px 14px}.dh-recent-card{background:#0a1d2f;border:1px solid #214865;border-radius:13px;padding:9px;text-align:center;cursor:pointer;transition:.16s}.dh-recent-card:hover{transform:translateY(-2px);border-color:#48a7e8}.dh-recent-card img{width:100%;height:86px;object-fit:contain;background:radial-gradient(circle,#173c60,transparent 62%);border-radius:10px}.dh-recent-card b{display:block;font-size:12px;margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.dh-recent-card span{font-size:10px;color:#86a8bf}
+.dh-lower{display:grid;grid-template-columns:1.06fr .94fr;gap:12px;margin-top:12px}.dh-chart{padding:14px}.dh-bars{height:158px;display:flex;align-items:flex-end;gap:8px;padding:14px 4px 20px;border-bottom:1px solid #23435a}.dh-bar{flex:1;min-width:0;background:linear-gradient(180deg,#28b4ff,#176bc6);border-radius:7px 7px 2px 2px;position:relative;min-height:3px}.dh-bar b{position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-size:10px}.dh-bar i{position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);font-size:9px;color:#7397b1;font-style:normal}.dh-chart-foot{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:12px}.dh-mini{padding:9px;background:#091a2b;border:1px solid #1c3a52;border-radius:10px;text-align:center}.dh-mini b{display:block;font-size:17px}.dh-mini span{font-size:10px;color:#789db8}
+.dh-game-list{padding:10px 14px 14px}.dh-game-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid #16334b}.dh-game-row:last-child{border-bottom:0}.dh-game-row div{display:flex;align-items:center;gap:8px}.dh-game-dot{width:9px;height:9px;border-radius:50%;background:#35b8ff;box-shadow:0 0 12px #35b8ff}.dh-game-row small{color:#7da1bc}
+.dh-feature{padding:0}.dh-feature-art{height:260px;position:relative;background:radial-gradient(circle at 70% 18%,#e8f4ff 0 5%,rgba(208,231,255,.22) 6% 12%,transparent 13%),linear-gradient(160deg,#17386b,#0c2446 55%,#071320);display:flex;align-items:flex-end;justify-content:center}.dh-feature-art img{width:78%;height:86%;object-fit:contain;filter:drop-shadow(0 16px 26px rgba(0,0,0,.45))}.dh-feature-title{position:absolute;left:16px;top:15px;z-index:2}.dh-feature-title small{color:#9ec2dd}.dh-feature-title h2{font-size:24px;margin:4px 0}.dh-feature-meta{padding:12px 15px}.dh-meta-row{display:grid;grid-template-columns:90px 1fr;gap:10px;padding:8px 0;border-bottom:1px solid #183850;font-size:12px}.dh-meta-row:last-child{border:0}.dh-meta-row span{color:#7fa5bf}.dh-meta-row b{text-align:right;font-weight:600}.dh-feature-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 15px 15px}.dh-feature-actions button{padding:11px;border-radius:10px;border:1px solid #2b78bd;background:#0e5fcc;color:white;font-weight:700;cursor:pointer}.dh-feature-actions button:last-child{background:linear-gradient(90deg,#7047ea,#a643ed);border-color:#9458ff}
+.dh-box{padding:12px}.dh-box-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:5px}.dh-box-slot{aspect-ratio:1;background:#0b2034;border:1px solid #1e4562;border-radius:7px;display:flex;align-items:center;justify-content:center;overflow:hidden}.dh-box-slot img{width:92%;height:92%;object-fit:contain}.dh-box-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px}.dh-box-head h3{margin:0}.dh-box-head button{border:0;background:#0f4167;color:white;border-radius:8px;padding:7px 9px;cursor:pointer}
+.dh-hunt{padding:14px}.dh-hunt-top{display:flex;gap:10px;align-items:center}.dh-hunt-top img{width:70px;height:70px;object-fit:contain;background:#0b2135;border-radius:12px}.dh-hunt-top h3{margin:0 0 4px}.dh-hunt-count{font-size:32px;color:#ffd14c;font-weight:900;margin:12px 0}.dh-hunt-buttons{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.dh-hunt-buttons button{padding:10px 5px;border-radius:9px;background:#0f3150;border:1px solid #2b5b7e;color:white;font-weight:800;cursor:pointer}.dh-capture{width:100%;margin-top:10px;padding:14px;border:1px solid #27b86f;border-radius:11px;background:linear-gradient(90deg,#0a9a54,#22c86e);color:white;font-size:18px;font-weight:900;cursor:pointer}.dh-odds{margin-top:10px;padding:11px;background:#091b2d;border:1px solid #1f4159;border-radius:10px}.dh-odds strong{display:block;font-size:23px;color:#ffd45a;margin-top:3px}
+@media (max-width:1250px) and (min-width:1000px){.desktop-home .dh-grid{grid-template-columns:minmax(0,1.45fr) minmax(310px,.75fr)}.dh-right{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:12px}.dh-recent{grid-template-columns:repeat(3,1fr)}}
+
 </style>
 
 <style>
@@ -600,6 +638,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
   </div>
 </div>
 <nav aria-label="画面切り替え" class="app-tabs">
+<button class="app-tab" data-tab="home" onclick="switchAppTab('home',this)" type="button">🏠 ホーム</button>
 <button class="app-tab active" data-tab="collection" onclick="switchAppTab('collection',this)" type="button">
 <img alt="" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/25.png"/>色違いコレクション
   </button>
@@ -617,7 +656,39 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 <img alt="" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/235.png"/>スクショギャラリー
   </button>
 <button class="app-tab" data-tab="sync" onclick="switchAppTab('sync',this)" type="button">☁️ 同期・設定</button>
-</nav><section class="tab-page active" id="tab-collection"><section class="hero">
+</nav><section class="tab-page" id="tab-home">
+  <div class="desktop-home">
+    <div class="dh-grid">
+      <main>
+        <section class="dh-card dh-hero">
+          <div class="dh-hero-date" id="dhDate">—</div>
+          <div class="dh-hero-copy"><div class="eyebrow">MY SHINY HOME</div><h2>色違いの出会いが、<br>いつも特別なものに。</h2><p id="dhHeroText">コレクションを読み込んでいます…</p></div>
+          <img class="dh-hero-sprite" id="dhHeroSprite" alt="">
+        </section>
+        <div class="dh-statrow">
+          <section class="dh-card dh-kpi"><small>コレクション進捗</small><strong><span id="dhOwned">0</span> <span style="font-size:15px;color:#87a8bf">/ <span id="dhTotal">0</span></span></strong><div style="font-size:20px;color:#8fffcf;font-weight:800" id="dhPercent">0.0%</div><div class="dh-progress"><span id="dhProgressBar" style="width:0%"></span></div></section>
+          <section class="dh-card dh-kpi"><small>📅 今月の色違い</small><strong id="dhMonth">0匹</strong><div class="sub" id="dhMonthLabel">—</div></section>
+          <section class="dh-card dh-kpi"><small>🏆 今年の色違い</small><strong id="dhYear">0匹</strong><div class="sub" id="dhYearLabel">—</div></section>
+          <section class="dh-card dh-kpi"><small>🎯 厳選中</small><strong id="dhHunting">0匹</strong><div class="sub">現在アクティブ</div></section>
+          <section class="dh-card dh-kpi"><small>📖 未所持</small><strong id="dhMissing">0匹</strong><div class="sub">コンプリートまで</div></section>
+        </div>
+        <section class="dh-card dh-section"><div class="dh-section-head"><h3>最近の色違い</h3><button onclick="switchAppTab('history',document.querySelector('.app-tab[data-tab=history]'))">もっと見る ›</button></div><div class="dh-recent" id="dhRecent"></div></section>
+        <div class="dh-lower">
+          <section class="dh-card dh-chart"><div class="dh-section-head" style="padding:0 0 2px"><h3>統計・ランキング</h3><button onclick="switchAppTab('stats',document.querySelector('.app-tab[data-tab=stats]'))">詳細 ›</button></div><div class="dh-bars" id="dhBars"></div><div class="dh-chart-foot"><div class="dh-mini"><span>今年</span><b id="dhFootYear">0匹</b></div><div class="dh-mini"><span>月平均</span><b id="dhAverage">0.0匹</b></div><div class="dh-mini"><span>最高の月</span><b id="dhBestMonth">—</b></div></div></section>
+          <section class="dh-card"><div class="dh-section-head"><h3>ゲーム別コレクション</h3><button onclick="switchAppTab('stats',document.querySelector('.app-tab[data-tab=stats]'))">詳細 ›</button></div><div class="dh-game-list" id="dhGames"></div></section>
+        </div>
+      </main>
+      <aside>
+        <section class="dh-card dh-feature" id="dhFeature"><div class="dh-feature-art"><div class="dh-feature-title"><small id="dhFeatureNo">—</small><h2 id="dhFeatureName">最近の色違い</h2></div><img id="dhFeatureSprite" alt=""></div><div class="dh-feature-meta" id="dhFeatureMeta"></div><div class="dh-feature-actions"><button id="dhFeatureOpen">個体を見る</button><button onclick="switchAppTab('gallery',document.querySelector('.app-tab[data-tab=gallery]'))">画像を見る</button></div></section>
+      </aside>
+      <aside class="dh-right">
+        <section class="dh-card dh-box"><div class="dh-box-head"><h3>HOME BOX</h3><button onclick="switchAppTab('homebox',document.querySelector('.app-tab[data-tab=homebox]'))">開く ›</button></div><div class="dh-box-grid" id="dhBox"></div></section>
+        <section class="dh-card dh-hunt" style="margin-top:12px"><div class="dh-section-head" style="padding:0 0 10px"><h3>厳選カウンター</h3><button onclick="switchAppTab('collection',document.querySelector('.app-tab[data-tab=collection]'))">管理 ›</button></div><div id="dhHuntBody"></div></section>
+      </aside>
+    </div>
+  </div>
+  <div class="mobile-only-home-note" style="display:none"></div>
+</section><section class="tab-page active" id="tab-collection"><section class="hero">
 <div class="summary"><div class="eyebrow">collection progress</div><div class="summary-main"><div class="big"><span id="ownedCount">0</span><small> / <span id="totalCount">0</span></small></div><div class="percent" id="percent">0.0%</div></div><div class="progress"><div class="bar" id="bar"></div></div><div class="mini"><span>未所持 <b id="missingCount">0</b></span><span>表示中 <b id="visibleCount">0</b></span><span>保存 <b>自動</b></span><span>対象 <b id="targetCount">0</b></span><span>色違い総個体数 <b id="individualCount">0</b></span></div></div>
 <div class="sidepanel"><div class="stat"><span>全国図鑑</span><strong id="normalStat">0.0%</strong><div class="statdetail" id="normalDetail">0 / 0</div></div><div class="stat"><span>リージョン</span><strong id="regionStat">0.0%</strong><div class="statdetail" id="regionDetail">0 / 0</div></div><div class="stat"><span>オス・メス違い</span><strong id="genderStat">0.0%</strong><div class="statdetail" id="genderDetail">0 / 0</div></div><div class="stat"><span>その他の姿違い</span><strong id="formStat">0.0%</strong><div class="statdetail" id="formDetail">0 / 0</div></div><div class="stat"><span>キョダイマックス</span><strong id="gmaxStat">0.0%</strong><div class="statdetail" id="gmaxDetail">0 / 0</div></div><div class="stat"><span>色違い未解禁</span><strong id="lockedStat">0</strong><div class="statdetail">％計算対象外</div></div></div>
 </section><div class="collection-goals" id="collection-goals"></div><div class="genpanel"><div class="genstat"><span>第1世代</span><strong id="gen1Stat">0.0%</strong><small id="gen1Detail">0 / 0</small></div><div class="genstat"><span>第2世代</span><strong id="gen2Stat">0.0%</strong><small id="gen2Detail">0 / 0</small></div><div class="genstat"><span>第3世代</span><strong id="gen3Stat">0.0%</strong><small id="gen3Detail">0 / 0</small></div><div class="genstat"><span>第4世代</span><strong id="gen4Stat">0.0%</strong><small id="gen4Detail">0 / 0</small></div><div class="genstat"><span>第5世代</span><strong id="gen5Stat">0.0%</strong><small id="gen5Detail">0 / 0</small></div><div class="genstat"><span>第6世代</span><strong id="gen6Stat">0.0%</strong><small id="gen6Detail">0 / 0</small></div><div class="genstat"><span>第7世代</span><strong id="gen7Stat">0.0%</strong><small id="gen7Detail">0 / 0</small></div><div class="genstat"><span>第8世代</span><strong id="gen8Stat">0.0%</strong><small id="gen8Detail">0 / 0</small></div><div class="genstat"><span>第9世代</span><strong id="gen9Stat">0.0%</strong><small id="gen9Detail">0 / 0</small></div></div><div class="dashboard-title"><h3>📊 進捗ダッシュボード</h3><span>カテゴリ別の所持率をひと目で確認</span></div><div class="dashboard2"><div class="dashcard"><span>全国図鑑</span><strong id="dashBase">0.0%</strong><div class="statdetail" id="dashBaseDetail">0 / 0</div></div><div class="dashcard"><span>リージョン</span><strong id="dashRegion">0.0%</strong><div class="statdetail" id="dashRegionDetail">0 / 0</div></div><div class="dashcard"><span>オス・メス違い</span><strong id="dashGender">0.0%</strong><div class="statdetail" id="dashGenderDetail">0 / 0</div></div><div class="dashcard"><span>その他の姿違い</span><strong id="dashForms">0.0%</strong><div class="statdetail" id="dashFormsDetail">0 / 0</div></div><div class="dashcard"><span>色違い総個体数</span><strong id="dashIndividuals">0</strong><div class="statdetail">重複個体を含む</div></div></div><div class="current-hunt"><div class="current-hunt-head"><h3>🎯 今厳選しているポケモン</h3><span>カードの「次に狙う」で登録</span></div><div class="current-hunt-list" id="currentHunt"></div></div><div class="software-panel"><div class="software-head"><h3>入手ソフト別 色違い個体数</h3><span class="section-count">登録済み個体のみ集計</span></div><div class="software-grid" id="softwareStats"></div></div>
@@ -835,7 +906,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
     <div class="extra-panel">
       <div class="extra-head">
         <div><h2 style="margin:0">☁️ Supabase 同期</h2>
-        <span class="section-count">PC・iPhoneで同じデータを共有 ・ build v108</span></div>
+        <span class="section-count">PC・iPhoneで同じデータを共有 ・ build v109</span></div>
       </div>
       <div class="sync-fields">
         <label>Supabase URL<input id="supabase-url" autocomplete="off" placeholder="https://xxxx.supabase.co"></label>
@@ -857,7 +928,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
       <div id="cloud-status" class="home-help">未設定です。</div>
       <div id="auto-sync-status" class="home-help" style="margin-top:8px">同期：v95 外出向け省通信</div><div id="network-status" class="net-pill">● 通信状態を確認中</div>
       <div class="home-help" style="margin-top:8px">
-        v108ではスマホ起動時に安全クラウドバックアップからコレクションを一方向で取り込み、厳選カウンターは従来どおり専用同期します。10秒操作がなければクラウドへ保存し、他端末は最新時刻の値だけを取り込みます。所持状況・HOME BOXなどのフルデータは上のボタンで手動同期します。
+        v109ではスマホ起動時に安全クラウドバックアップからコレクションを一方向で取り込み、厳選カウンターは従来どおり専用同期します。10秒操作がなければクラウドへ保存し、他端末は最新時刻の値だけを取り込みます。所持状況・HOME BOXなどのフルデータは上のボタンで手動同期します。
       </div>
       <div class="home-help" style="margin-top:10px">初回は「設定保存」→「接続テスト」の順に確認してください。既存データがある場合、確認前にクラウドへ保存しないでください。</div>
     </div>
@@ -2787,22 +2858,56 @@ function mobileStartHunt(id){
   save();render();renderMobileCounter();
 }
 
+
+function desktopRecentIndividuals(){
+  return allIndividualsFlat().filter(r=>r.ind&&r.ind.date).sort((a,b)=>String(b.ind.date).localeCompare(String(a.ind.date))||String(b.ind.uid||'').localeCompare(String(a.ind.uid||'')));
+}
+function renderDesktopHome(){
+  if(!el('tab-home')||!data.length)return;
+  const available=data.filter(p=>!p.locked),owned=available.filter(p=>ownedCountFor(p.id)>0).length,total=available.length,pct=total?owned/total*100:0;
+  const now=new Date(),year=now.getFullYear(),month=String(now.getMonth()+1).padStart(2,'0'),mk=`${year}-${month}`;
+  const inds=allIndividualsFlat(),recent=desktopRecentIndividuals();
+  const monthRows=inds.filter(r=>(r.ind.date||'').startsWith(mk)),yearRows=inds.filter(r=>(r.ind.date||'').startsWith(String(year)));
+  const hunts=orderedActiveHunts();
+  const set=(id,v)=>{const x=el(id);if(x)x.textContent=v};
+  set('dhOwned',owned);set('dhTotal',total);set('dhPercent',`${pct.toFixed(1)}%`);set('dhMonth',`${monthRows.length}匹`);set('dhYear',`${yearRows.length}匹`);set('dhHunting',`${hunts.length}匹`);set('dhMissing',`${Math.max(0,total-owned)}匹`);set('dhMonthLabel',`${year}年${Number(month)}月`);set('dhYearLabel',`${year}年`);
+  const bar=el('dhProgressBar');if(bar)bar.style.width=`${pct}%`;
+  const dateEl=el('dhDate');if(dateEl)dateEl.textContent=new Intl.DateTimeFormat('ja-JP',{year:'numeric',month:'long',day:'numeric',weekday:'short'}).format(now);
+  const hero=recent[0]||hunts[0]&&{p:hunts[0],ind:null,id:hunts[0].id};
+  if(hero){const src=spriteURL(hero.p);const hs=el('dhHeroSprite');if(hs){hs.src=src;hs.onerror=()=>hs.src=baseSpriteURL(hero.p)};const ht=el('dhHeroText');if(ht)ht.textContent=recent[0]?`最近の出会いは「${hero.p.name}」。${hero.ind?.date||''}の思い出をコレクションに残しています。`:`今は「${hero.p.name}」を厳選中。次の色違いとの出会いを記録しよう。`;}
+  const recEl=el('dhRecent');if(recEl)recEl.innerHTML=(recent.slice(0,6).map(r=>`<div class="dh-recent-card" onclick="showPokemonDetail('${esc(r.id)}')"><img loading="lazy" src="${spriteURL(r.p)}" onerror="this.src='${baseSpriteURL(r.p)}'"><b>${esc(r.p.name)}</b><span>${esc(r.ind.date||'—')}<br>${esc(r.ind.game||'')}</span></div>`).join('')||'<div style="grid-column:1/-1;padding:24px;color:#779ab3;text-align:center">個体を登録すると、最近の色違いがここに並びます。</div>');
+  // 12-month bars
+  const counts=[];for(let i=0;i<12;i++){const k=`${year}-${String(i+1).padStart(2,'0')}`;counts.push(inds.filter(r=>(r.ind.date||'').startsWith(k)).length)}
+  const max=Math.max(1,...counts),bars=el('dhBars');if(bars)bars.innerHTML=counts.map((n,i)=>`<div class="dh-bar" style="height:${Math.max(3,n/max*100)}%"><b>${n}</b><i>${i+1}月</i></div>`).join('');
+  set('dhFootYear',`${yearRows.length}匹`);set('dhAverage',`${(yearRows.length/Math.max(1,now.getMonth()+1)).toFixed(1)}匹`);const bm=Math.max(...counts),bi=counts.indexOf(bm);set('dhBestMonth',bm?`${bi+1}月 (${bm}匹)`:'—');
+  // games
+  const gm={};inds.forEach(r=>{const g=r.ind.game||'未設定';gm[g]=(gm[g]||0)+1});const games=Object.entries(gm).sort((a,b)=>b[1]-a[1]).slice(0,7),gameEl=el('dhGames');if(gameEl)gameEl.innerHTML=(games.map(([g,n])=>`<div class="dh-game-row"><div><span class="dh-game-dot"></span><span>${esc(g)}</span></div><small>${n}匹</small></div>`).join('')||'<div style="padding:18px;color:#779ab3">ゲーム情報を登録すると集計されます。</div>');
+  // feature
+  const fr=recent[0];if(fr){set('dhFeatureNo',`No.${String(fr.p.no).padStart(4,'0')}`);set('dhFeatureName',fr.p.name);const fs=el('dhFeatureSprite');if(fs){fs.src=spriteURL(fr.p);fs.onerror=()=>fs.src=baseSpriteURL(fr.p)};const fm=el('dhFeatureMeta');if(fm)fm.innerHTML=`<div class="dh-meta-row"><span>捕獲日</span><b>${esc(fr.ind.date||'—')}</b></div><div class="dh-meta-row"><span>ゲーム</span><b>${esc(fr.ind.game||'—')}</b></div><div class="dh-meta-row"><span>方法</span><b>${esc(fr.ind.huntMethod||fr.ind.method||'—')}</b></div><div class="dh-meta-row"><span>回数</span><b>${Number(fr.ind.huntCount)||0}回</b></div><div class="dh-meta-row"><span>ボール</span><b>${esc(BALL_NAME[ballSlugFromValue(fr.ind.ball)]||fr.ind.ball||'—')}</b></div><div class="dh-meta-row"><span>メモ</span><b>${esc(fr.ind.memo||'—')}</b></div>`;const fo=el('dhFeatureOpen');if(fo)fo.onclick=()=>showPokemonDetail(fr.id)}else{set('dhFeatureNo','—');set('dhFeatureName','まだ個体がありません')}
+  // HOME BOX preview uses current custom order IDs, then falls back to first owned IDs
+  let boxIds=[];try{boxIds=customHomeSlotIds().slice(0,30)}catch(e){} if(!boxIds.length)boxIds=available.filter(p=>ownedCountFor(p.id)>0).slice(0,30).map(p=>p.id);
+  const box=el('dhBox');if(box)box.innerHTML=Array.from({length:30},(_,i)=>{const id=boxIds[i],p=data.find(x=>x.id===id);return `<div class="dh-box-slot">${p?`<img loading="lazy" src="${spriteURL(p)}" onerror="this.src='${baseSpriteURL(p)}'" title="${esc(p.name)}">`:''}</div>`}).join('');
+  // hunt
+  const hb=el('dhHuntBody');if(hb){const p=hunts[0];if(!p){hb.innerHTML='<div style="padding:26px 8px;color:#7da0b8;text-align:center">現在厳選中のポケモンはいません。</div>'}else{const h=huntData(p.id),od=shinyOdds(h.game||'',h.method||'',h.charm||'',h);hb.innerHTML=`<div class="dh-hunt-top"><img src="${spriteURL(p)}" onerror="this.src='${baseSpriteURL(p)}'"><div><h3>${esc(p.name)}</h3><small>${esc(h.game||'ゲーム未設定')} ・ ${esc(h.method||'方法未設定')}</small></div></div><div class="dh-hunt-count" id="dhHuntCount">${Number(h.count)||0}回</div><div class="dh-hunt-buttons"><button onclick="incHunt('${esc(p.id)}',-1);renderDesktopHome()">-1</button><button onclick="incHunt('${esc(p.id)}',1);renderDesktopHome()">+1</button><button onclick="incHunt('${esc(p.id)}',10);renderDesktopHome()">+10</button><button onclick="incHunt('${esc(p.id)}',100);renderDesktopHome()">+100</button></div><div class="dh-odds"><span>現在の1回あたり色違い確率</span><strong>${esc(od.text||'—')}</strong></div><button class="dh-capture" onclick="captureHunt('${esc(p.id)}');renderDesktopHome()">✨ 捕獲！</button>`}}
+}
+
 function switchAppTab(name,btn){
   document.querySelectorAll('.app-tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===name));
   document.querySelectorAll('.tab-page').forEach(p=>p.classList.toggle('active',p.id===`tab-${name}`));
   localStorage.setItem('shinyHomeActiveTab_v1',name);
+  if(name==='home'){renderDesktopHome()}
   if(name==='calendar'){renderMonthlyShinies();renderCaptureCalendar();renderCaptureTimeline();renderYearAlbum()}
   if(name==='stats'){renderYearSummary();renderHuntRankings();renderHuntStats();renderBallStats();renderMethodStats();renderCollectionTrend();populateYearImageSelect();renderDataQuality();renderBestRecords();renderRoadmap()}
   if(name==='homebox'){renderNationalHomeBox();initHomeSwipe()} if(name==='dex'){populateDexExtraFilters();renderDexView()} if(name==='collection'){renderHomeBoxes();renderHomeBoxBoard();renderIndividualSearch();renderCollectionGoals();renderDexHeatmap();renderHuntFocus()} if(name==='sync'){renderCloudSettings()}
   if(name==='gallery'){renderShotGallery();populateGameImageSelect();renderHallOfFame();renderMilestones()}
 }
 function restoreAppTab(){
-  const name=localStorage.getItem('shinyHomeActiveTab_v1')||'collection';
+  const name=localStorage.getItem('shinyHomeActiveTab_v1')||(window.innerWidth>=1000?'home':'collection');
   const btn=document.querySelector(`.app-tab[data-tab="${name}"]`)||document.querySelector('.app-tab[data-tab="collection"]');
   if(btn)switchAppTab(btn.dataset.tab,btn);
 }
 
-function renderExtraPanels(){renderMonthlyShinies();renderCaptureHistory();renderHuntStats();renderYearSummary();renderHuntRankings();renderCaptureCalendar();populateGameImageSelect();renderDexView();renderShotGallery();renderBallStats();renderMethodStats();renderHomeBoxes();renderHomeBoxBoard();renderIndividualSearch();renderCollectionTrend();populateYearImageSelect();renderCollectionGoals();renderHallOfFame();renderCaptureTimeline();renderDataQuality();populateDexExtraFilters();renderDexHeatmap();renderYearAlbum();renderMilestones();renderNationalHomeBox();renderHuntFocus();renderBestRecords();renderRoadmap();renderCloudSettings();renderNationalHomeBox();initHomeSwipe();if(isMobileCounterDevice()&&!document.querySelector('#mobile-multi-hunt-list .mobile-hunt-card'))renderMobileCounter();}
+function renderExtraPanels(){renderDesktopHome();renderMonthlyShinies();renderCaptureHistory();renderHuntStats();renderYearSummary();renderHuntRankings();renderCaptureCalendar();populateGameImageSelect();renderDexView();renderShotGallery();renderBallStats();renderMethodStats();renderHomeBoxes();renderHomeBoxBoard();renderIndividualSearch();renderCollectionTrend();populateYearImageSelect();renderCollectionGoals();renderHallOfFame();renderCaptureTimeline();renderDataQuality();populateDexExtraFilters();renderDexHeatmap();renderYearAlbum();renderMilestones();renderNationalHomeBox();renderHuntFocus();renderBestRecords();renderRoadmap();renderCloudSettings();renderNationalHomeBox();initHomeSwipe();if(isMobileCounterDevice()&&!document.querySelector('#mobile-multi-hunt-list .mobile-hunt-card'))renderMobileCounter();}
 function shinyOdds(game,method,charm,hunt={}){
   const c=charm==='あり';
   if(!game)return {text:'—',note:'厳選ソフトを選択してください'};
@@ -3274,14 +3379,14 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 // ===== v56 automatic update / cache repair =====
 (function(){
-  const APP_VERSION='v108';
+  const APP_VERSION='v109';
   const UPDATE_KEY='shinyHomeReloadedForSW_'+APP_VERSION;
 
   async function registerFreshWorker(){
     if(!('serviceWorker' in navigator) || location.protocol==='file:') return;
     try{
       const reg = await navigator.serviceWorker.register(
-        './service-worker.js?v=108',
+        './service-worker.js?v=109',
         {updateViaCache:'none'}
       );
 
