@@ -582,7 +582,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
   .dh-hunt-count{font-size:38px}.dh-capture{min-height:58px;font-size:20px;box-shadow:0 10px 26px rgba(21,186,104,.17)}
 }
 
-/* ===== v113 mobile hunt + shiny get =====
+/* ===== v114 mobile hunt + shiny get =====
    Keep the left navigation visually fixed, but reserve real page space for it.
    This prevents the sidebar from covering/capturing clicks on Sync/Settings and other pages. */
 @media (min-width:1000px){
@@ -597,7 +597,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 }
 
 
-/* ===== v113 desktop navigation/layout fix ===== */
+/* ===== v114 desktop navigation/layout fix ===== */
 @media (min-width:1000px){
   .app-tabs{width:232px!important;left:14px!important;padding:12px 10px!important;overflow-x:hidden!important}
   .app-tab{font-size:13px!important;white-space:nowrap!important;word-break:keep-all!important;overflow:hidden!important;text-overflow:ellipsis!important;gap:8px!important}
@@ -608,7 +608,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
   #tab-sync .sync-grid{margin-top:0!important;padding-top:0!important}
   #tab-sync .extra-panel:first-child{margin-top:0!important}
 }
-/* ===== v113 mobile hunting UX ===== */
+/* ===== v114 mobile hunting UX ===== */
 .mobile-day-total{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:8px 0 12px;padding:12px 14px;border:1px solid #2a4964;border-radius:14px;background:linear-gradient(135deg,#0a2034,#0d1727);box-shadow:0 8px 28px rgba(0,0,0,.18)}
 .mobile-day-total span{font-size:12px;color:#91a9bc}.mobile-day-total strong{font-size:24px;color:#ffd86b;font-variant-numeric:tabular-nums}.mobile-day-total small{font-size:11px;color:#6f8ba1}
 @media(max-width:800px){
@@ -621,7 +621,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
   .mobile-hunt-card{padding:14px!important}
   .mobile-hunt-count{font-size:38px!important;color:#ffd86b}
 }
-/* ===== v113 shiny result modal ===== */
+/* ===== v114 shiny result modal ===== */
 .shiny-result-overlay{position:fixed;inset:0;z-index:20000;background:rgba(2,7,18,.86);backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center;padding:18px;overflow:auto}
 .shiny-result-overlay.show{display:flex}
 .shiny-result-card{position:relative;width:min(920px,96vw);border:1px solid rgba(141,193,255,.35);border-radius:28px;overflow:hidden;background:radial-gradient(circle at 50% 22%,rgba(85,110,255,.28),transparent 35%),linear-gradient(180deg,#0b1730,#08111f 62%,#0b1725);box-shadow:0 30px 100px rgba(0,0,0,.62),0 0 50px rgba(103,80,255,.16)}
@@ -635,6 +635,19 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 .shiny-result-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 22px 24px}.shiny-result-actions button{min-height:52px;border-radius:14px;border:1px solid #315370;background:#12263b;color:#fff;font-weight:900}.shiny-result-actions .shareimg{background:linear-gradient(135deg,#6c4df6,#a24be8);border-color:#b68cff}.shiny-result-actions .done{background:linear-gradient(135deg,#0d8f68,#0bb87f);border-color:#42d8a5}
 @media(max-width:800px){.shiny-result-overlay{padding:0;align-items:stretch}.shiny-result-card{width:100%;min-height:100vh;border-radius:0}.shiny-result-hero{padding-top:52px}.shiny-result-meta{grid-template-columns:1fr 1fr}.shiny-result-actions{position:sticky;bottom:0;background:linear-gradient(180deg,transparent,#08111f 18%);padding-top:18px}.shiny-result-title{font-size:42px}.shiny-result-pokemon{width:250px;height:250px}.shiny-result-name{font-size:26px}}
 
+
+/* ===== v114 desktop shell fix =====
+   Keep all tab pages inside the app flow and remove accidental viewport-sized gaps. */
+@media (min-width:1000px){
+  .app{padding-left:272px!important;padding-right:22px!important}
+  .topbar{margin-left:0!important;width:100%!important;padding:12px 0!important}
+  .app-tabs{left:16px!important;top:76px!important;width:232px!important}
+  .tab-page{margin-left:0!important;width:100%!important;min-height:0!important;padding-top:0!important}
+  .tab-page.active{display:block!important}
+  #tab-sync{margin:0!important;padding:0!important}
+  #tab-sync .sync-grid{margin:0!important;padding:0!important;align-items:start!important}
+  #tab-sync .extra-panel{margin-top:0!important}
+}
 </style>
 
 <style>
@@ -683,7 +696,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 
   <div id="mobile-active-hunt" class="mobile-active-hunt" style="display:none">
     <div class="mobile-day-total"><div><span>今日の厳選</span><br><small>厳選中すべての合計</small></div><strong id="mobile-today-total">0回</strong></div>
-    <div id="mobile-sync-status" class="mobile-hunt-meta" style="text-align:center;margin:4px 0 8px">☁️ 端末内に保存済み ・ v113</div>
+    <div id="mobile-sync-status" class="mobile-hunt-meta" style="text-align:center;margin:4px 0 8px">☁️ 端末内に保存済み ・ v114</div>
     <div id="mobile-multi-hunt-list" class="mobile-hunt-list"></div>
     <button id="mobile-multi-add" class="btn" type="button">＋ 厳選を追加</button>
   </div>
@@ -977,14 +990,14 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 <summary><img alt="" class="panel-poke-icon" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/385.png"/> 記念個体</summary>
 <div class="extra-head"><span class="section-count">1・10・50・100匹目、その後100匹ごとを自動抽出</span></div>
 <div class="milestone-grid" id="milestone-grid"></div>
-</details></section></div>
+</details></section>
 
 <section id="tab-sync" class="tab-page">
   <div class="sync-grid">
     <div class="extra-panel">
       <div class="extra-head">
         <div><h2 style="margin:0">☁️ Supabase 同期</h2>
-        <span class="section-count">PC・iPhoneで同じデータを共有 ・ build v113</span></div>
+        <span class="section-count">PC・iPhoneで同じデータを共有 ・ build v114</span></div>
       </div>
       <div class="sync-local-tools">
         <div class="sync-local-head"><div><strong>🛟 データ保護・バックアップ</strong><small>普段はここだけで管理します</small></div><button class="btn" onclick="undoLastChange()" type="button">↶ 1つ前に戻す</button></div>
@@ -1020,7 +1033,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
       <div id="cloud-status" class="home-help">未設定です。</div>
       <div id="auto-sync-status" class="home-help" style="margin-top:8px">同期：v95 外出向け省通信</div><div id="network-status" class="net-pill">● 通信状態を確認中</div>
       <div class="home-help" style="margin-top:8px">
-        v113ではスマホ起動時に安全クラウドバックアップからコレクションを一方向で取り込み、厳選カウンターは従来どおり専用同期します。10秒操作がなければクラウドへ保存し、他端末は最新時刻の値だけを取り込みます。所持状況・HOME BOXなどのフルデータは上のボタンで手動同期します。
+        v114ではスマホ起動時に安全クラウドバックアップからコレクションを一方向で取り込み、厳選カウンターは従来どおり専用同期します。10秒操作がなければクラウドへ保存し、他端末は最新時刻の値だけを取り込みます。所持状況・HOME BOXなどのフルデータは上のボタンで手動同期します。
       </div>
       <div class="home-help" style="margin-top:10px">初回は「設定保存」→「接続テスト」の順に確認してください。既存データがある場合、確認前にクラウドへ保存しないでください。</div>
     </div>
@@ -1028,7 +1041,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 </section>
 
 <script>
-const DATA_VERSION='full-2026-09-09-v108';
+const DATA_VERSION='full-2026-09-10-v114';
 const SPECIES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species.csv';
 const NAMES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
 const MAX_DEX=1025;
@@ -1525,8 +1538,8 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState===
 
 window.toggleTarget=id=>{
   targetState[id]=!targetState[id];
-  if(targetState[id]&&!huntState[id]) huntState[id]={count:0,start:new Date().toISOString().slice(0,10),method:'',ball:'',game:'',charm:'',outbreak:'0',sparkling:'0',daily:{}};
-  else if(targetState[id]&&!huntState[id].start) huntState[id].start=new Date().toISOString().slice(0,10);
+  if(targetState[id]&&!huntState[id]) huntState[id]={count:0,start:localDateKey(),method:'',ball:'',game:'',charm:'',outbreak:'0',sparkling:'0',daily:{}};
+  else if(targetState[id]&&!huntState[id].start) huntState[id].start=localDateKey();
   save(); if(typeof requestAutoSyncAfterDataChange==='function')requestAutoSyncAfterDataChange();
   // v99: update only the clicked card and hunt panel so the button always responds.
   refreshSingleCollectionCard(id,{openIndividuals:openIndividualPanels.has(id)});
@@ -1561,8 +1574,9 @@ function render(){
   updateStats(rows.length);
   renderCurrentHunt();
 }
-function huntData(id){if(!huntState[id])huntState[id]={count:0,start:new Date().toISOString().slice(0,10),method:'',ball:'',game:'',charm:'',outbreak:'0',sparkling:'0',daily:{}};if(!huntState[id].daily||typeof huntState[id].daily!=='object')huntState[id].daily={};return huntState[id]}
-function huntTodayKey(){return new Date().toISOString().slice(0,10)}
+function huntData(id){if(!huntState[id])huntState[id]={count:0,start:localDateKey(),method:'',ball:'',game:'',charm:'',outbreak:'0',sparkling:'0',daily:{}};if(!huntState[id].daily||typeof huntState[id].daily!=='object')huntState[id].daily={};return huntState[id]}
+function localDateKey(d=new Date()){const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');return `${y}-${m}-${day}`}
+function huntTodayKey(){return localDateKey()}
 function todayHuntCount(id){const x=huntData(id);return Math.max(0,Number(x.daily?.[huntTodayKey()]||0)||0)}
 function addTodayHunt(id,delta){const x=huntData(id),k=huntTodayKey();x.daily=x.daily||{};x.daily[k]=Math.max(0,(Number(x.daily[k])||0)+delta)}
 function huntElapsedText(start){if(!start)return '開始日未設定';const a=new Date(start+'T00:00:00'),b=new Date();b.setHours(0,0,0,0);if(Number.isNaN(a.getTime()))return '開始日未設定';return `開始から${Math.max(1,Math.floor((b-a)/86400000)+1)}日目`}
@@ -1580,7 +1594,7 @@ let lastShinyCapture=null;
 window.captureHunt=id=>{
   if(!individualState[id])individualState[id]=[];
   const p=data.find(p=>p.id===id),x=huntData(id),snap={...x,daily:{...(x.daily||{})}},recordMsg=captureRecordMessage(x.count);
-  const ind=newIndividual({date:new Date().toISOString().slice(0,10),ball:x.ball||'',huntCount:Number(x.count)||0,huntStart:x.start||'',huntMethod:x.method||'',game:x.game||'',huntCharm:x.charm||'',huntTargetId:id,huntTargetName:(p?.name||''),huntJournal:Array.isArray(x.journal)?x.journal:[]});
+  const ind=newIndividual({date:localDateKey(),ball:x.ball||'',huntCount:Number(x.count)||0,huntStart:x.start||'',huntMethod:x.method||'',game:x.game||'',huntCharm:x.charm||'',huntTargetId:id,huntTargetName:(p?.name||''),huntJournal:Array.isArray(x.journal)?x.journal:[]});
   individualState[id].push(ind);appendCaptureEvent(id,id,ind);syncOwned(id);targetState[id]=false;save();requestAutoSyncAfterDataChange();if(typeof syncHuntSessionState==='function')syncHuntSessionState();
   lastShinyCapture={p,ind,hunt:snap,odds:shinyOdds(snap.game||'',snap.method||'',snap.charm||'',snap)};
   render();showShinyEffect(p);showShinyGetResult(p,ind,snap);showToast(`${p?.name||'ポケモン'}を捕獲個体として登録しました.${recordMsg?` ${recordMsg}`:''}`);
@@ -2531,7 +2545,7 @@ function showShinyGetResult(p,ind,hunt){
   if(!p||!ind)return;lastShinyCapture={p,ind,hunt:{...(hunt||{})},odds:shinyOdds(hunt?.game||'',hunt?.method||'',hunt?.charm||'',hunt||{})};
   const w=el('shiny-result-overlay'),img=el('shiny-result-img'),name=el('shiny-result-name'),meta=el('shiny-result-meta');if(!w||!img||!name||!meta)return;
   img.src=spriteURL(p);img.onerror=()=>img.src=baseSpriteURL(p);name.textContent=`No.${String(p.no).padStart(4,'0')} ${p.name}`;
-  const odds=lastShinyCapture.odds?.text||'—',count=Math.max(0,Number(ind.huntCount||hunt?.count)||0),date=ind.date||new Date().toISOString().slice(0,10);
+  const odds=lastShinyCapture.odds?.text||'—',count=Math.max(0,Number(ind.huntCount||hunt?.count)||0),date=ind.date||localDateKey();
   meta.innerHTML=`<div><span>ゲーム</span><strong>${esc(ind.game||'未設定')}</strong></div><div><span>厳選方法</span><strong>${esc(ind.huntMethod||'未設定')}</strong></div><div><span>${esc(counterLabel(ind.huntMethod||''))}</span><strong>${count}回</strong></div><div><span>色違い確率</span><strong>${esc(odds)}</strong></div><div><span>捕獲日</span><strong>${esc(date)}</strong></div><div><span>ボール</span><strong>${esc(BALLS.find(x=>x[0]===ind.ball)?.[1]||ind.ball||'未設定')}</strong></div>`;
   w.classList.add('show');
 }
@@ -3519,7 +3533,7 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 // ===== v56 automatic update / cache repair =====
 (function(){
-  const APP_VERSION='v113';
+  const APP_VERSION='v114';
   const UPDATE_KEY='shinyHomeReloadedForSW_'+APP_VERSION;
 
   async function registerFreshWorker(){
