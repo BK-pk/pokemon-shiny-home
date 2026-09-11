@@ -1028,7 +1028,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
     <div class="extra-panel">
       <div class="extra-head">
         <div><h2 style="margin:0">☁️ Supabase 同期</h2>
-        <span class="section-count">PC・iPhone・iPadで同じ厳選データを共有 ・ build v118</span></div>
+        <span class="section-count">PC・iPhone・iPadで同じ厳選データを共有 ・ build v119</span></div>
       </div>
       <div class="sync-local-tools">
         <div class="sync-local-head"><div><strong>🛟 データ保護・バックアップ</strong><small>普段はここだけで管理します</small></div><button class="btn" onclick="undoLastChange()" type="button">↶ 1つ前に戻す</button></div>
@@ -1038,6 +1038,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
           <button class="btn" id="exportImagesBtn">画像だけ保存</button>
           <button class="btn" id="importImagesBtn">画像だけ読込</button>
           <button class="btn" id="rescuePreUpdateImagesBtn" type="button" onclick="rescuePreUpdateScreenshots()">🖼️ 更新前画像だけ救出</button>
+          <button class="btn" id="diagnoseImagesBtn" type="button" onclick="diagnoseScreenshotStorage()">🔎 画像データを診断</button>
           <button class="btn" id="restorePreUpdateBtn" type="button" onclick="restorePreUpdateBackup()">🛟 更新前に戻す</button>
           <button class="btn" id="backupHistoryBtn" type="button" onclick="openBackupHistory()">🗂 履歴</button>
           <button class="btn" onclick="showBackupInfo()" type="button">自動バックアップ</button>
@@ -1073,7 +1074,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 </section>
 
 <script>
-const DATA_VERSION='full-2026-09-11-v118';
+const DATA_VERSION='full-2026-09-11-v119';
 const SPECIES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species.csv';
 const NAMES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
 const MAX_DEX=1025;
@@ -2603,6 +2604,98 @@ async function rescuePreUpdateScreenshots(){
     alert('画像の救出中にエラーが発生しました。現在のデータは変更していません。 '+(e?.message||''));
   }finally{if(btn)btn.disabled=false}
 }
+
+// v119: READ-ONLY screenshot storage diagnosis. This function never restores, deletes or writes collection data.
+function countDataImagesDeep(value, seen=new Set()){
+  let n=0;
+  if(typeof value==='string'){
+    if(value.startsWith('data:image/')) return 1;
+    if((value.startsWith('{')||value.startsWith('[')) && value.length<80*1024*1024){try{return countDataImagesDeep(JSON.parse(value),seen)}catch(_){} }
+    return 0;
+  }
+  if(!value||typeof value!=='object'||seen.has(value))return 0;seen.add(value);
+  if(Array.isArray(value)){for(const v of value)n+=countDataImagesDeep(v,seen)}else{for(const v of Object.values(value))n+=countDataImagesDeep(v,seen)}
+  return n;
+}
+function screenshotObjectCount(obj){
+  if(!obj||typeof obj!=='object')return 0;
+  return Object.values(obj).filter(v=>typeof v==='string'&&v.startsWith('data:image/')).length;
+}
+function parseMaybeJSON(v){try{return typeof v==='string'?JSON.parse(v):v}catch(_){return null}}
+function diagnosticCloudSettings(){
+  const fallback={url:'https://litkisamojglstbjwloo.supabase.co',key:'sb_publishable_pc-8E8ETM6yZ3OcB1cNkjA_OzVjc-Rh',userId:'pokemon-shiny-home'};
+  let a={};try{a=JSON.parse(localStorage.getItem('shinyHomeCloudSettings_v2')||localStorage.getItem('shinyHomeCloudSettings_v1')||'{}')||{}}catch(_){}
+  return {...fallback,...a,url:String(a.url||fallback.url).replace(/\/$/,'')};
+}
+async function diagnosticIDBBackups(){
+  const out=[];
+  try{
+    const db=await openBackupDB();
+    try{
+      const rows=await new Promise((resolve,reject)=>{const tx=db.transaction(PREUPDATE_IDB_STORE,'readonly'),r=tx.objectStore(PREUPDATE_IDB_STORE).getAll();r.onsuccess=()=>resolve(r.result||[]);r.onerror=()=>reject(r.error)});
+      rows.sort((a,b)=>String(b.createdAt||'').localeCompare(String(a.createdAt||'')));
+      for(const b of rows){
+        const raw=b?.values?.shinyHomeIndividualScreenshots_v1;
+        const shots=parseMaybeJSON(raw)||{};
+        out.push({where:`IndexedDB ${b.sourceVersion||'?'}→${b.targetVersion||'?'} ${b.createdAt?new Date(b.createdAt).toLocaleString('ja-JP'):''}`,count:screenshotObjectCount(shots),deep:countDataImagesDeep(b)});
+      }
+    }finally{db.close()}
+  }catch(e){out.push({where:'IndexedDB',error:e?.message||String(e)})}
+  return out;
+}
+async function diagnosticSupabase(){
+  const out=[];const c=diagnosticCloudSettings();
+  if(!navigator.onLine){out.push({where:'Supabase',error:'オフラインのため未確認'});return out}
+  if(!c.url||!c.key||!c.userId){out.push({where:'Supabase',error:'設定なし'});return out}
+  for(const [label,id] of [['通常同期',c.userId],['安全バックアップ',c.userId+'::auto-backup'],['1世代前安全バックアップ',c.userId+'::auto-backup-prev']]){
+    try{
+      const r=await fetch(c.url+'/rest/v1/shiny_home_sync?user_id=eq.'+encodeURIComponent(id)+'&select=payload,updated_at',{headers:{apikey:c.key,Authorization:'Bearer '+c.key},cache:'no-store'});
+      if(!r.ok)throw Error('HTTP '+r.status);
+      const rows=await r.json();if(!rows.length){out.push({where:'Supabase '+label,count:0,note:'行なし'});continue}
+      const payload=rows[0].payload||{};const snap=payload.data||payload;
+      const shots=snap.individualScreenshots||snap.screenshots||parseMaybeJSON(snap.shinyHomeIndividualScreenshots_v1)||{};
+      out.push({where:'Supabase '+label,count:screenshotObjectCount(shots),deep:countDataImagesDeep(payload),updated:rows[0].updated_at?new Date(rows[0].updated_at).toLocaleString('ja-JP'):''});
+    }catch(e){out.push({where:'Supabase '+label,error:e?.message||String(e)})}
+  }
+  return out;
+}
+async function diagnoseScreenshotStorage(){
+  const btn=document.getElementById('diagnoseImagesBtn');if(btn)btn.disabled=true;
+  try{
+    const rows=[];
+    const cur=parseMaybeJSON(localStorage.getItem('shinyHomeIndividualScreenshots_v1'))||{};
+    rows.push({where:'現在の画像保存領域',count:screenshotObjectCount(cur),deep:countDataImagesDeep(cur)});
+    const auto=parseMaybeJSON(localStorage.getItem('shinyHomeAutoBackups_v1'))||[];
+    rows.push({where:'ブラウザ内 自動バックアップ',count:null,deep:countDataImagesDeep(auto),note:`${Array.isArray(auto)?auto.length:0}件`});
+    const legacy=parseMaybeJSON(localStorage.getItem(PREUPDATE_BACKUP_KEY));
+    if(legacy)rows.push({where:'旧 更新前バックアップ',count:screenshotObjectCount(parseMaybeJSON(legacy?.values?.shinyHomeIndividualScreenshots_v1)||{}),deep:countDataImagesDeep(legacy)});
+    for(const r of await diagnosticIDBBackups())rows.push(r);
+    for(const r of await diagnosticSupabase())rows.push(r);
+    // Also scan every localStorage key read-only, to catch an older/renamed image store.
+    const known=new Set(['shinyHomeIndividualScreenshots_v1','shinyHomeAutoBackups_v1',PREUPDATE_BACKUP_KEY]);
+    for(let i=0;i<localStorage.length;i++){
+      const k=localStorage.key(i);if(!k||known.has(k))continue;
+      const v=localStorage.getItem(k),n=countDataImagesDeep(v);
+      if(n)rows.push({where:'localStorage: '+k,count:null,deep:n,note:'別キー内で画像を検出'});
+    }
+    const lines=['【画像データ診断 v119】','※ 読み取り専用。データの復元・削除・上書きはしていません。',''];
+    for(const r of rows){
+      if(r.error){lines.push(`⚠ ${r.where}: ${r.error}`);continue}
+      const exact=r.count==null?'':`捕獲スクショ ${r.count}枚`;
+      const deep=(r.deep!=null&&r.deep!==r.count)?`${exact?' / ':''}画像データ検出 ${r.deep}件`:'';
+      const extra=[r.updated,r.note].filter(Boolean).join(' / ');
+      lines.push(`${(r.count||r.deep)?'✅':'—'} ${r.where}: ${exact}${deep}${extra?' / '+extra:''}`);
+    }
+    lines.push('','この結果をスクリーンショットで送ってください。画像が残っている保存先だけを対象に復旧します。');
+    const text=lines.join('\n');
+    let modal=document.getElementById('imageDiagnosticModal');
+    if(!modal){modal=document.createElement('div');modal.id='imageDiagnosticModal';modal.style.cssText='position:fixed;inset:0;z-index:100000;background:rgba(0,0,0,.78);padding:24px;overflow:auto';modal.innerHTML='<div style="max-width:850px;margin:4vh auto;background:#091522;border:1px solid #284967;border-radius:18px;padding:20px"><h2 style="margin-top:0">🔎 画像データ診断</h2><pre id="imageDiagnosticText" style="white-space:pre-wrap;word-break:break-word;background:#06101a;padding:16px;border-radius:12px;line-height:1.7;max-height:62vh;overflow:auto"></pre><div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px"><button class="btn" id="copyImageDiagnostic">結果をコピー</button><button class="btn" onclick="document.getElementById(\'imageDiagnosticModal\').style.display=\'none\'">閉じる</button></div></div>';document.body.appendChild(modal)}
+    document.getElementById('imageDiagnosticText').textContent=text;modal.style.display='block';
+    document.getElementById('copyImageDiagnostic').onclick=async()=>{try{await navigator.clipboard.writeText(text);showToast('診断結果をコピーしました。')}catch(_){alert(text)}};
+  }catch(e){console.error(e);alert('診断中にエラーが発生しました。データは変更していません。 '+(e?.message||''))}
+  finally{if(btn)btn.disabled=false}
+}
+
 function restoreRawBackup(b){
   const managed=['shinyHomeState_v1','shinyHomeBoxes_v1','shinyHomeDates_v1','shinyHomeGames_v1','shinyHomeIndividuals_v1','shinyHomeTargets_v1','shinyHomeHunts_v1','shinyHomeMonthImages_v1','shinyHomeIndividualScreenshots_v1','shinyHomeNationalBox_v1','shinyHomeOrder_v1','shinyHomeActiveTab_v1','shinyHomeMobileFocusedHunt_v1'];
   for(const key of managed){if(Object.prototype.hasOwnProperty.call(b.values||{},key))localStorage.setItem(key,b.values[key]);else if(!b.partial)localStorage.removeItem(key)}
@@ -3748,14 +3841,14 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 // ===== v56 automatic update / cache repair =====
 (function(){
-  const APP_VERSION='v118';
+  const APP_VERSION='v119';
   const UPDATE_KEY='shinyHomeReloadedForSW_'+APP_VERSION;
 
   async function registerFreshWorker(){
     if(!('serviceWorker' in navigator) || location.protocol==='file:') return;
     try{
       const reg = await navigator.serviceWorker.register(
-        './service-worker.js?v=118',
+        './service-worker.js?v=119',
         {updateViaCache:'none'}
       );
 
