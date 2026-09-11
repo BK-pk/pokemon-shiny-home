@@ -727,7 +727,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 
   <div id="mobile-active-hunt" class="mobile-active-hunt" style="display:none">
     <div class="mobile-day-total"><div><span>今日の厳選</span><br><small>厳選中すべての合計</small></div><strong id="mobile-today-total">0回</strong></div>
-    <div id="mobile-sync-status" class="mobile-hunt-meta" style="text-align:center;margin:4px 0 8px">☁️ 端末内に保存済み ・ v117</div>
+    <div id="mobile-sync-status" class="mobile-hunt-meta" style="text-align:center;margin:4px 0 8px">☁️ 端末内に保存済み ・ v118</div>
     <div id="mobile-multi-hunt-list" class="mobile-hunt-list"></div>
     <button id="mobile-multi-add" class="btn" type="button">＋ 厳選を追加</button>
   </div>
@@ -1028,7 +1028,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
     <div class="extra-panel">
       <div class="extra-head">
         <div><h2 style="margin:0">☁️ Supabase 同期</h2>
-        <span class="section-count">PC・iPhone・iPadで同じ厳選データを共有 ・ build v117</span></div>
+        <span class="section-count">PC・iPhone・iPadで同じ厳選データを共有 ・ build v118</span></div>
       </div>
       <div class="sync-local-tools">
         <div class="sync-local-head"><div><strong>🛟 データ保護・バックアップ</strong><small>普段はここだけで管理します</small></div><button class="btn" onclick="undoLastChange()" type="button">↶ 1つ前に戻す</button></div>
@@ -1037,6 +1037,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
           <button class="btn" id="importBtn">読込</button>
           <button class="btn" id="exportImagesBtn">画像だけ保存</button>
           <button class="btn" id="importImagesBtn">画像だけ読込</button>
+          <button class="btn" id="rescuePreUpdateImagesBtn" type="button" onclick="rescuePreUpdateScreenshots()">🖼️ 更新前画像だけ救出</button>
           <button class="btn" id="restorePreUpdateBtn" type="button" onclick="restorePreUpdateBackup()">🛟 更新前に戻す</button>
           <button class="btn" id="backupHistoryBtn" type="button" onclick="openBackupHistory()">🗂 履歴</button>
           <button class="btn" onclick="showBackupInfo()" type="button">自動バックアップ</button>
@@ -1064,7 +1065,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
       <div id="cloud-status" class="home-help">未設定です。</div>
       <div id="auto-sync-status" class="home-help" style="margin-top:8px">同期：v95 外出向け省通信</div><div id="network-status" class="net-pill">● 通信状態を確認中</div>
       <div class="home-help" style="margin-top:8px">
-        v117では厳選方法マスター・記録方式の自動切替・タイマー・セッション記録を追加しました。スマホ起動時は安全クラウドバックアップからコレクションを一方向で取り込み、厳選データは専用同期します。10秒操作がなければクラウドへ保存し、他端末は最新時刻の値だけを取り込みます。所持状況・HOME BOXなどのフルデータは上のボタンで手動同期します。
+        v118では更新前バックアップから「捕獲スクショだけ」を安全に救出できる機能を追加しました。厳選方法マスター・記録方式の自動切替・タイマー・セッション記録はそのまま利用できます。スマホ起動時は安全クラウドバックアップからコレクションを一方向で取り込み、厳選データは専用同期します。10秒操作がなければクラウドへ保存し、他端末は最新時刻の値だけを取り込みます。所持状況・HOME BOXなどのフルデータは上のボタンで手動同期します。
       </div>
       <div class="home-help" style="margin-top:10px">初回は「設定保存」→「接続テスト」の順に確認してください。既存データがある場合、確認前にクラウドへ保存しないでください。</div>
     </div>
@@ -1072,7 +1073,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 </section>
 
 <script>
-const DATA_VERSION='full-2026-09-11-v117';
+const DATA_VERSION='full-2026-09-11-v118';
 const SPECIES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species.csv';
 const NAMES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
 const MAX_DEX=1025;
@@ -1748,7 +1749,14 @@ function setIndividualScreenshot(id,uid,file){
   if(!file.type.startsWith('image/')){showToast('画像ファイルを選択してください。');return}
   const rd=new FileReader();
   rd.onload=()=>{
-    individualScreenshots[screenshotKey(id,uid)]=rd.result;
+    const key=screenshotKey(id,uid),before=individualScreenshots[key];
+    individualScreenshots[key]=rd.result;
+    const ok=safeLocalSet('shinyHomeIndividualScreenshots_v1',JSON.stringify(individualScreenshots));
+    if(!ok){
+      if(before)individualScreenshots[key]=before;else delete individualScreenshots[key];
+      alert('画像を保存できませんでした。端末の保存容量が不足している可能性があります。既存データは変更していません。');
+      return;
+    }
     save();
     render();
     renderExtraPanels();
@@ -2543,6 +2551,57 @@ async function resolveBackupEntry(meta){
   if(meta.values)return meta;
   if(meta.storage==='indexeddb'&&meta.id){try{return await idbGetBackup(meta.id)}catch(e){console.warn('IDB backup read failed',e);return null}}
   return null;
+}
+// v118: restore only missing capture screenshots from pre-update backups.
+// Current collection / hunt / session data is never replaced by this operation.
+async function rescuePreUpdateScreenshots(){
+  const btn=document.getElementById('rescuePreUpdateImagesBtn');
+  if(btn)btn.disabled=true;
+  try{
+    const current=individualScreenshots||{};
+    const candidates=[];
+    const legacy=getPreUpdateBackup();
+    if(legacy&&legacy.values)candidates.push(legacy);
+    for(const meta of getPreUpdateHistory()){
+      const b=await resolveBackupEntry(meta);
+      if(b&&b.values)candidates.push(b);
+    }
+    // Newest backup first. If the same screenshot exists in multiple backups, keep the newest copy.
+    candidates.sort((a,b)=>String(b.createdAt||'').localeCompare(String(a.createdAt||'')));
+    const recovered={};
+    const sources=[];
+    for(const b of candidates){
+      const raw=b.values?.shinyHomeIndividualScreenshots_v1;
+      if(!raw)continue;
+      let shots={};try{shots=JSON.parse(raw)||{}}catch(_){continue}
+      const valid=Object.entries(shots).filter(([k,v])=>k&&typeof v==='string'&&v.startsWith('data:image/'));
+      if(valid.length)sources.push(`${b.sourceVersion||'更新前'} / ${b.createdAt?new Date(b.createdAt).toLocaleString('ja-JP'):'日時不明'} / ${valid.length}枚`);
+      for(const [k,v] of valid){
+        if(current[k]||recovered[k])continue;
+        recovered[k]=v;
+      }
+    }
+    const keys=Object.keys(recovered);
+    if(!keys.length){
+      alert(sources.length?'更新前バックアップ内に画像は見つかりましたが、現在の画像と同じものだけでした。':'更新前バックアップから捕獲スクショを見つけられませんでした。');
+      return;
+    }
+    const msg=`更新前バックアップから ${keys.length}枚 の捕獲スクショを救出できます。\n\n現在のコレクション・厳選回数・セッション情報は変更しません。既にある画像も上書きしません。\n\n救出しますか？`;
+    if(!confirm(msg))return;
+    Object.assign(current,recovered);
+    const ok=safeLocalSet('shinyHomeIndividualScreenshots_v1',JSON.stringify(current));
+    if(!ok){
+      for(const k of keys)delete current[k];
+      alert('画像の保存容量が足りないため、救出を中止しました。現在のデータは変更していません。画像だけバックアップを書き出して整理してから再度お試しください。');
+      return;
+    }
+    render();renderExtraPanels();
+    showToast(`捕獲スクショを ${keys.length}枚 救出しました。`);
+    alert(`捕獲スクショを ${keys.length}枚 救出しました。\n現在の色違い・厳選データはそのままです。`);
+  }catch(e){
+    console.error(e);
+    alert('画像の救出中にエラーが発生しました。現在のデータは変更していません。 '+(e?.message||''));
+  }finally{if(btn)btn.disabled=false}
 }
 function restoreRawBackup(b){
   const managed=['shinyHomeState_v1','shinyHomeBoxes_v1','shinyHomeDates_v1','shinyHomeGames_v1','shinyHomeIndividuals_v1','shinyHomeTargets_v1','shinyHomeHunts_v1','shinyHomeMonthImages_v1','shinyHomeIndividualScreenshots_v1','shinyHomeNationalBox_v1','shinyHomeOrder_v1','shinyHomeActiveTab_v1','shinyHomeMobileFocusedHunt_v1'];
@@ -3689,14 +3748,14 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 // ===== v56 automatic update / cache repair =====
 (function(){
-  const APP_VERSION='v117';
+  const APP_VERSION='v118';
   const UPDATE_KEY='shinyHomeReloadedForSW_'+APP_VERSION;
 
   async function registerFreshWorker(){
     if(!('serviceWorker' in navigator) || location.protocol==='file:') return;
     try{
       const reg = await navigator.serviceWorker.register(
-        './service-worker.js?v=117',
+        './service-worker.js?v=118',
         {updateViaCache:'none'}
       );
 
