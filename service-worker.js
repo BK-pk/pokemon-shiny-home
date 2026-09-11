@@ -1,4 +1,4 @@
-const CACHE_NAME = 'shiny-home-v116';
+const CACHE_NAME = 'shiny-home-v117';
 const CORE = [
   './',
   './index.html',
