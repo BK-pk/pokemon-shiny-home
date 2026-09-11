@@ -1028,7 +1028,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
     <div class="extra-panel">
       <div class="extra-head">
         <div><h2 style="margin:0">☁️ Supabase 同期</h2>
-        <span class="section-count">PC・iPhone・iPadで同じ厳選データを共有 ・ build v119</span></div>
+        <span class="section-count">PC・iPhone・iPadで同じ厳選データを共有 ・ build v120</span></div>
       </div>
       <div class="sync-local-tools">
         <div class="sync-local-head"><div><strong>🛟 データ保護・バックアップ</strong><small>普段はここだけで管理します</small></div><button class="btn" onclick="undoLastChange()" type="button">↶ 1つ前に戻す</button></div>
@@ -1066,7 +1066,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
       <div id="cloud-status" class="home-help">未設定です。</div>
       <div id="auto-sync-status" class="home-help" style="margin-top:8px">同期：v95 外出向け省通信</div><div id="network-status" class="net-pill">● 通信状態を確認中</div>
       <div class="home-help" style="margin-top:8px">
-        v118では更新前バックアップから「捕獲スクショだけ」を安全に救出できる機能を追加しました。厳選方法マスター・記録方式の自動切替・タイマー・セッション記録はそのまま利用できます。スマホ起動時は安全クラウドバックアップからコレクションを一方向で取り込み、厳選データは専用同期します。10秒操作がなければクラウドへ保存し、他端末は最新時刻の値だけを取り込みます。所持状況・HOME BOXなどのフルデータは上のボタンで手動同期します。
+        v120では捕獲スクショの保存先をlocalStorageからIndexedDBへ分離しました。画像追加時にlocalStorage容量を圧迫しません。厳選方法マスター・記録方式の自動切替・タイマー・セッション記録はそのまま利用できます。スマホ起動時は安全クラウドバックアップからコレクションを一方向で取り込み、厳選データは専用同期します。10秒操作がなければクラウドへ保存し、他端末は最新時刻の値だけを取り込みます。所持状況・HOME BOXなどのフルデータは上のボタンで手動同期します。
       </div>
       <div class="home-help" style="margin-top:10px">初回は「設定保存」→「接続テスト」の順に確認してください。既存データがある場合、確認前にクラウドへ保存しないでください。</div>
     </div>
@@ -1074,7 +1074,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 </section>
 
 <script>
-const DATA_VERSION='full-2026-09-11-v119';
+const DATA_VERSION='full-2026-09-11-v120';
 const SPECIES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species.csv';
 const NAMES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
 const MAX_DEX=1025;
@@ -1089,7 +1089,56 @@ const targetState=JSON.parse(localStorage.getItem('shinyHomeTargets_v1')||'{}');
 const huntState=JSON.parse(localStorage.getItem('shinyHomeHunts_v1')||'{}');
 const monthImages=JSON.parse(localStorage.getItem('shinyHomeMonthImages_v1')||'{}');
 const individualScreenshots=JSON.parse(localStorage.getItem('shinyHomeIndividualScreenshots_v1')||'{}');
+const SCREENSHOT_DB_NAME='shinyHomeImages_v1', SCREENSHOT_STORE='screenshots';
+let screenshotDBReady=false;
 const el=id=>document.getElementById(id);
+
+function openScreenshotDB(){
+  return new Promise((resolve,reject)=>{
+    const req=indexedDB.open(SCREENSHOT_DB_NAME,1);
+    req.onupgradeneeded=()=>{const db=req.result;if(!db.objectStoreNames.contains(SCREENSHOT_STORE))db.createObjectStore(SCREENSHOT_STORE,{keyPath:'key'})};
+    req.onsuccess=()=>resolve(req.result);
+    req.onerror=()=>reject(req.error||new Error('画像保存領域を開けませんでした'));
+  });
+}
+async function screenshotDBPut(key,dataUrl){
+  const db=await openScreenshotDB();
+  try{await new Promise((resolve,reject)=>{const tx=db.transaction(SCREENSHOT_STORE,'readwrite');tx.objectStore(SCREENSHOT_STORE).put({key,dataUrl,updatedAt:new Date().toISOString()});tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error||new Error('画像保存に失敗しました'))})}finally{db.close()}
+}
+async function screenshotDBDelete(key){
+  const db=await openScreenshotDB();
+  try{await new Promise((resolve,reject)=>{const tx=db.transaction(SCREENSHOT_STORE,'readwrite');tx.objectStore(SCREENSHOT_STORE).delete(key);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error||new Error('画像削除に失敗しました'))})}finally{db.close()}
+}
+async function screenshotDBLoadAll(){
+  const db=await openScreenshotDB();
+  try{return await new Promise((resolve,reject)=>{const tx=db.transaction(SCREENSHOT_STORE,'readonly');const r=tx.objectStore(SCREENSHOT_STORE).getAll();r.onsuccess=()=>resolve(r.result||[]);r.onerror=()=>reject(r.error)})}finally{db.close()}
+}
+async function initScreenshotStore(){
+  let legacy={};
+  try{legacy=JSON.parse(localStorage.getItem('shinyHomeIndividualScreenshots_v1')||'{}')||{}}catch(_){legacy={}}
+  try{
+    const existing=await screenshotDBLoadAll();
+    const existingKeys=new Set(existing.map(x=>x&&x.key).filter(Boolean));
+    for(const [key,dataUrl] of Object.entries(legacy)){
+      if(!dataUrl||existingKeys.has(key))continue;
+      await screenshotDBPut(key,dataUrl);
+    }
+    const rows=await screenshotDBLoadAll();
+    Object.keys(individualScreenshots).forEach(k=>delete individualScreenshots[k]);
+    for(const row of rows){if(row?.key&&row?.dataUrl)individualScreenshots[row.key]=row.dataUrl}
+    if(Object.keys(legacy).length){
+      const allMigrated=Object.keys(legacy).every(k=>!!individualScreenshots[k]);
+      if(allMigrated){try{localStorage.removeItem('shinyHomeIndividualScreenshots_v1')}catch(_){}}
+    }
+    screenshotDBReady=true;
+    return rows.length;
+  }catch(e){
+    console.error('IndexedDB screenshot init failed',e);
+    screenshotDBReady=false;
+    return Object.keys(individualScreenshots).length;
+  }
+}
+
 
 const BALLS=[['','ボール未設定'],['poke-ball','モンスターボール'],['great-ball','スーパーボール'],['ultra-ball','ハイパーボール'],['master-ball','マスターボール'],['premier-ball','プレミアボール'],['luxury-ball','ゴージャスボール'],['heal-ball','ヒールボール'],['net-ball','ネットボール'],['nest-ball','ネストボール'],['dive-ball','ダイブボール'],['dusk-ball','ダークボール'],['quick-ball','クイックボール'],['timer-ball','タイマーボール'],['repeat-ball','リピートボール'],['level-ball','レベルボール'],['lure-ball','ルアーボール'],['moon-ball','ムーンボール'],['friend-ball','フレンドボール'],['love-ball','ラブラブボール'],['heavy-ball','ヘビーボール'],['fast-ball','スピードボール'],['dream-ball','ドリームボール'],['beast-ball','ウルトラボール'],['safari-ball','サファリボール'],['sport-ball','コンペボール'],['park-ball','パークボール'],['cherish-ball','プレシャスボール'],['strange-ball','ストレンジボール'],['la-poke-ball','モンスターボール（ヒスイ）'],['la-great-ball','スーパーボール（ヒスイ）'],['la-ultra-ball','ハイパーボール（ヒスイ）'],['feather-ball','フェザーボール'],['wing-ball','ウイングボール'],['jet-ball','ジェットボール'],['la-heavy-ball','ヘビーボール（ヒスイ）'],['leaden-ball','メガトンボール'],['gigaton-ball','ギガトンボール'],['origin-ball','オリジンボール']];
 const BALL_NAME=Object.fromEntries(BALLS);
@@ -1315,7 +1364,7 @@ async function loadSpecies(){
 }
 let backupRestoring=false;
 function currentDataSnapshot(){
-  return {state,boxState,dateState,gameState,individualState,targetState,huntState,monthImages,individualScreenshots};
+  return {state,boxState,dateState,gameState,individualState,targetState,huntState,monthImages};
 }
 function safeLocalSet(key,value){
   try{localStorage.setItem(key,value);return true}
@@ -1342,7 +1391,7 @@ function save(){
   safeLocalSet('shinyHomeTargets_v1',JSON.stringify(targetState));
   safeLocalSet('shinyHomeHunts_v1',JSON.stringify(huntState));
   safeLocalSet('shinyHomeMonthImages_v1',JSON.stringify(monthImages));
-  safeLocalSet('shinyHomeIndividualScreenshots_v1',JSON.stringify(individualScreenshots));
+  // v120: 捕獲スクショは IndexedDB 専用。localStorage へは書き戻さない。
 }
 function newIndividual(seed={}){return {uid:seed.uid||Date.now().toString(36)+Math.random().toString(36).slice(2,7),date:seed.date||'',game:seed.game||'',box:seed.box||'',nickname:seed.nickname||'',source:seed.source||'',ball:seed.ball||'',memo:seed.memo||'',favorite:!!seed.favorite,huntCount:Number(seed.huntCount)||0,huntStart:seed.huntStart||'',huntMethod:seed.huntMethod||'',huntCharm:seed.huntCharm||'',huntTargetId:seed.huntTargetId||'',huntTargetName:seed.huntTargetName||'',huntJournal:Array.isArray(seed.huntJournal)?seed.huntJournal:[],huntSessions:Array.isArray(seed.huntSessions)?seed.huntSessions:[],huntElapsedMs:Number(seed.huntElapsedMs)||0,huntRecordMode:seed.huntRecordMode||'',nature:seed.nature||'',ability:seed.ability||'',teraType:seed.teraType||'',ribbons:seed.ribbons||'',otName:seed.otName||'',trainerId:seed.trainerId||'',catchLocation:seed.catchLocation||'',catchLevel:seed.catchLevel==null?'':seed.catchLevel,isAlpha:!!seed.isAlpha,size:seed.size||''};}
 function ensureLegacyIndividuals(){for(const id of Object.keys(state)){if(state[id]&&(!Array.isArray(individualState[id])||individualState[id].length===0)){individualState[id]=[newIndividual({date:dateState[id]||'',game:gameState[id]||'',box:boxState[id]||''})];}}}
@@ -1745,31 +1794,32 @@ function setManualHuntCount(id,uid,val){
 }
 function screenshotKey(id,uid){return `${id}::${uid}`}
 function individualScreenshot(id,uid){return individualScreenshots[screenshotKey(id,uid)]||''}
-function setIndividualScreenshot(id,uid,file){
+async function setIndividualScreenshot(id,uid,file){
   if(!file)return;
   if(!file.type.startsWith('image/')){showToast('画像ファイルを選択してください。');return}
-  const rd=new FileReader();
-  rd.onload=()=>{
-    const key=screenshotKey(id,uid),before=individualScreenshots[key];
-    individualScreenshots[key]=rd.result;
-    const ok=safeLocalSet('shinyHomeIndividualScreenshots_v1',JSON.stringify(individualScreenshots));
-    if(!ok){
-      if(before)individualScreenshots[key]=before;else delete individualScreenshots[key];
-      alert('画像を保存できませんでした。端末の保存容量が不足している可能性があります。既存データは変更していません。');
-      return;
-    }
-    save();
-    render();
-    renderExtraPanels();
-    showToast('この個体の画像を登録しました。');
-  };
-  rd.readAsDataURL(file);
+  const key=screenshotKey(id,uid);
+  try{
+    const dataUrl=await new Promise((resolve,reject)=>{const rd=new FileReader();rd.onload=()=>resolve(rd.result);rd.onerror=()=>reject(rd.error||new Error('画像を読み込めませんでした'));rd.readAsDataURL(file)});
+    await screenshotDBPut(key,dataUrl);
+    individualScreenshots[key]=dataUrl;
+    screenshotDBReady=true;
+    render();renderExtraPanels();
+    showToast('この個体の画像を保存しました。');
+  }catch(e){
+    console.error(e);
+    alert('画像を保存できませんでした。既存データは変更していません。ブラウザのサイトデータ保存が許可されているか確認してください。');
+  }
 }
-function removeIndividualScreenshot(id,uid){
-  delete individualScreenshots[screenshotKey(id,uid)];
-  save();
-  render();
-  renderExtraPanels();
+async function removeIndividualScreenshot(id,uid){
+  const key=screenshotKey(id,uid),before=individualScreenshots[key];
+  if(!before)return;
+  if(!confirm('この個体の捕獲スクショを削除しますか？'))return;
+  try{
+    await screenshotDBDelete(key);
+    delete individualScreenshots[key];
+    render();renderExtraPanels();
+    showToast('捕獲スクショを削除しました。');
+  }catch(e){console.error(e);alert('画像を削除できませんでした。既存画像は変更していません。')}
 }
 function allIndividualsFlat(){
   const out=[];
@@ -2589,13 +2639,8 @@ async function rescuePreUpdateScreenshots(){
     }
     const msg=`更新前バックアップから ${keys.length}枚 の捕獲スクショを救出できます。\n\n現在のコレクション・厳選回数・セッション情報は変更しません。既にある画像も上書きしません。\n\n救出しますか？`;
     if(!confirm(msg))return;
+    for(const [key,dataUrl] of Object.entries(recovered)){await screenshotDBPut(key,dataUrl)}
     Object.assign(current,recovered);
-    const ok=safeLocalSet('shinyHomeIndividualScreenshots_v1',JSON.stringify(current));
-    if(!ok){
-      for(const k of keys)delete current[k];
-      alert('画像の保存容量が足りないため、救出を中止しました。現在のデータは変更していません。画像だけバックアップを書き出して整理してから再度お試しください。');
-      return;
-    }
     render();renderExtraPanels();
     showToast(`捕獲スクショを ${keys.length}枚 救出しました。`);
     alert(`捕獲スクショを ${keys.length}枚 救出しました。\n現在の色違い・厳選データはそのままです。`);
@@ -2663,8 +2708,10 @@ async function diagnoseScreenshotStorage(){
   const btn=document.getElementById('diagnoseImagesBtn');if(btn)btn.disabled=true;
   try{
     const rows=[];
+    let idbRows=[];try{idbRows=await screenshotDBLoadAll()}catch(_){}
+    rows.push({where:'現在の画像保存領域（IndexedDB）',count:idbRows.filter(x=>x?.key&&x?.dataUrl).length,deep:idbRows.filter(x=>typeof x?.dataUrl==='string'&&x.dataUrl.startsWith('data:image/')).length});
     const cur=parseMaybeJSON(localStorage.getItem('shinyHomeIndividualScreenshots_v1'))||{};
-    rows.push({where:'現在の画像保存領域',count:screenshotObjectCount(cur),deep:countDataImagesDeep(cur)});
+    if(screenshotObjectCount(cur)||countDataImagesDeep(cur))rows.push({where:'旧画像保存領域（localStorage）',count:screenshotObjectCount(cur),deep:countDataImagesDeep(cur)});
     const auto=parseMaybeJSON(localStorage.getItem('shinyHomeAutoBackups_v1'))||[];
     rows.push({where:'ブラウザ内 自動バックアップ',count:null,deep:countDataImagesDeep(auto),note:`${Array.isArray(auto)?auto.length:0}件`});
     const legacy=parseMaybeJSON(localStorage.getItem(PREUPDATE_BACKUP_KEY));
@@ -2678,7 +2725,7 @@ async function diagnoseScreenshotStorage(){
       const v=localStorage.getItem(k),n=countDataImagesDeep(v);
       if(n)rows.push({where:'localStorage: '+k,count:null,deep:n,note:'別キー内で画像を検出'});
     }
-    const lines=['【画像データ診断 v119】','※ 読み取り専用。データの復元・削除・上書きはしていません。',''];
+    const lines=['【画像データ診断 v120】','※ 読み取り専用。データの復元・削除・上書きはしていません。',''];
     for(const r of rows){
       if(r.error){lines.push(`⚠ ${r.where}: ${r.error}`);continue}
       const exact=r.count==null?'':`捕獲スクショ ${r.count}枚`;
@@ -3169,7 +3216,7 @@ async function importIndividualsCSV(file){
   save();render();showToast(`${added}件読み込みました。`);
 }
 function downloadFullBackup(){
-  const payload={version:DATA_VERSION,exportedAt:new Date().toISOString(),...currentDataSnapshot()};
+  const payload={version:DATA_VERSION,exportedAt:new Date().toISOString(),...currentDataSnapshot(),individualScreenshots};
   downloadBlob(new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}),`shiny-home-backup-${new Date().toISOString().slice(0,10)}.json`);
 }
 function loadCloudSettings(){try{return JSON.parse(localStorage.getItem(CLOUD_SETTINGS_KEY)||'{}')}catch{return {}}}
@@ -3531,13 +3578,16 @@ el('exportImagesBtn').onclick=()=>{
 el('importImagesBtn').onclick=()=>el('imageBackupInput').click();
 el('imageBackupInput').onchange=e=>{
   const f=e.target.files[0];if(!f)return;
-  const r=new FileReader();r.onload=()=>{
-    try{const d=JSON.parse(r.result);Object.keys(individualScreenshots).forEach(k=>delete individualScreenshots[k]);Object.assign(individualScreenshots,d.individualScreenshots||{});save();render();renderExtraPanels();restoreAppTab();showToast('画像バックアップを読み込みました。')}
-    catch{alert('画像バックアップを読み込めませんでした')}
+  const r=new FileReader();r.onload=async()=>{
+    try{
+      const d=JSON.parse(r.result),shots=d.individualScreenshots||{};
+      for(const [key,dataUrl] of Object.entries(shots)){if(dataUrl)await screenshotDBPut(key,dataUrl)}
+      await initScreenshotStore();render();renderExtraPanels();restoreAppTab();showToast(`画像バックアップを ${Object.keys(shots).length}枚 読み込みました。`)
+    }catch(err){console.error(err);alert('画像バックアップを読み込めませんでした')}
   };r.readAsText(f);
 };
 el('exportBtn').onclick=()=>{const blob=new Blob([JSON.stringify({version:DATA_VERSION,state,boxState,dateState,gameState,individualState,targetState,huntState,monthImages,individualScreenshots},null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='shiny-home-backup.json';a.click();URL.revokeObjectURL(a.href)};
-el('importBtn').onclick=()=>el('fileInput').click();el('fileInput').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);Object.assign(state,d.state||{});Object.assign(boxState,d.boxState||{});Object.assign(dateState,d.dateState||{});Object.assign(gameState,d.gameState||{});if(d.individualState)Object.assign(individualState,d.individualState);if(d.targetState)Object.assign(targetState,d.targetState);if(d.huntState)Object.assign(huntState,d.huntState);if(d.monthImages)Object.assign(monthImages,d.monthImages);if(d.individualScreenshots)Object.assign(individualScreenshots,d.individualScreenshots);ensureLegacyIndividuals();save();render()}catch{alert('バックアップファイルを読み込めませんでした')}};r.readAsText(f)};
+el('importBtn').onclick=()=>el('fileInput').click();el('fileInput').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=async()=>{try{const d=JSON.parse(r.result);Object.assign(state,d.state||{});Object.assign(boxState,d.boxState||{});Object.assign(dateState,d.dateState||{});Object.assign(gameState,d.gameState||{});if(d.individualState)Object.assign(individualState,d.individualState);if(d.targetState)Object.assign(targetState,d.targetState);if(d.huntState)Object.assign(huntState,d.huntState);if(d.monthImages)Object.assign(monthImages,d.monthImages);if(d.individualScreenshots){for(const [key,dataUrl] of Object.entries(d.individualScreenshots)){if(dataUrl)await screenshotDBPut(key,dataUrl)}await initScreenshotStore()}ensureLegacyIndividuals();save();render()}catch(err){console.error(err);alert('バックアップファイルを読み込めませんでした')}};r.readAsText(f)};
 for(const g of gameOptions.filter(Boolean)){const o=document.createElement('option');o.value=g;o.textContent=g;el('gameFilter').appendChild(o);}for(const [slug,name] of BALLS){const o=document.createElement('option');o.value=slug;o.textContent=name;el('ballFilter').appendChild(o);}
 
 // v108: mobile collection bootstrap. Hunt counters remain on their dedicated sync table.
@@ -3565,7 +3615,7 @@ async function hydrateMobileCollectionFromSafetyBackup(){
     // Merge collection data so a mobile-only capture event is never discarded.
     Object.assign(state,snap.state||{});
     Object.assign(boxState,snap.boxState||{});Object.assign(dateState,snap.dateState||{});Object.assign(gameState,snap.gameState||{});
-    Object.assign(monthImages,snap.monthImages||{});Object.assign(individualScreenshots,snap.individualScreenshots||{});
+    Object.assign(monthImages,snap.monthImages||{}); // v120: 画像は端末のIndexedDBで管理
     for(const [id,arr] of Object.entries(snap.individualState||{})){
       if(!Array.isArray(arr))continue; const cur=Array.isArray(individualState[id])?individualState[id]:[];
       const seen=new Set(cur.map(x=>x&&x.uid).filter(Boolean));
@@ -3583,6 +3633,7 @@ async function hydrateMobileCollectionFromSafetyBackup(){
   try{
     const species=await loadSpecies();
     data=buildData(species);
+    await initScreenshotStore();
     await hydrateMobileCollectionFromSafetyBackup();
     ensureLegacyIndividuals();
     save();
@@ -3602,6 +3653,7 @@ async function hydrateMobileCollectionFromSafetyBackup(){
     console.error(err);
     // 最終保険：通信やキャッシュに問題があっても画面を起動する。
     data=buildData(offlineSpeciesFallback());
+    try{await initScreenshotStore()}catch(_){}
     ensureLegacyIndividuals();
     render();
     const loading=el('loading');
@@ -3841,14 +3893,14 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 // ===== v56 automatic update / cache repair =====
 (function(){
-  const APP_VERSION='v119';
+  const APP_VERSION='v120';
   const UPDATE_KEY='shinyHomeReloadedForSW_'+APP_VERSION;
 
   async function registerFreshWorker(){
     if(!('serviceWorker' in navigator) || location.protocol==='file:') return;
     try{
       const reg = await navigator.serviceWorker.register(
-        './service-worker.js?v=119',
+        './service-worker.js?v=120',
         {updateViaCache:'none'}
       );
 
