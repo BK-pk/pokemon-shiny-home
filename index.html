@@ -648,6 +648,24 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
   #tab-sync .sync-grid{margin:0!important;padding:0!important;align-items:start!important}
   #tab-sync .extra-panel{margin-top:0!important}
 }
+
+/* v116: Pokemon detail / normal-vs-shiny viewer */
+.dex-detail-shell{display:grid;gap:14px}
+.dex-detail-title{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-right:80px}
+.dex-detail-title h2{margin:2px 0 0;font-size:30px}.dex-detail-title small{color:#8fb0c7}.dex-form-badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}
+.dex-compare{display:grid;grid-template-columns:1fr 1fr;gap:10px}.dex-compare-card{position:relative;min-height:300px;border:1px solid #294f68;border-radius:16px;background:radial-gradient(circle at 50% 36%,rgba(73,174,220,.18),rgba(8,24,38,.92) 62%);padding:12px;text-align:center;overflow:hidden}
+.dex-compare-card.shiny{border-color:#9a7a26;background:radial-gradient(circle at 50% 36%,rgba(255,213,88,.18),rgba(8,24,38,.92) 62%)}
+.dex-compare-label{font-size:12px;font-weight:900;color:#cceafb;letter-spacing:.04em}.dex-compare-card.shiny .dex-compare-label{color:#ffe79a}
+.dex-compare-card img{width:min(280px,92%);height:245px;object-fit:contain;filter:drop-shadow(0 18px 16px rgba(0,0,0,.42))}
+.dex-detail-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:12px}.dex-info-panel{background:#0b1928;border:1px solid #29445f;border-radius:14px;padding:13px}.dex-info-panel h3{margin:0 0 10px;font-size:15px;color:#bfeeff}
+.dex-basic-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.dex-kv{background:#0e2133;border:1px solid #203c55;border-radius:9px;padding:8px}.dex-kv span{display:block;color:#8ea9bd;font-size:10px}.dex-kv b{display:block;margin-top:3px;font-size:13px}
+.dex-types{display:flex;gap:6px;flex-wrap:wrap}.dex-type{display:inline-flex;padding:4px 9px;border-radius:999px;background:#17334a;border:1px solid #335b78;font-size:11px;font-weight:900}
+.dex-flavor{line-height:1.8;color:#dcecf7;white-space:pre-wrap;min-height:72px}.dex-source-note{color:#7895a9;font-size:10px;margin-top:8px}
+.dex-stat-list{display:grid;gap:6px}.dex-stat-row{display:grid;grid-template-columns:82px 1fr 36px;gap:7px;align-items:center;font-size:11px}.dex-stat-track{height:8px;background:#15293a;border-radius:99px;overflow:hidden}.dex-stat-fill{height:100%;background:linear-gradient(90deg,#3e9fe8,#63e0cf);border-radius:99px}
+.dex-owned-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:2px}.dex-owned-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px}.dex-owned-card{background:#0d2031;border:1px solid #29445f;border-radius:11px;padding:9px;display:grid;grid-template-columns:70px 1fr;gap:9px;align-items:center}.dex-owned-card img{width:68px;height:68px;object-fit:contain}.dex-owned-card b{display:block}.dex-owned-card small{color:#a9becd;line-height:1.55}.dex-related{display:flex;gap:7px;flex-wrap:wrap}.dex-related button{border:1px solid #31536c;background:#0e2030;color:#dbeef9;padding:7px 9px;border-radius:9px;cursor:pointer}.dex-related button.active{border-color:#55cdfd;background:#0d5278}
+.dex-loading{color:#8ca7ba;padding:8px 0}
+@media(max-width:760px){.dex-detail-title{padding-right:0}.dex-detail-title h2{font-size:24px}.dex-compare{grid-template-columns:1fr 1fr}.dex-compare-card{min-height:210px}.dex-compare-card img{height:165px}.dex-detail-grid{grid-template-columns:1fr}.dex-owned-grid{grid-template-columns:1fr}.pokemon-modal-card{padding:12px}.dex-basic-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.dex-compare{gap:6px}.dex-compare-card{padding:8px;min-height:180px}.dex-compare-card img{height:140px}.dex-stat-row{grid-template-columns:70px 1fr 32px}}
 </style>
 
 <style>
@@ -997,7 +1015,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
     <div class="extra-panel">
       <div class="extra-head">
         <div><h2 style="margin:0">☁️ Supabase 同期</h2>
-        <span class="section-count">PC・iPhoneで同じデータを共有 ・ build v114</span></div>
+        <span class="section-count">PC・iPhoneで同じデータを共有 ・ build v116</span></div>
       </div>
       <div class="sync-local-tools">
         <div class="sync-local-head"><div><strong>🛟 データ保護・バックアップ</strong><small>普段はここだけで管理します</small></div><button class="btn" onclick="undoLastChange()" type="button">↶ 1つ前に戻す</button></div>
@@ -1033,7 +1051,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
       <div id="cloud-status" class="home-help">未設定です。</div>
       <div id="auto-sync-status" class="home-help" style="margin-top:8px">同期：v95 外出向け省通信</div><div id="network-status" class="net-pill">● 通信状態を確認中</div>
       <div class="home-help" style="margin-top:8px">
-        v114ではスマホ起動時に安全クラウドバックアップからコレクションを一方向で取り込み、厳選カウンターは従来どおり専用同期します。10秒操作がなければクラウドへ保存し、他端末は最新時刻の値だけを取り込みます。所持状況・HOME BOXなどのフルデータは上のボタンで手動同期します。
+        v116ではスマホ起動時に安全クラウドバックアップからコレクションを一方向で取り込み、厳選カウンターは従来どおり専用同期します。10秒操作がなければクラウドへ保存し、他端末は最新時刻の値だけを取り込みます。所持状況・HOME BOXなどのフルデータは上のボタンで手動同期します。
       </div>
       <div class="home-help" style="margin-top:10px">初回は「設定保存」→「接続テスト」の順に確認してください。既存データがある場合、確認前にクラウドへ保存しないでください。</div>
     </div>
@@ -1041,7 +1059,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 </section>
 
 <script>
-const DATA_VERSION='full-2026-09-10-v114';
+const DATA_VERSION='full-2026-09-11-v116';
 const SPECIES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species.csv';
 const NAMES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
 const MAX_DEX=1025;
@@ -2500,12 +2518,60 @@ function addHuntJournal(id){
   x.journal=Array.isArray(x.journal)?x.journal:[];
   x.journal.push({at:new Date().toISOString(),count:Number(x.count)||0,text:text.trim()});save();renderCurrentHunt();
 }
+const dexApiMemoryCache=new Map();
+function normalSpriteURL(p){
+  const sl=showdownSpriteSlug(p);
+  return sl?`https://play.pokemonshowdown.com/sprites/home/${sl}.png`:`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${p.no}.png`;
+}
+function cleanFlavorText(t=''){return String(t||'').replace(/[\n\f\r]+/g,' ').replace(/\s+/g,' ').trim()}
+function jpFlavor(species){
+  const xs=(species?.flavor_text_entries||[]).filter(x=>x.language?.name==='ja-Hrkt'||x.language?.name==='ja');
+  if(!xs.length)return '日本語の図鑑説明を取得できませんでした。';
+  return cleanFlavorText(xs[xs.length-1]?.flavor_text||xs[0]?.flavor_text||'');
+}
+function jpGenus(species){return (species?.genera||[]).find(x=>x.language?.name==='ja-Hrkt')?.genus||(species?.genera||[]).find(x=>x.language?.name==='ja')?.genus||''}
+async function fetchDexApi(no){
+  const key=String(no);if(dexApiMemoryCache.has(key))return dexApiMemoryCache.get(key);
+  const req=Promise.all([
+    fetch(`https://pokeapi.co/api/v2/pokemon/${no}`,{cache:'force-cache'}).then(r=>{if(!r.ok)throw Error('pokemon');return r.json()}),
+    fetch(`https://pokeapi.co/api/v2/pokemon-species/${no}`,{cache:'force-cache'}).then(r=>{if(!r.ok)throw Error('species');return r.json()})
+  ]).then(([pokemon,species])=>({pokemon,species})).catch(()=>null);
+  dexApiMemoryCache.set(key,req);return req;
+}
+function dexStatName(n){return ({hp:'HP',attack:'こうげき',defense:'ぼうぎょ','special-attack':'とくこう','special-defense':'とくぼう',speed:'すばやさ'})[n]||n}
+function dexTypeName(n){return ({normal:'ノーマル',fire:'ほのお',water:'みず',electric:'でんき',grass:'くさ',ice:'こおり',fighting:'かくとう',poison:'どく',ground:'じめん',flying:'ひこう',psychic:'エスパー',bug:'むし',rock:'いわ',ghost:'ゴースト',dragon:'ドラゴン',dark:'あく',steel:'はがね',fairy:'フェアリー'})[n]||n}
+function abilityDisplay(a){return (a||[]).map(x=>(x.is_hidden?'隠れ特性: ':'')+(x.ability?.name||'')).join(' / ')||'—'}
 function showPokemonDetail(id){
   const p=data.find(x=>x.id===id),box=el('pokemon-modal-content');if(!p||!box)return;
   const rel=data.filter(x=>x.no===p.no&&!x.locked),inds=individualState[id]||[];
-  box.innerHTML=`<div class="pokemon-modal-head"><img src="${spriteURL(p)}" onerror="this.src='${baseSpriteURL(p)}'"><div><small>No.${String(p.no).padStart(4,'0')}</small><h2>${esc(p.name)}</h2><div>${kindLabel(p)} ${esc(p.form||'')} ${esc(p.gender||'')}</div><div class="related-status">${rel.map(x=>`<span class="related-chip ${ownedCountFor(x.id)?'ok':''}">${ownedCountFor(x.id)?'✓':'○'} ${esc(kindLabel(x))} ${x.form!=='通常'?esc(x.form):''}</span>`).join('')}</div></div></div>
-  <h3>所持個体 ${inds.length}匹</h3><div class="pokemon-modal-grid">${inds.map((ind,i)=>`<div class="pokemon-modal-item">${individualScreenshot(id,ind.uid)?`<img src="${individualScreenshot(id,ind.uid)}">`:`<img src="${spriteURL(p)}">`}<strong>${i+1}匹目</strong><small>${esc(ind.date||'日付未登録')} / ${esc(ind.game||'')}<br>${esc(ind.ball||'')} / ${esc(ind.huntMethod||'')} ${huntCountLabelForImage(ind)?'<br>'+esc(huntCountLabelForImage(ind)):''}<br>${esc(ind.memo||'')}</small></div>`).join('')||'<div class="empty">未所持</div>'}</div>`;
+  const owned=inds.length;
+  box.innerHTML=`<div class="dex-detail-shell">
+    <div class="dex-detail-title"><div><small>No.${String(p.no).padStart(4,'0')} ・ ${esc(kindLabel(p))}</small><h2>${esc(p.name)}</h2><div class="dex-form-badges">${p.form&&p.form!=='通常'?`<span class="tag form">${esc(p.form)}</span>`:''}${p.gender?`<span class="tag gender">${esc(p.gender)}</span>`:''}${owned?`<span class="countbadge">✓ ${owned}匹所持</span>`:'<span class="countbadge">未所持</span>'}</div></div></div>
+    <div class="dex-compare">
+      <div class="dex-compare-card"><div class="dex-compare-label">通常のすがた</div><img src="${normalSpriteURL(p)}" onerror="this.src='${offlineSpriteURL(p.no)}'" alt="${esc(p.name)} 通常色"></div>
+      <div class="dex-compare-card shiny"><div class="dex-compare-label">✨ 色違いのすがた</div><img src="${spriteURL(p)}" onerror="this.src='${baseSpriteURL(p)}'" alt="${esc(p.name)} 色違い"></div>
+    </div>
+    <div class="dex-detail-grid">
+      <section class="dex-info-panel"><h3>📖 図鑑説明</h3><div id="dex-flavor-${safeId(id)}" class="dex-flavor dex-loading">図鑑データを読み込んでいます…</div><div class="dex-source-note">図鑑情報はオンライン時にPokeAPIから取得します。</div></section>
+      <section class="dex-info-panel"><h3>🔎 基本情報</h3><div id="dex-basic-${safeId(id)}" class="dex-basic-grid"><div class="dex-loading">読み込み中…</div></div></section>
+    </div>
+    <section class="dex-info-panel"><h3>📊 種族値</h3><div id="dex-stats-${safeId(id)}" class="dex-stat-list"><div class="dex-loading">読み込み中…</div></div></section>
+    ${rel.length>1?`<section class="dex-info-panel"><h3>🧬 同じ図鑑No.の姿</h3><div class="dex-related">${rel.map(x=>`<button class="${x.id===id?'active':''}" onclick="showPokemonDetail('${esc(x.id)}')">${esc(kindLabel(x))}${x.form&&x.form!=='通常'?'・'+esc(x.form):''}${ownedCountFor(x.id)?' ✓':''}</button>`).join('')}</div></section>`:''}
+    <section class="dex-info-panel"><div class="dex-owned-head"><h3>✨ 自分の色違い個体 ${owned}匹</h3><button class="smallbtn" onclick="addIndividual('${esc(id)}');setTimeout(()=>showPokemonDetail('${esc(id)}'),30)">＋ 個体を追加</button></div><div class="dex-owned-grid">${inds.map((ind,i)=>`<div class="dex-owned-card"><img src="${individualScreenshot(id,ind.uid)||spriteURL(p)}" onerror="this.src='${baseSpriteURL(p)}'"><div><b>${i+1}匹目 ${ind.nickname?'・'+esc(ind.nickname):''}</b><small>${esc(ind.date||'日付未登録')} / ${esc(ind.game||'ゲーム未登録')}<br>${esc(BALL_NAME[ballSlugFromValue(ind.ball)]||ind.ball||'ボール未登録')} / ${esc(ind.huntMethod||'方法未登録')}${Number(ind.huntCount)?`<br>${Number(ind.huntCount).toLocaleString()}回でGET`:''}${ind.memo?`<br>メモ：${esc(ind.memo)}`:''}</small></div></div>`).join('')||'<div class="empty" style="padding:24px">まだ色違い個体は登録されていません。</div>'}</div></section>
+  </div>`;
   el('pokemon-modal').classList.add('show');
+  fetchDexApi(p.no).then(api=>{
+    if(!api||!el('pokemon-modal')?.classList.contains('show'))return;
+    const f=el(`dex-flavor-${safeId(id)}`),b=el(`dex-basic-${safeId(id)}`),st=el(`dex-stats-${safeId(id)}`);
+    if(f)f.textContent=jpFlavor(api.species);
+    if(b){const pk=api.pokemon,sp=api.species;const genus=jpGenus(sp);b.innerHTML=`
+      <div class="dex-kv"><span>分類</span><b>${esc(genus||'—')}</b></div>
+      <div class="dex-kv"><span>タイプ</span><b class="dex-types">${(pk.types||[]).map(x=>`<span class="dex-type">${esc(dexTypeName(x.type?.name))}</span>`).join('')||'—'}</b></div>
+      <div class="dex-kv"><span>高さ</span><b>${Number(pk.height||0)/10} m</b></div>
+      <div class="dex-kv"><span>重さ</span><b>${Number(pk.weight||0)/10} kg</b></div>
+      <div class="dex-kv" style="grid-column:1/-1"><span>特性</span><b>${esc(abilityDisplay(pk.abilities))}</b></div>`}
+    if(st){st.innerHTML=(api.pokemon.stats||[]).map(x=>{const v=Number(x.base_stat)||0,pct=Math.min(100,v/255*100);return `<div class="dex-stat-row"><span>${esc(dexStatName(x.stat?.name))}</span><div class="dex-stat-track"><div class="dex-stat-fill" style="width:${pct.toFixed(1)}%"></div></div><b>${v}</b></div>`}).join('')||'<div class="dex-loading">種族値を取得できませんでした。</div>'}
+  });
 }
 function closePokemonDetail(){el('pokemon-modal')?.classList.remove('show')}
 function renderHomeBoxBoard(){
@@ -3533,7 +3599,7 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 // ===== v56 automatic update / cache repair =====
 (function(){
-  const APP_VERSION='v114';
+  const APP_VERSION='v116';
   const UPDATE_KEY='shinyHomeReloadedForSW_'+APP_VERSION;
 
   async function registerFreshWorker(){
@@ -3665,7 +3731,7 @@ function requestAutoSyncAfterDataChange(){try{if(typeof syncHuntSessionState==='
     return 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/'+p.no+'.png';
   }
 
-  function mutateCount(key,delta){const h=allHunts(),hv=h[key]||{},field=('count' in hv)?'count':(('huntCount' in hv)?'huntCount':(('encounters' in hv)?'encounters':'count')),old=Math.max(0,Number(hv[field])||0),next=Math.max(0,old+delta),applied=next-old;hv[field]=next;hv.daily=hv.daily&&typeof hv.daily==='object'?hv.daily:{};const day=new Date().toISOString().slice(0,10);hv.daily[day]=Math.max(0,(Number(hv.daily[day])||0)+applied);if(!hv.start)hv.start=day;h[key]=hv;saveHunts(h);if(typeof syncHuntCounterValue==='function')syncHuntCounterValue(key,hv[field]);const card=document.querySelector('.mobile-hunt-card[data-key="'+CSS.escape(key)+'"]'),num=card&&card.querySelector('.mobile-hunt-count');if(num)num.textContent=hv[field];if(typeof updateHuntMetaDOM==='function')updateHuntMetaDOM(key);if(typeof updateMobileTodayTotal==='function')updateMobileTodayTotal()}
+  function mutateCount(key,delta){const h=allHunts(),hv=h[key]||{},field=('count' in hv)?'count':(('huntCount' in hv)?'huntCount':(('encounters' in hv)?'encounters':'count')),old=Math.max(0,Number(hv[field])||0),next=Math.max(0,old+delta),applied=next-old;hv[field]=next;hv.daily=hv.daily&&typeof hv.daily==='object'?hv.daily:{};const day=(typeof localDateKey==='function'?localDateKey():new Date().toLocaleDateString('sv-SE'));hv.daily[day]=Math.max(0,(Number(hv.daily[day])||0)+applied);if(!hv.start)hv.start=day;h[key]=hv;saveHunts(h);if(typeof syncHuntCounterValue==='function')syncHuntCounterValue(key,hv[field]);const card=document.querySelector('.mobile-hunt-card[data-key="'+CSS.escape(key)+'"]'),num=card&&card.querySelector('.mobile-hunt-count');if(num)num.textContent=hv[field];if(typeof updateHuntMetaDOM==='function')updateHuntMetaDOM(key);if(typeof updateMobileTodayTotal==='function')updateMobileTodayTotal()}
 
   function finishHunt(key,captured){const p=(typeof data!=='undefined'?data.find(x=>x.id===key):null),label=p?.name||'このポケモン';if(!confirm(captured?`${label}を「捕獲した」として登録し、厳選を終了しますか？`:`${label}の厳選を終了しますか？`))return;if(captured&&typeof window.captureHunt==='function'){window.captureHunt(key);setTimeout(renderMultiHunts,50);return}const t=allTargets();if(key in t)delete t[key];saveTargets(t);const h=allHunts();if(h[key]){h[key].active=false;h[key].status='ended';h[key].endedAt=new Date().toISOString();saveHunts(h)}if(typeof requestAutoSyncAfterDataChange==='function')requestAutoSyncAfterDataChange();renderMultiHunts();if(typeof render==='function')try{render()}catch(e){}}
 
