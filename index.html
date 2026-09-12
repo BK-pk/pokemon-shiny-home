@@ -1143,7 +1143,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
       <div id="cloud-status" class="home-help">未設定です。</div>
       <div id="auto-sync-status" class="home-help" style="margin-top:8px">同期：v95 外出向け省通信</div><div id="network-status" class="net-pill">● 通信状態を確認中</div>
       <div class="home-help" style="margin-top:8px">
-        v135ではスマホ厳選カードのリージョン・姿違い画像のフォールバック処理を修正し、アローララッタなどがNo.000表示になる不具合を直しました。v134ではコレクションカードの「✓ ○匹所持」がスマホ幅でも改行されないよう表示を調整しました。保存データ構造は変更しません。v133では世代別進捗を「通常個体・リージョン・オス/メス違い・その他の姿違い・キョダイマックス」に分けて表示します。各カテゴリ内で第1〜第9世代の所持率を個別集計します。v132では月別の色違い一覧の集計レイアウトを整理し、上段に4つのサマリー、下段に厳選回数の横長集計カードを表示します。重複していた捕獲数表示も整理しました。v131では個体編集画面の厳選回数ラベルを選択した厳選方法に即時追従させ、個体画像作成時にその場でプレビューを表示するよう修正しました。v130では、「殿堂入り」と「SHINY GET画像」を廃止しました。画像作成は「個体画像を作成」1つにまとめ、捕獲スクショの登録・変更と削除だけを残します。既存のコレクション・個体・画像・厳選・BINGOデータ構造は変更しません。スマホ起動時は安全クラウドバックアップからコレクションを一方向で取り込み、厳選データは専用同期します。
+        v136ではHOMEの個体画面スクリーンショットをOCRで読み取り、捕獲日・性格・特性・親名・ID・捕獲場所・レベル・能力値・技などを確認して個体情報へ反映できる機能を追加しました。v135ではスマホ厳選カードのリージョン・姿違い画像のフォールバック処理を修正し、アローララッタなどがNo.000表示になる不具合を直しました。v134ではコレクションカードの「✓ ○匹所持」がスマホ幅でも改行されないよう表示を調整しました。保存データ構造は変更しません。v133では世代別進捗を「通常個体・リージョン・オス/メス違い・その他の姿違い・キョダイマックス」に分けて表示します。各カテゴリ内で第1〜第9世代の所持率を個別集計します。v132では月別の色違い一覧の集計レイアウトを整理し、上段に4つのサマリー、下段に厳選回数の横長集計カードを表示します。重複していた捕獲数表示も整理しました。v131では個体編集画面の厳選回数ラベルを選択した厳選方法に即時追従させ、個体画像作成時にその場でプレビューを表示するよう修正しました。v130では、「殿堂入り」と「SHINY GET画像」を廃止しました。画像作成は「個体画像を作成」1つにまとめ、捕獲スクショの登録・変更と削除だけを残します。既存のコレクション・個体・画像・厳選・BINGOデータ構造は変更しません。スマホ起動時は安全クラウドバックアップからコレクションを一方向で取り込み、厳選データは専用同期します。
       </div>
       <div class="home-help" style="margin-top:10px">初回は「設定保存」→「接続テスト」の順に確認してください。既存データがある場合、確認前にクラウドへ保存しないでください。</div>
     </div>
@@ -1151,7 +1151,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 </section>
 
 <script>
-const DATA_VERSION='full-2026-09-12-v130';
+const DATA_VERSION='full-2026-09-12-v136';
 const SPECIES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species.csv';
 const NAMES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
 const MAX_DEX=1025;
@@ -1472,7 +1472,7 @@ function save(){
   safeLocalSet('shinyHomeBingo_v1',JSON.stringify(bingoState));
   // v120: 捕獲スクショは IndexedDB 専用。localStorage へは書き戻さない。
 }
-function newIndividual(seed={}){return {uid:seed.uid||Date.now().toString(36)+Math.random().toString(36).slice(2,7),date:seed.date||'',game:seed.game||'',box:seed.box||'',nickname:seed.nickname||'',source:seed.source||'',ball:seed.ball||'',memo:seed.memo||'',favorite:!!seed.favorite,huntCount:Number(seed.huntCount)||0,huntStart:seed.huntStart||'',huntMethod:seed.huntMethod||'',huntCharm:seed.huntCharm||'',huntTargetId:seed.huntTargetId||'',huntTargetName:seed.huntTargetName||'',huntJournal:Array.isArray(seed.huntJournal)?seed.huntJournal:[],huntSessions:Array.isArray(seed.huntSessions)?seed.huntSessions:[],huntElapsedMs:Number(seed.huntElapsedMs)||0,huntRecordMode:seed.huntRecordMode||'',nature:seed.nature||'',ability:seed.ability||'',teraType:seed.teraType||'',ribbons:seed.ribbons||'',otName:seed.otName||'',trainerId:seed.trainerId||'',catchLocation:seed.catchLocation||'',catchLevel:seed.catchLevel==null?'':seed.catchLevel,isAlpha:!!seed.isAlpha,size:seed.size||''};}
+function newIndividual(seed={}){return {uid:seed.uid||Date.now().toString(36)+Math.random().toString(36).slice(2,7),date:seed.date||'',game:seed.game||'',box:seed.box||'',nickname:seed.nickname||'',source:seed.source||'',ball:seed.ball||'',memo:seed.memo||'',favorite:!!seed.favorite,huntCount:Number(seed.huntCount)||0,huntStart:seed.huntStart||'',huntMethod:seed.huntMethod||'',huntCharm:seed.huntCharm||'',huntTargetId:seed.huntTargetId||'',huntTargetName:seed.huntTargetName||'',huntJournal:Array.isArray(seed.huntJournal)?seed.huntJournal:[],huntSessions:Array.isArray(seed.huntSessions)?seed.huntSessions:[],huntElapsedMs:Number(seed.huntElapsedMs)||0,huntRecordMode:seed.huntRecordMode||'',nature:seed.nature||'',ability:seed.ability||'',teraType:seed.teraType||'',ribbons:seed.ribbons||'',otName:seed.otName||'',trainerId:seed.trainerId||'',catchLocation:seed.catchLocation||'',catchLevel:seed.catchLevel==null?'':seed.catchLevel,isAlpha:!!seed.isAlpha,size:seed.size||'',gender:seed.gender||'',heldItem:seed.heldItem||'',statHP:seed.statHP==null?'':seed.statHP,statAtk:seed.statAtk==null?'':seed.statAtk,statDef:seed.statDef==null?'':seed.statDef,statSpA:seed.statSpA==null?'':seed.statSpA,statSpD:seed.statSpD==null?'':seed.statSpD,statSpe:seed.statSpe==null?'':seed.statSpe,moves:Array.isArray(seed.moves)?seed.moves.slice(0,4):[]};}
 function ensureLegacyIndividuals(){for(const id of Object.keys(state)){if(state[id]&&(!Array.isArray(individualState[id])||individualState[id].length===0)){individualState[id]=[newIndividual({date:dateState[id]||'',game:gameState[id]||'',box:boxState[id]||''})];}}}
 function ownedCountFor(id){return Array.isArray(individualState[id])?individualState[id].length:0}
 function syncOwned(id){const arr=individualState[id]||[];state[id]=arr.length>0;if(arr.length){dateState[id]=arr[0].date||'';gameState[id]=arr[0].game||'';boxState[id]=arr[0].box||'';}else{dateState[id]='';gameState[id]='';boxState[id]='';}save();}
@@ -1637,6 +1637,15 @@ function individualRowHTML(p,ind,i){
         <div class="detail-fields">
           <div class="detail-field"><label>性格</label><select oninput="setIndividualLive('${esc(p.id)}',${i},'nature',this.value)" onchange="setIndividual('${esc(p.id)}',${i},'nature',this.value)">${simpleOptionsHTML(NATURES,ind.nature||'','性格未設定')}</select></div>
           <div class="detail-field"><label>特性</label><input value="${esc(ind.ability||'')}" placeholder="例：いかく" oninput="setIndividualLive('${esc(p.id)}',${i},'ability',this.value)" onchange="setIndividual('${esc(p.id)}',${i},'ability',this.value)"></div>
+          <div class="detail-field"><label>性別</label><select oninput="setIndividualLive('${esc(p.id)}',${i},'gender',this.value)" onchange="setIndividual('${esc(p.id)}',${i},'gender',this.value)"><option value="">未設定</option><option value="♂" ${ind.gender==='♂'?'selected':''}>♂</option><option value="♀" ${ind.gender==='♀'?'selected':''}>♀</option><option value="不明" ${ind.gender==='不明'?'selected':''}>不明</option></select></div>
+          <div class="detail-field"><label>持ち物</label><input value="${esc(ind.heldItem||'')}" placeholder="例：なし" oninput="setIndividualLive('${esc(p.id)}',${i},'heldItem',this.value)" onchange="setIndividual('${esc(p.id)}',${i},'heldItem',this.value)"></div>
+          <div class="detail-field"><label>HP</label><input type="number" min="0" value="${esc(ind.statHP??'')}" oninput="setIndividualLive('${esc(p.id)}',${i},'statHP',this.value)" onchange="setIndividual('${esc(p.id)}',${i},'statHP',this.value)"></div>
+          <div class="detail-field"><label>こうげき</label><input type="number" min="0" value="${esc(ind.statAtk??'')}" oninput="setIndividualLive('${esc(p.id)}',${i},'statAtk',this.value)" onchange="setIndividual('${esc(p.id)}',${i},'statAtk',this.value)"></div>
+          <div class="detail-field"><label>ぼうぎょ</label><input type="number" min="0" value="${esc(ind.statDef??'')}" oninput="setIndividualLive('${esc(p.id)}',${i},'statDef',this.value)" onchange="setIndividual('${esc(p.id)}',${i},'statDef',this.value)"></div>
+          <div class="detail-field"><label>とくこう</label><input type="number" min="0" value="${esc(ind.statSpA??'')}" oninput="setIndividualLive('${esc(p.id)}',${i},'statSpA',this.value)" onchange="setIndividual('${esc(p.id)}',${i},'statSpA',this.value)"></div>
+          <div class="detail-field"><label>とくぼう</label><input type="number" min="0" value="${esc(ind.statSpD??'')}" oninput="setIndividualLive('${esc(p.id)}',${i},'statSpD',this.value)" onchange="setIndividual('${esc(p.id)}',${i},'statSpD',this.value)"></div>
+          <div class="detail-field"><label>すばやさ</label><input type="number" min="0" value="${esc(ind.statSpe??'')}" oninput="setIndividualLive('${esc(p.id)}',${i},'statSpe',this.value)" onchange="setIndividual('${esc(p.id)}',${i},'statSpe',this.value)"></div>
+          <div class="detail-field" style="grid-column:1/-1"><label>技（4つまで・1行ずつ）</label><textarea rows="4" placeholder="技1\n技2\n技3\n技4" oninput="setIndividualLive('${esc(p.id)}',${i},'moves',this.value.split(/\n/).map(x=>x.trim()).filter(Boolean).slice(0,4))" onchange="setIndividual('${esc(p.id)}',${i},'moves',this.value.split(/\n/).map(x=>x.trim()).filter(Boolean).slice(0,4))">${esc((ind.moves||[]).join('\n'))}</textarea></div>
           <div class="detail-field"><label>テラスタイプ</label><select oninput="setIndividualLive('${esc(p.id)}',${i},'teraType',this.value)" onchange="setIndividual('${esc(p.id)}',${i},'teraType',this.value)">${simpleOptionsHTML(TERA_TYPES,ind.teraType||'','テラスタイプ未設定')}</select></div>
           <div class="detail-field"><label>証・リボン</label><input value="${esc(ind.ribbons||'')}" placeholder="例：あかし / リボン" oninput="setIndividualLive('${esc(p.id)}',${i},'ribbons',this.value)" onchange="setIndividual('${esc(p.id)}',${i},'ribbons',this.value)"></div>
           <div class="detail-field"><label>親名</label><input value="${esc(ind.otName||'')}" placeholder="親名" oninput="setIndividualLive('${esc(p.id)}',${i},'otName',this.value)" onchange="setIndividual('${esc(p.id)}',${i},'otName',this.value)"></div>
@@ -1652,6 +1661,8 @@ function individualRowHTML(p,ind,i){
       <div class="ind-shot-actions">
         <input id="shot-${safeId(p.id)}-${safeId(ind.uid)}" type="file" accept="image/*" style="display:none" onchange="setIndividualScreenshot('${esc(p.id)}','${esc(ind.uid)}',this.files?.[0])">
         <button type="button" onclick="document.getElementById('shot-${safeId(p.id)}-${safeId(ind.uid)}').click()">📷 捕獲スクショを登録・変更</button>
+        <input id="homeocr-${safeId(p.id)}-${safeId(ind.uid)}" type="file" accept="image/*" style="display:none" onchange="readHomeScreenshot('${esc(p.id)}','${esc(ind.uid)}',this.files?.[0]);this.value=''">
+        <button type="button" onclick="document.getElementById('homeocr-${safeId(p.id)}-${safeId(ind.uid)}').click()">🔎 HOMEスクショから自動入力</button>
         <button type="button" class="card-shot-btn" onclick="generateIndividualCardImage('${esc(p.id)}','${esc(ind.uid)}')">📸 個体画像を作成</button>
         ${individualScreenshot(p.id,ind.uid)?`<button type="button" onclick="removeIndividualScreenshot('${esc(p.id)}','${esc(ind.uid)}')">スクショ削除</button>`:''}
       </div>
@@ -1983,6 +1994,103 @@ async function removeIndividualScreenshot(id,uid){
     showToast('捕獲スクショを削除しました。');
   }catch(e){console.error(e);alert('画像を削除できませんでした。既存画像は変更していません。')}
 }
+
+let homeOcrScriptPromise=null;
+function loadHomeOCR(){
+  if(window.Tesseract)return Promise.resolve(window.Tesseract);
+  if(homeOcrScriptPromise)return homeOcrScriptPromise;
+  homeOcrScriptPromise=new Promise((resolve,reject)=>{
+    const sc=document.createElement('script');
+    sc.src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
+    sc.async=true;
+    sc.onload=()=>window.Tesseract?resolve(window.Tesseract):reject(new Error('OCRライブラリを読み込めませんでした'));
+    sc.onerror=()=>reject(new Error('OCRライブラリの読み込みに失敗しました'));
+    document.head.appendChild(sc);
+  });
+  return homeOcrScriptPromise;
+}
+function normalizeHomeOCRText(t){return String(t||'').replace(/\r/g,'').replace(/[　\t]+/g,' ').replace(/ +/g,' ').trim()}
+function homeOcrLineValue(lines,label){
+  const i=lines.findIndex(x=>x.includes(label));
+  if(i<0)return '';
+  const same=lines[i].replace(label,'').replace(/^[：:\s|]+/,'').trim();
+  if(same)return same;
+  return (lines[i+1]||'').trim();
+}
+function parseHomeOCR(raw){
+  const text=normalizeHomeOCRText(raw),lines=text.split('\n').map(x=>x.trim()).filter(Boolean),out={};
+  let m=text.match(/(20\d{2})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日/);
+  if(m)out.date=`${m[1]}-${String(m[2]).padStart(2,'0')}-${String(m[3]).padStart(2,'0')}`;
+  m=text.match(/Lv[\.\s]*([0-9]{1,3})/i); if(m)out.catchLevel=m[1];
+  m=text.match(/ID\s*No[\.：:\s]*([0-9]{3,})/i); if(m)out.trainerId=m[1];
+  m=text.match(/([ァ-ヶー一-龠々]{2,}(?:地方|地方で))/); if(m)out.catchLocation=m[1].replace(/で$/,'');
+  if(/[♂]/.test(text))out.gender='♂'; else if(/[♀]/.test(text))out.gender='♀';
+  const labels=['せいかく','とくせい','もちもの'];
+  const vals={}; labels.forEach(l=>vals[l]=homeOcrLineValue(lines,l));
+  if(vals['せいかく'])out.nature=vals['せいかく'].split(/\s+/)[0];
+  if(vals['とくせい'])out.ability=vals['とくせい'].split(/\s+/)[0];
+  if(vals['もちもの'])out.heldItem=vals['もちもの'].split(/\s+/)[0];
+  // HOME下部の親/ID欄。OCRでは「親 bk」「親 | bk」などになりやすい。
+  for(const line of lines){
+    let mm=line.match(/(?:^|\s)親\s*[|｜:]?\s*([^\s|｜]{1,20})/); if(mm&&!/ID/i.test(mm[1])){out.otName=mm[1];break}
+  }
+  const statPatterns=[['statHP',/\bHP\s*([0-9]{1,3})/i],['statAtk',/こうげき\s*([0-9]{1,3})/],['statDef',/ぼうぎょ\s*([0-9]{1,3})/],['statSpA',/とくこう\s*([0-9]{1,3})/],['statSpD',/とくぼう\s*([0-9]{1,3})/],['statSpe',/すばやさ\s*([0-9]{1,3})/]];
+  statPatterns.forEach(([k,re])=>{const mm=text.match(re);if(mm)out[k]=mm[1]});
+  // 技名は「No.xxxx」の後～親欄の前に並ぶことが多い。明らかなUI語を除外して最大4件。
+  const uiWords=new Set(['ようすをみる','せいかく','とくせい','もちもの','なし','親','JPN','ヘルプ','もどる','連動ソフト','きそポイント','マーキング']);
+  const moveCandidates=[];
+  lines.forEach(line=>{
+    const z=line.replace(/[●○◯◉◎◇◆□■△▲☆★]/g,'').replace(/^No\.\d+\s*/i,'').trim();
+    if(!z||z.length<2||z.length>12||uiWords.has(z)||/^[0-9]+$/.test(z)||/^(HP|Lv|ID)/i.test(z)||/[0-9]{3,}/.test(z))return;
+    if(/^[ぁ-んァ-ヶー一-龠々]+$/.test(z)&&!['せいかく','とくせい','もちもの','すばやさ','こうげき','ぼうぎょ','とくこう','とくぼう'].includes(z))moveCandidates.push(z);
+  });
+  // 重複を除き、能力値ラベルやポケモン名らしき先頭項目を避けるため4文字以上の候補を優先。
+  out.moves=[...new Set(moveCandidates.filter(x=>x.length>=3))].slice(0,4);
+  return out;
+}
+function ensureHomeOcrModal(){
+  let ov=document.getElementById('home-ocr-overlay'); if(ov)return ov;
+  ov=document.createElement('div');ov.id='home-ocr-overlay';ov.style.cssText='position:fixed;inset:0;z-index:100050;background:rgba(1,7,15,.88);display:none;align-items:flex-start;justify-content:center;padding:18px;overflow:auto';
+  ov.innerHTML=`<div style="width:min(820px,96vw);margin:2vh auto;background:#0a1727;border:1px solid #315675;border-radius:18px;padding:18px;color:#eef8ff"><div style="display:flex;justify-content:space-between;gap:12px;align-items:center"><h2 style="margin:0">🔎 HOMEスクショ読取</h2><button type="button" onclick="closeHomeOcrModal()">✕</button></div><div id="home-ocr-status" style="margin:12px 0;color:#9ec8e8">画像を解析します。</div><img id="home-ocr-preview" alt="" style="width:100%;max-height:260px;object-fit:contain;background:#07111d;border-radius:12px;margin-bottom:12px"><div id="home-ocr-fields" class="detail-fields"></div><label style="display:flex;gap:8px;align-items:center;margin:12px 0"><input id="home-ocr-no-overwrite" type="checkbox" checked> すでに入力済みの項目は上書きしない</label><details><summary>OCRの生テキスト</summary><pre id="home-ocr-raw" style="white-space:pre-wrap;max-height:180px;overflow:auto;background:#06101a;padding:10px;border-radius:10px"></pre></details><div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px"><button type="button" class="btn" id="home-ocr-apply" disabled>この内容を個体情報へ反映</button><button type="button" onclick="closeHomeOcrModal()">閉じる</button></div></div>`;
+  ov.onclick=e=>{if(e.target===ov)closeHomeOcrModal()};document.body.appendChild(ov);return ov;
+}
+function closeHomeOcrModal(){const ov=document.getElementById('home-ocr-overlay');if(ov)ov.style.display='none'}
+function homeOcrFieldHTML(k,label,val,type='text'){
+  if(k==='moves')return `<div class="detail-field" style="grid-column:1/-1"><label>${label}</label><textarea data-home-ocr="${k}" rows="4">${esc(Array.isArray(val)?val.join('\n'):(val||''))}</textarea></div>`;
+  if(k==='gender')return `<div class="detail-field"><label>${label}</label><select data-home-ocr="${k}"><option value="">未検出</option><option value="♂" ${val==='♂'?'selected':''}>♂</option><option value="♀" ${val==='♀'?'selected':''}>♀</option><option value="不明" ${val==='不明'?'selected':''}>不明</option></select></div>`;
+  return `<div class="detail-field"><label>${label}</label><input data-home-ocr="${k}" type="${type}" value="${esc(val??'')}"></div>`;
+}
+async function readHomeScreenshot(id,uid,file){
+  if(!file)return;if(!file.type.startsWith('image/')){showToast('画像ファイルを選択してください。');return}
+  const arr=individualState[id]||[],ind=arr.find(x=>x.uid===uid);if(!ind)return;
+  const ov=ensureHomeOcrModal(),status=document.getElementById('home-ocr-status'),apply=document.getElementById('home-ocr-apply');ov.style.display='flex';apply.disabled=true;
+  try{
+    const dataUrl=await new Promise((resolve,reject)=>{const rd=new FileReader();rd.onload=()=>resolve(rd.result);rd.onerror=()=>reject(rd.error||new Error('画像を読み込めませんでした'));rd.readAsDataURL(file)});
+    document.getElementById('home-ocr-preview').src=dataUrl; status.textContent='OCRを準備しています…（初回は日本語データの読込に時間がかかります）';
+    const T=await loadHomeOCR();
+    const ret=await T.recognize(dataUrl,'jpn+eng',{logger:m=>{if(m.status==='recognizing text'&&Number.isFinite(m.progress))status.textContent=`文字を読み取っています… ${Math.round(m.progress*100)}%`}});
+    const raw=ret?.data?.text||'',parsed=parseHomeOCR(raw);document.getElementById('home-ocr-raw').textContent=raw||'（文字を検出できませんでした）';
+    const defs=[['date','捕獲日','date'],['catchLevel','レベル','number'],['gender','性別'],['nature','性格'],['ability','特性'],['heldItem','持ち物'],['otName','親名'],['trainerId','ID'],['catchLocation','捕獲場所'],['statHP','HP','number'],['statAtk','こうげき','number'],['statDef','ぼうぎょ','number'],['statSpA','とくこう','number'],['statSpD','とくぼう','number'],['statSpe','すばやさ','number'],['moves','技']];
+    document.getElementById('home-ocr-fields').innerHTML=defs.map(([k,l,t])=>homeOcrFieldHTML(k,l,parsed[k]??'',t)).join('');
+    status.textContent=`読取完了：${Object.entries(parsed).filter(([k,v])=>k!=='moves'?(v!==''&&v!=null):(Array.isArray(v)&&v.length)).length}項目を検出しました。内容を確認・修正してから反映してください。`;
+    ov.dataset.id=id;ov.dataset.uid=uid;ov.dataset.dataUrl=dataUrl;apply.disabled=false;
+    apply.onclick=()=>applyHomeOcrResult();
+  }catch(e){console.error(e);status.textContent='読取に失敗しました。ネット接続を確認して、もう一度試してください。';document.getElementById('home-ocr-raw').textContent=String(e?.message||e)}
+}
+async function applyHomeOcrResult(){
+  const ov=document.getElementById('home-ocr-overlay');if(!ov)return;const id=ov.dataset.id,uid=ov.dataset.uid,arr=individualState[id]||[],ind=arr.find(x=>x.uid===uid);if(!ind)return;
+  const noOverwrite=document.getElementById('home-ocr-no-overwrite')?.checked!==false;let changed=0;
+  document.querySelectorAll('#home-ocr-fields [data-home-ocr]').forEach(inp=>{
+    const k=inp.dataset.homeOcr;let v=inp.value.trim();if(k==='moves')v=v.split(/\n/).map(x=>x.trim()).filter(Boolean).slice(0,4);if((Array.isArray(v)&&!v.length)||(!Array.isArray(v)&&v===''))return;
+    const current=ind[k];const hasCurrent=Array.isArray(current)?current.length>0:(current!==''&&current!=null&&current!==false);if(noOverwrite&&hasCurrent)return;
+    ind[k]=v;changed++;
+  });
+  // HOMEスクショとしても保存する。画像保存失敗時は個体情報を壊さない。
+  try{if(ov.dataset.dataUrl){const key=screenshotKey(id,uid);await screenshotDBPut(key,ov.dataset.dataUrl);individualScreenshots[key]=ov.dataset.dataUrl;screenshotDBReady=true}}catch(e){console.error(e);showToast('情報は反映しましたが、スクショ画像は保存できませんでした。')}
+  openIndividualPanels.add(id);activeIndividualTabs.set(id,uid);save();requestAutoSyncAfterDataChange();closeHomeOcrModal();render();renderExtraPanels();showToast(`HOMEスクショから ${changed}項目を反映しました。`);
+}
+window.readHomeScreenshot=readHomeScreenshot;window.closeHomeOcrModal=closeHomeOcrModal;window.applyHomeOcrResult=applyHomeOcrResult;
+
 function allIndividualsFlat(){
   const out=[];
   Object.entries(individualState||{}).forEach(([id,list])=>{
@@ -4291,14 +4399,14 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 // ===== v56 automatic update / cache repair =====
 (function(){
-  const APP_VERSION='v135';
+  const APP_VERSION='v136';
   const UPDATE_KEY='shinyHomeReloadedForSW_'+APP_VERSION;
 
   async function registerFreshWorker(){
     if(!('serviceWorker' in navigator) || location.protocol==='file:') return;
     try{
       const reg = await navigator.serviceWorker.register(
-        './service-worker.js?v=135',
+        './service-worker.js?v=136',
         {updateViaCache:'none'}
       );
 
