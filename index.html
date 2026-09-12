@@ -139,6 +139,9 @@
 
 /* v128: Mobile hunt cards can collapse; Bingo only counts captures after board creation. */
 .bingo-shell{max-width:980px;margin:0 auto}.bingo-hero{display:flex;justify-content:space-between;gap:14px;align-items:flex-end;background:linear-gradient(135deg,#102b45,#0a1b2b 58%,#291d43);border:1px solid #335773;border-radius:18px;padding:18px;margin-bottom:12px}.bingo-hero h2{margin:3px 0 5px;font-size:25px}.bingo-hero p{margin:0;color:#8ea8bc;font-size:12px}.bingo-actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}.bingo-actions button{border:1px solid #335873;background:#102a40;color:#e9f7ff;border-radius:10px;padding:9px 12px;font-weight:900;cursor:pointer}.bingo-actions button.primary{background:#194e6e;border-color:#4e93bb}.bingo-progress{display:flex;align-items:center;justify-content:space-between;gap:10px;background:#091725;border:1px solid #29445f;border-radius:12px;padding:10px 13px;margin-bottom:10px}.bingo-progress strong{font-size:18px;color:#ffd86b}.bingo-board{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px;background:#07121e;border:1px solid #29445f;border-radius:16px;padding:9px}.bingo-cell{aspect-ratio:1/1.08;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:0;border:1px solid #29445f;border-radius:11px;background:radial-gradient(circle at 50% 36%,rgba(83,166,208,.14),rgba(8,22,35,.92) 62%);overflow:hidden;cursor:pointer}.bingo-cell img{width:72%;height:65%;object-fit:contain;filter:drop-shadow(0 6px 7px rgba(0,0,0,.35))}.bingo-cell small{position:absolute;left:5px;top:5px;font-size:8px;color:#67859b;font-weight:900}.bingo-cell b{width:92%;font-size:10px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bingo-cell.owned{border-color:#59e3b0;background:radial-gradient(circle at 50% 36%,rgba(89,227,176,.25),rgba(8,37,37,.96) 65%);box-shadow:inset 0 0 0 1px rgba(89,227,176,.12)}.bingo-cell.owned:after{content:'✓';position:absolute;right:5px;top:5px;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:#59e3b0;color:#05251c;font-size:14px;font-weight:1000}.bingo-lines{font-size:12px;color:#91aabc}.bingo-note{margin-top:10px;color:#718ca1;font-size:11px;text-align:center}.bingo-canvas-wrap{display:none}
+
+/* v129: compact individual tabs + clearer BINGO hits */
+.individual-tabs{display:flex;gap:6px;overflow-x:auto;padding:3px 1px 8px;scrollbar-width:thin}.individual-tab{flex:0 0 auto;border:1px solid #2b4a63;background:#0b1c2c;color:#bcd5e6;border-radius:9px;padding:7px 10px;font-size:10px;font-weight:900;cursor:pointer}.individual-tab.active{border-color:#66cfff;background:#123553;color:#fff;box-shadow:0 0 0 1px rgba(102,207,255,.15)}.individual-tab small{display:block;font-size:8px;color:#7f9db2;margin-top:2px}.individual-tab-add{color:#8fe6c4}.bingo-cell.owned{filter:saturate(.72)}.bingo-cell.owned:before{content:'○';position:absolute;inset:0;display:grid;place-items:center;color:#fff;font-size:64px;line-height:1;font-weight:1000;text-shadow:0 2px 10px rgba(0,0,0,.8);z-index:3;pointer-events:none}.bingo-cell.owned:after{content:'GET';right:6px;top:6px;width:auto;height:auto;padding:3px 6px;border-radius:999px;font-size:8px;z-index:4}.bingo-cell.bingo-line{box-shadow:inset 0 0 0 2px #ffd86b,0 0 14px rgba(255,216,107,.35);border-color:#ffd86b}
 @media(max-width:700px){.bingo-hero{align-items:stretch;flex-direction:column}.bingo-actions{justify-content:flex-start}.bingo-board{gap:4px;padding:5px}.bingo-cell{border-radius:8px}.bingo-cell b{font-size:8px}.bingo-cell small{font-size:7px}.bingo-cell.owned:after{width:17px;height:17px;font-size:11px}}
 
 .detail-card-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}
@@ -1136,7 +1139,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
       <div id="cloud-status" class="home-help">未設定です。</div>
       <div id="auto-sync-status" class="home-help" style="margin-top:8px">同期：v95 外出向け省通信</div><div id="network-status" class="net-pill">● 通信状態を確認中</div>
       <div class="home-help" style="margin-top:8px">
-        v128ではスマホの厳選カードを折りたたみ式にし、閉じた状態ではポケモン名・現在回数・本日回数・開始日数・累積確率・+1・捕獲を中心に表示します。詳細を開くとゲーム・厳選方法・ひかるおまもり・ボール・+10/+100/-1・セッション・リセット・厳選終了を操作できます。累積確率は小数点以下2桁で表示します。色違いBINGOは盤面作成時点の所持数を基準として保存し、それ以前に捕獲済みのポケモンは達成扱いにせず、盤面作成後に新たに捕獲した個体だけが自動で埋まります。既存のコレクション・個体・画像・厳選データ構造は変更しません。スマホ起動時は安全クラウドバックアップからコレクションを一方向で取り込み、厳選データは専用同期します。
+        v129では色違いBINGOの達成マスに大きな○とGET表示を重ね、BINGO成立ラインも強調します。個体一覧は複数個体を縦に並べず、1匹目・2匹目…のタブで切り替え、選択中の1個体だけを表示します。個体編集欄の上にあった大型要約カードは削除し、詳細情報は折りたたみのまま維持します。既存のコレクション・個体・画像・厳選データ構造は変更しません。スマホ起動時は安全クラウドバックアップからコレクションを一方向で取り込み、厳選データは専用同期します。
       </div>
       <div class="home-help" style="margin-top:10px">初回は「設定保存」→「接続テスト」の順に確認してください。既存データがある場合、確認前にクラウドへ保存しないでください。</div>
     </div>
@@ -1144,7 +1147,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 </section>
 
 <script>
-const DATA_VERSION='full-2026-09-12-v128';
+const DATA_VERSION='full-2026-09-12-v129';
 const SPECIES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species.csv';
 const NAMES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
 const MAX_DEX=1025;
@@ -1553,6 +1556,7 @@ function individualBadges(id,uid){
 // This prevents the newly added editor from disappearing after saving fields
 // or after another panel/stat refresh.
 const openIndividualPanels=new Set();
+const activeIndividualTabs=new Map();
 let pendingIndividualFocus=null;
 function restoreOpenIndividualPanels(){
   for(const id of [...openIndividualPanels]){
@@ -1604,7 +1608,6 @@ function individualRowHTML(p,ind,i){
       <div><strong>${esc(p.name)} ${ord}匹目</strong><div class="badge-row">${individualBadges(p.id,ind.uid).map(b=>`<span class="memory-badge">${esc(b)}</span>`).join('')}</div></div>
       <div class="detail-nav">${(individualState[p.id]||[]).length>1?`<button type="button" onclick="focusAdjacentIndividual('${esc(p.id)}','${esc(ind.uid)}',-1)">← 前の個体</button><button type="button" onclick="focusAdjacentIndividual('${esc(p.id)}','${esc(ind.uid)}',1)">次の個体 →</button>`:''}<button class="deletebtn" onclick="deleteIndividual('${esc(p.id)}',${i})">削除</button></div>
     </div>
-    ${individualShowcaseHTML(p,ind,ord)}
     <div class="detail-fields">
       <div class="detail-field"><label>捕獲日</label><input type="date" value="${esc(ind.date||'')}" oninput="setIndividualLive('${esc(p.id)}',${i},'date',this.value)" onchange="setIndividual('${esc(p.id)}',${i},'date',this.value)"></div>
       <div class="detail-field"><label>ゲーム</label><select oninput="setIndividualLive('${esc(p.id)}',${i},'game',this.value)" onchange="setIndividual('${esc(p.id)}',${i},'game',this.value)">${gameOptionsHTML(ind.game||'')}</select></div>
@@ -1655,9 +1658,22 @@ function ownedBallIcons(id){
   return `<div class="card-ball-row">${entries.map(([s,c])=>`<span class="sprite-ball" title="${esc(ballName(s))}${c>1?` ×${c}`:''}"><img src="${ballIcon(s)}" alt="${esc(ballName(s))}">${c>1?`<em>${c}</em>`:''}</span>`).join('')}</div>`;
 }
 
+function individualTabsHTML(p,inds){
+  if(!inds.length)return '';
+  let uid=activeIndividualTabs.get(p.id);
+  if(!inds.some(x=>x.uid===uid))uid=inds[0].uid;
+  activeIndividualTabs.set(p.id,uid);
+  const idx=inds.findIndex(x=>x.uid===uid),ind=inds[idx];
+  const tabs=inds.map((x,i)=>`<button type="button" class="individual-tab ${x.uid===uid?'active':''}" onclick="selectIndividualTab('${esc(p.id)}','${esc(x.uid)}')">${i+1}匹目<small>${esc(x.date||x.game||'未登録')}</small></button>`).join('');
+  return `<div class="individual-tabs">${tabs}<button type="button" class="individual-tab individual-tab-add" onclick="addIndividual('${esc(p.id)}')">＋ 個体追加</button></div>${individualRowHTML(p,ind,idx)}`;
+}
+function selectIndividualTab(id,uid){
+  activeIndividualTabs.set(id,uid);openIndividualPanels.add(id);
+  refreshSingleCollectionCard(id,{openIndividuals:true,focusUid:uid});
+}
 function cardHTML(p){
   const inds=individualState[p.id]||[], count=inds.length, targeted=!!targetState[p.id];
-  return `<article class="card ${count?'owned':''}" data-id="${esc(p.id)}" style="${p.locked?'opacity:.68;':''}"><div class="sprite" onclick="showPokemonDetail('${esc(p.id)}')"><img loading="lazy" src="${spriteURL(p)}" alt="" onerror="if(!this.dataset.fallback){this.dataset.fallback='1';this.src='${baseSpriteURL(p)}'}else{this.style.display='none'}"></div><div><div class="number">No.${String(p.no).padStart(4,'0')} · GEN ${p.gen}</div><div class="name" onclick="showPokemonDetail('${esc(p.id)}')">${esc(p.name)} ${hasRecentIndividual(p.id,7)?'<span class="new-badge">NEW</span>':''}</div>${targeted?'<div class="tags"><span class="tag target-tag">🎯 次に狙う</span></div>':''}${ownedBallIcons(p.id)}</div>${p.locked?'':`<div class="individual-summary"><div class="individual-head"><span class="countbadge">${count?`✓ ${count}匹所持`:'未所持'}</span><div><button class="target-btn ${targeted?'active':''}" onclick="toggleTarget('${esc(p.id)}')">🎯 ${targeted?'厳選中':'厳選する'}</button> <button class="smallbtn" onclick="addIndividual('${esc(p.id)}')">＋ 個体を追加</button>${count?` <button class="smallbtn" onclick="toggleIndividuals('${esc(p.id)}')">個体一覧</button>`:''}</div></div><div class="individuals" id="inds-${encodeURIComponent(p.id)}">${inds.map((ind,i)=>individualRowHTML(p,ind,i)).join('')}</div></div>`}${p.locked?'<div class="individual-summary"><span class="countbadge">🔒 色違い未解禁</span></div>':''}</article>`;
+  return `<article class="card ${count?'owned':''}" data-id="${esc(p.id)}" style="${p.locked?'opacity:.68;':''}"><div class="sprite" onclick="showPokemonDetail('${esc(p.id)}')"><img loading="lazy" src="${spriteURL(p)}" alt="" onerror="if(!this.dataset.fallback){this.dataset.fallback='1';this.src='${baseSpriteURL(p)}'}else{this.style.display='none'}"></div><div><div class="number">No.${String(p.no).padStart(4,'0')} · GEN ${p.gen}</div><div class="name" onclick="showPokemonDetail('${esc(p.id)}')">${esc(p.name)} ${hasRecentIndividual(p.id,7)?'<span class="new-badge">NEW</span>':''}</div>${targeted?'<div class="tags"><span class="tag target-tag">🎯 次に狙う</span></div>':''}${ownedBallIcons(p.id)}</div>${p.locked?'':`<div class="individual-summary"><div class="individual-head"><span class="countbadge">${count?`✓ ${count}匹所持`:'未所持'}</span><div><button class="target-btn ${targeted?'active':''}" onclick="toggleTarget('${esc(p.id)}')">🎯 ${targeted?'厳選中':'厳選する'}</button> <button class="smallbtn" onclick="addIndividual('${esc(p.id)}')">＋ 個体を追加</button>${count?` <button class="smallbtn" onclick="toggleIndividuals('${esc(p.id)}')">個体一覧</button>`:''}</div></div><div class="individuals" id="inds-${encodeURIComponent(p.id)}">${individualTabsHTML(p,inds)}</div></div>`}${p.locked?'<div class="individual-summary"><span class="countbadge">🔒 色違い未解禁</span></div>':''}</article>`;
 }
 function refreshSingleCollectionCard(id,{openIndividuals=false,focusUid=null}={}){
   const p=data.find(x=>x.id===id); if(!p)return false;
@@ -2646,9 +2662,9 @@ function adjacentIndividual(id,uid,dir){
 }
 function focusAdjacentIndividual(id,uid,dir){
   const next=adjacentIndividual(id,uid,dir);if(!next)return;
-  const target=document.querySelector(`[data-individual-uid="${CSS.escape(next.uid)}"]`);
-  if(target)target.scrollIntoView({behavior:'smooth',block:'center'});
+  selectIndividualTab(id,next.uid);
 }
+
 
 
 function recentDays(dateStr){
@@ -3188,6 +3204,13 @@ function bingoEnsureBoard(){
   const newIds=pool.slice(0,25).map(p=>p.id);
   bingoState={ids:newIds,generatedAt:new Date().toISOString(),baselineCounts:bingoBaselineFor(newIds)};safeLocalSet('shinyHomeBingo_v1',JSON.stringify(bingoState));
 }
+function bingoWinningCells(ids){
+  const hit=ids.map(id=>bingoIsHit(id)),win=new Set(),groups=[];
+  for(let r=0;r<5;r++)groups.push([0,1,2,3,4].map(c=>r*5+c));
+  for(let c=0;c<5;c++)groups.push([0,1,2,3,4].map(r=>r*5+c));
+  groups.push([0,6,12,18,24],[4,8,12,16,20]);
+  groups.forEach(g=>{if(g.every(i=>hit[i]))g.forEach(i=>win.add(i))});return win;
+}
 function bingoLineCount(ids){
   const hit=ids.map(id=>bingoIsHit(id)),lines=[];
   for(let r=0;r<5;r++)lines.push([0,1,2,3,4].map(c=>r*5+c));
@@ -3198,7 +3221,8 @@ function bingoLineCount(ids){
 function renderShinyBingo(){
   const board=el('bingo-board');if(!board||!data.length)return;bingoEnsureBoard();
   const ids=bingoState.ids||[],rows=ids.map(id=>data.find(p=>p.id===id)).filter(Boolean),owned=ids.filter(id=>bingoIsHit(id)).length,lines=bingoLineCount(ids);
-  board.innerHTML=rows.map(p=>`<button type="button" class="bingo-cell ${bingoIsHit(p.id)?'owned':''}" onclick="showPokemonDetail('${esc(p.id)}')" title="No.${String(p.no).padStart(4,'0')} ${esc(p.name)}"><small>No.${String(p.no).padStart(3,'0')}</small><img src="${spriteURL(p)}" onerror="this.src='${baseSpriteURL(p)}'" alt=""><b>${esc(p.name)}</b></button>`).join('');
+  const winning=bingoWinningCells(ids);
+  board.innerHTML=rows.map((p,i)=>`<button type="button" class="bingo-cell ${bingoIsHit(p.id)?'owned':''} ${winning.has(i)?'bingo-line':''}" onclick="showPokemonDetail('${esc(p.id)}')" title="No.${String(p.no).padStart(4,'0')} ${esc(p.name)}"><small>No.${String(p.no).padStart(3,'0')}</small><img src="${spriteURL(p)}" onerror="this.src='${baseSpriteURL(p)}'" alt=""><b>${esc(p.name)}</b></button>`).join('');
   if(el('bingo-owned'))el('bingo-owned').textContent=`${owned} / 25`;
   if(el('bingo-lines'))el('bingo-lines').textContent=lines?`${lines} BINGO ✨`:'0 BINGO';
   if(el('bingo-note')){const d=bingoState.generatedAt?new Date(bingoState.generatedAt):null;el('bingo-note').textContent=`達成 ${owned}/25 ・ ${lines} BINGO${d&&!Number.isNaN(d.getTime())?' ・ 開始 '+d.toLocaleDateString('ja-JP'):''}。開始後に新しく捕獲した個体だけを判定します。`}
@@ -4202,14 +4226,14 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 // ===== v56 automatic update / cache repair =====
 (function(){
-  const APP_VERSION='v128';
+  const APP_VERSION='v129';
   const UPDATE_KEY='shinyHomeReloadedForSW_'+APP_VERSION;
 
   async function registerFreshWorker(){
     if(!('serviceWorker' in navigator) || location.protocol==='file:') return;
     try{
       const reg = await navigator.serviceWorker.register(
-        './service-worker.js?v=128',
+        './service-worker.js?v=129',
         {updateViaCache:'none'}
       );
 
