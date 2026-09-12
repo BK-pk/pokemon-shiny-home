@@ -114,6 +114,33 @@
 .game-image-preview.show{display:block}
 .game-image-preview canvas{display:block;width:100%;height:auto;border-radius:10px}
 .detail-card{background:#091725;border:1px solid #29445f;border-radius:12px;padding:10px;margin-top:8px}
+
+/* v124: read-only showcase card + screenshot mode. Existing saved data is not rewritten. */
+.individual-showcase{display:grid;grid-template-columns:132px minmax(0,1fr);gap:14px;align-items:stretch;background:linear-gradient(135deg,#0d2942,#081725 55%,#10253a);border:1px solid #37617d;border-radius:16px;padding:13px;margin:9px 0 12px;box-shadow:0 8px 28px rgba(0,0,0,.18)}
+.individual-showcase-media{position:relative;min-height:132px;display:grid;place-items:center;background:radial-gradient(circle at 50% 35%,rgba(103,213,255,.20),rgba(4,17,29,.85) 62%);border:1px solid #294f69;border-radius:14px;overflow:hidden}
+.individual-showcase-media>img.poke{width:122px;height:122px;object-fit:contain;filter:drop-shadow(0 8px 12px rgba(0,0,0,.34))}
+.individual-showcase-media .ball-float{position:absolute;right:8px;bottom:8px;width:30px;height:30px;object-fit:contain;background:rgba(4,17,29,.8);border-radius:50%;padding:3px}
+.individual-showcase-body{min-width:0;display:flex;flex-direction:column;gap:8px}
+.individual-showcase-title{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.individual-showcase-title strong{font-size:18px;line-height:1.15}.individual-showcase-title small{display:block;color:#8eb0c8;font-size:10px;margin-top:3px}
+.individual-game-badge{flex:0 0 auto;background:#174361;border:1px solid #3a7194;color:#eaf8ff;border-radius:999px;padding:5px 9px;font-size:10px;font-weight:900;max-width:46%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.individual-showcase-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.individual-showcase-item{background:rgba(5,18,30,.64);border:1px solid #24445e;border-radius:9px;padding:6px 8px;min-width:0}.individual-showcase-item span{display:block;color:#7899af;font-size:9px;margin-bottom:2px}.individual-showcase-item b{display:block;color:#f2f9ff;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.individual-showcase-memo{font-size:11px;line-height:1.55;color:#c8d8e4;background:rgba(4,16,27,.6);border-radius:9px;padding:7px 9px;overflow-wrap:anywhere}.individual-showcase-memo:empty{display:none}
+.card-shot-btn{border-color:#5384a4!important;background:linear-gradient(180deg,#153b56,#102b40)!important;color:#e9f8ff!important;font-weight:900!important}
+@media(max-width:620px){.individual-showcase{grid-template-columns:98px minmax(0,1fr);gap:9px;padding:9px}.individual-showcase-media{min-height:106px}.individual-showcase-media>img.poke{width:94px;height:94px}.individual-showcase-title strong{font-size:15px}.individual-showcase-grid{grid-template-columns:1fr 1fr}.individual-game-badge{max-width:42%}}
+
+/* v126: completed Pokédex detail summary/history. Read-only; no existing individual data is rewritten. */
+.dex-collection-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin:10px 0 12px}
+.dex-summary-card{background:linear-gradient(145deg,#0e2335,#091724);border:1px solid #2c4f68;border-radius:13px;padding:11px;min-width:0}.dex-summary-card span{display:block;color:#83a2b9;font-size:10px;margin-bottom:4px}.dex-summary-card b{display:block;font-size:15px;color:#f4fbff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.dex-summary-card.accent b{color:#ffd86b}
+.dex-capture-history{display:grid;gap:7px}.dex-history-row{display:grid;grid-template-columns:92px minmax(120px,1fr) minmax(120px,1fr) minmax(110px,1fr) minmax(95px,1fr);gap:7px;align-items:center;background:#081724;border:1px solid #213d53;border-radius:10px;padding:8px 10px;font-size:11px}.dex-history-row>span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.dex-history-row .date{font-weight:900;color:#dff5ff}.dex-history-row .muted{color:#91a9bb}.dex-history-empty{color:#7f9aae;font-size:11px;padding:8px}
+.dex-form-switch-title{display:flex;align-items:center;justify-content:space-between;gap:10px}.dex-form-switch-title small{color:#7f9aae;font-weight:500}
+@media(max-width:760px){.dex-collection-summary{grid-template-columns:1fr 1fr}.dex-history-row{grid-template-columns:86px 1fr 1fr}.dex-history-row .hide-mobile{display:none}}
+
+/* v127: Shiny Bingo. Board state is isolated in shinyHomeBingo_v1. */
+.bingo-shell{max-width:980px;margin:0 auto}.bingo-hero{display:flex;justify-content:space-between;gap:14px;align-items:flex-end;background:linear-gradient(135deg,#102b45,#0a1b2b 58%,#291d43);border:1px solid #335773;border-radius:18px;padding:18px;margin-bottom:12px}.bingo-hero h2{margin:3px 0 5px;font-size:25px}.bingo-hero p{margin:0;color:#8ea8bc;font-size:12px}.bingo-actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}.bingo-actions button{border:1px solid #335873;background:#102a40;color:#e9f7ff;border-radius:10px;padding:9px 12px;font-weight:900;cursor:pointer}.bingo-actions button.primary{background:#194e6e;border-color:#4e93bb}.bingo-progress{display:flex;align-items:center;justify-content:space-between;gap:10px;background:#091725;border:1px solid #29445f;border-radius:12px;padding:10px 13px;margin-bottom:10px}.bingo-progress strong{font-size:18px;color:#ffd86b}.bingo-board{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px;background:#07121e;border:1px solid #29445f;border-radius:16px;padding:9px}.bingo-cell{aspect-ratio:1/1.08;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:0;border:1px solid #29445f;border-radius:11px;background:radial-gradient(circle at 50% 36%,rgba(83,166,208,.14),rgba(8,22,35,.92) 62%);overflow:hidden;cursor:pointer}.bingo-cell img{width:72%;height:65%;object-fit:contain;filter:drop-shadow(0 6px 7px rgba(0,0,0,.35))}.bingo-cell small{position:absolute;left:5px;top:5px;font-size:8px;color:#67859b;font-weight:900}.bingo-cell b{width:92%;font-size:10px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bingo-cell.owned{border-color:#59e3b0;background:radial-gradient(circle at 50% 36%,rgba(89,227,176,.25),rgba(8,37,37,.96) 65%);box-shadow:inset 0 0 0 1px rgba(89,227,176,.12)}.bingo-cell.owned:after{content:'✓';position:absolute;right:5px;top:5px;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:#59e3b0;color:#05251c;font-size:14px;font-weight:1000}.bingo-lines{font-size:12px;color:#91aabc}.bingo-note{margin-top:10px;color:#718ca1;font-size:11px;text-align:center}.bingo-canvas-wrap{display:none}
+@media(max-width:700px){.bingo-hero{align-items:stretch;flex-direction:column}.bingo-actions{justify-content:flex-start}.bingo-board{gap:4px;padding:5px}.bingo-cell{border-radius:8px}.bingo-cell b{font-size:8px}.bingo-cell small{font-size:7px}.bingo-cell.owned:after{width:17px;height:17px;font-size:11px}}
+
 .detail-card-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}
 .detail-card-head strong{font-size:14px}
 .detail-fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:7px}
@@ -656,15 +683,15 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 .dex-compare{display:grid;grid-template-columns:1fr 1fr;gap:10px}.dex-compare-card{position:relative;min-height:300px;border:1px solid #294f68;border-radius:16px;background:radial-gradient(circle at 50% 36%,rgba(73,174,220,.18),rgba(8,24,38,.92) 62%);padding:12px;text-align:center;overflow:hidden}
 .dex-compare-card.shiny{border-color:#9a7a26;background:radial-gradient(circle at 50% 36%,rgba(255,213,88,.18),rgba(8,24,38,.92) 62%)}
 .dex-compare-label{font-size:12px;font-weight:900;color:#cceafb;letter-spacing:.04em}.dex-compare-card.shiny .dex-compare-label{color:#ffe79a}
-.dex-compare-card img{width:min(280px,92%);height:245px;object-fit:contain;filter:drop-shadow(0 18px 16px rgba(0,0,0,.42))}
+.dex-compare-card img{width:min(300px,94%);height:255px;object-fit:contain;filter:drop-shadow(0 18px 16px rgba(0,0,0,.42))}.dex-compare-caption{margin-top:4px;color:#7fa0b7;font-size:10px}.dex-compare-card.shiny .dex-compare-caption{color:#c9b26e}
 .dex-detail-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:12px}.dex-info-panel{background:#0b1928;border:1px solid #29445f;border-radius:14px;padding:13px}.dex-info-panel h3{margin:0 0 10px;font-size:15px;color:#bfeeff}
 .dex-basic-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.dex-kv{background:#0e2133;border:1px solid #203c55;border-radius:9px;padding:8px}.dex-kv span{display:block;color:#8ea9bd;font-size:10px}.dex-kv b{display:block;margin-top:3px;font-size:13px}
 .dex-types{display:flex;gap:6px;flex-wrap:wrap}.dex-type{display:inline-flex;padding:4px 9px;border-radius:999px;background:#17334a;border:1px solid #335b78;font-size:11px;font-weight:900}
 .dex-flavor{line-height:1.8;color:#dcecf7;white-space:pre-wrap;min-height:72px}.dex-source-note{color:#7895a9;font-size:10px;margin-top:8px}
 .dex-stat-list{display:grid;gap:6px}.dex-stat-row{display:grid;grid-template-columns:82px 1fr 36px;gap:7px;align-items:center;font-size:11px}.dex-stat-track{height:8px;background:#15293a;border-radius:99px;overflow:hidden}.dex-stat-fill{height:100%;background:linear-gradient(90deg,#3e9fe8,#63e0cf);border-radius:99px}
-.dex-owned-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:2px}.dex-owned-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px}.dex-owned-card{background:#0d2031;border:1px solid #29445f;border-radius:11px;padding:9px;display:grid;grid-template-columns:70px 1fr;gap:9px;align-items:center}.dex-owned-card img{width:68px;height:68px;object-fit:contain}.dex-owned-card b{display:block}.dex-owned-card small{color:#a9becd;line-height:1.55}.dex-related{display:flex;gap:7px;flex-wrap:wrap}.dex-related button{border:1px solid #31536c;background:#0e2030;color:#dbeef9;padding:7px 9px;border-radius:9px;cursor:pointer}.dex-related button.active{border-color:#55cdfd;background:#0d5278}
+.dex-owned-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:2px}.dex-owned-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px}.dex-owned-card{background:#0d2031;border:1px solid #29445f;border-radius:13px;padding:10px;display:grid;grid-template-columns:86px 1fr;gap:10px;align-items:start}.dex-owned-card img{width:84px;height:84px;object-fit:contain;border-radius:10px;background:#081522}.dex-owned-card b{display:block;font-size:14px}.dex-owned-card small{color:#a9becd;line-height:1.55}.dex-owned-meta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;margin-top:7px}.dex-owned-meta span{display:block;background:#0a1927;border:1px solid #203b55;border-radius:8px;padding:6px 7px;font-size:10px;color:#8fa9bc}.dex-owned-meta strong{display:block;margin-top:2px;color:#e9f7ff;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.dex-owned-memo{margin-top:7px;padding:7px 8px;border-radius:8px;background:#101d2a;color:#bed0dc;font-size:10px;line-height:1.55;white-space:pre-wrap}.dex-related{display:flex;gap:7px;flex-wrap:wrap}.dex-related button{border:1px solid #31536c;background:#0e2030;color:#dbeef9;padding:7px 9px;border-radius:9px;cursor:pointer}.dex-related button.active{border-color:#55cdfd;background:#0d5278}
 .dex-loading{color:#8ca7ba;padding:8px 0}
-@media(max-width:760px){.dex-detail-title{padding-right:0}.dex-detail-title h2{font-size:24px}.dex-compare{grid-template-columns:1fr 1fr}.dex-compare-card{min-height:210px}.dex-compare-card img{height:165px}.dex-detail-grid{grid-template-columns:1fr}.dex-owned-grid{grid-template-columns:1fr}.pokemon-modal-card{padding:12px}.dex-basic-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:760px){.dex-detail-title{padding-right:0}.dex-detail-title h2{font-size:24px}.dex-compare{grid-template-columns:1fr 1fr}.dex-compare-card{min-height:210px}.dex-compare-card img{height:165px}.dex-detail-grid{grid-template-columns:1fr}.dex-owned-grid{grid-template-columns:1fr}.pokemon-modal-card{padding:12px}.dex-basic-grid{grid-template-columns:1fr 1fr}.dex-owned-card{grid-template-columns:76px 1fr}.dex-owned-card img{width:74px;height:74px}}
 @media(max-width:520px){.dex-compare{gap:6px}.dex-compare-card{padding:8px;min-height:180px}.dex-compare-card img{height:140px}.dex-stat-row{grid-template-columns:70px 1fr 32px}}
 
 /* ===== v117 hunting master / timer / sessions ===== */
@@ -777,6 +804,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 <button class="app-tab" data-tab="gallery" onclick="switchAppTab('gallery',this)" type="button">
 <img alt="" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/235.png"/>スクショギャラリー
   </button>
+<button class="app-tab" data-tab="bingo" onclick="switchAppTab('bingo',this)" type="button">🎯 色違いBINGO</button>
 <button class="app-tab" data-tab="sync" onclick="switchAppTab('sync',this)" type="button">☁️ 同期・設定</button>
 </nav><section class="tab-page" id="tab-home">
   <div class="desktop-home">
@@ -1023,12 +1051,25 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 <div class="milestone-grid" id="milestone-grid"></div>
 </details></section>
 
+<section class="tab-page" id="tab-bingo">
+  <div class="bingo-shell">
+    <section class="bingo-hero">
+      <div><div class="eyebrow">SHINY BINGO</div><h2>色違いBINGO</h2><p>全国図鑑の基本個体から25匹をランダム生成。所持済みのポケモンは自動で埋まります。</p></div>
+      <div class="bingo-actions"><button class="primary" onclick="generateShinyBingo()">🎲 新しいBINGO</button><button onclick="downloadBingoImage()">🖼 PNGで保存</button></div>
+    </section>
+    <div class="bingo-progress"><div><span class="bingo-lines" id="bingo-lines">0 BINGO</span></div><strong id="bingo-owned">0 / 25</strong></div>
+    <div class="bingo-board" id="bingo-board"></div>
+    <div class="bingo-note" id="bingo-note">盤面はこの端末に保存されます。捕獲登録すると所持済み判定は自動で更新されます。</div>
+    <div class="bingo-canvas-wrap"><canvas id="bingo-canvas" width="1200" height="1350"></canvas></div>
+  </div>
+</section>
+
 <section id="tab-sync" class="tab-page">
   <div class="sync-grid">
     <div class="extra-panel">
       <div class="extra-head">
         <div><h2 style="margin:0">☁️ Supabase 同期</h2>
-        <span class="section-count">PC・iPhone・iPadで同じ厳選データを共有 ・ build v120</span></div>
+        <span class="section-count">PC・iPhone・iPadで同じ厳選データを共有 ・ build v124</span></div>
       </div>
       <div class="sync-local-tools">
         <div class="sync-local-head"><div><strong>🛟 データ保護・バックアップ</strong><small>普段はここだけで管理します</small></div><button class="btn" onclick="undoLastChange()" type="button">↶ 1つ前に戻す</button></div>
@@ -1039,6 +1080,8 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
           <button class="btn" id="importImagesBtn">画像だけ読込</button>
           <button class="btn" id="rescuePreUpdateImagesBtn" type="button" onclick="rescuePreUpdateScreenshots()">🖼️ 更新前画像だけ救出</button>
           <button class="btn" id="diagnoseImagesBtn" type="button" onclick="diagnoseScreenshotStorage()">🔎 画像データを診断</button>
+          <button class="btn" id="recoverIndividualMetaBtn" type="button" onclick="recoverMissingIndividualMetadata()">🧩 空欄の個体項目を救出</button>
+          <button class="btn" id="runRegressionBtn" type="button" onclick="runDataRegressionCheck(true)">✅ データ回帰チェック</button>
           <button class="btn" id="restorePreUpdateBtn" type="button" onclick="restorePreUpdateBackup()">🛟 更新前に戻す</button>
           <button class="btn" id="backupHistoryBtn" type="button" onclick="openBackupHistory()">🗂 履歴</button>
           <button class="btn" onclick="showBackupInfo()" type="button">自動バックアップ</button>
@@ -1063,10 +1106,11 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
         <button class="btn" id="cloud-auto-backup-restore" type="button">↶ 安全バックアップから復元</button>
       </div>
       <div id="cloud-auto-backup-status" class="home-help" style="margin-top:8px">自動バックアップ：待機中</div>
+      <div id="regression-status" class="home-help" style="margin-top:8px">データ回帰チェック：未実行</div>
       <div id="cloud-status" class="home-help">未設定です。</div>
       <div id="auto-sync-status" class="home-help" style="margin-top:8px">同期：v95 外出向け省通信</div><div id="network-status" class="net-pill">● 通信状態を確認中</div>
       <div class="home-help" style="margin-top:8px">
-        v120では捕獲スクショの保存先をlocalStorageからIndexedDBへ分離しました。画像追加時にlocalStorage容量を圧迫しません。厳選方法マスター・記録方式の自動切替・タイマー・セッション記録はそのまま利用できます。スマホ起動時は安全クラウドバックアップからコレクションを一方向で取り込み、厳選データは専用同期します。10秒操作がなければクラウドへ保存し、他端末は最新時刻の値だけを取り込みます。所持状況・HOME BOXなどのフルデータは上のボタンで手動同期します。
+        v127ではv126の図鑑詳細完成版を維持したまま、5×5の色違いBINGOを追加しました。全国図鑑の基本個体から25匹をランダム生成し、所持済みは自動で達成表示します。盤面は端末に保存され、いつでも作り直し・PNG画像保存ができます。既存コレクションや個体データの保存構造は変更しません。スマホ起動時は安全クラウドバックアップからコレクションを一方向で取り込み、厳選データは専用同期します。10秒操作がなければクラウドへ保存し、他端末は最新時刻の値だけを取り込みます。所持状況・HOME BOXなどのフルデータは上のボタンで手動同期します。
       </div>
       <div class="home-help" style="margin-top:10px">初回は「設定保存」→「接続テスト」の順に確認してください。既存データがある場合、確認前にクラウドへ保存しないでください。</div>
     </div>
@@ -1074,7 +1118,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 </section>
 
 <script>
-const DATA_VERSION='full-2026-09-11-v120';
+const DATA_VERSION='full-2026-09-12-v127';
 const SPECIES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species.csv';
 const NAMES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
 const MAX_DEX=1025;
@@ -1088,6 +1132,7 @@ const individualState=JSON.parse(localStorage.getItem('shinyHomeIndividuals_v1')
 const targetState=JSON.parse(localStorage.getItem('shinyHomeTargets_v1')||'{}');
 const huntState=JSON.parse(localStorage.getItem('shinyHomeHunts_v1')||'{}');
 const monthImages=JSON.parse(localStorage.getItem('shinyHomeMonthImages_v1')||'{}');
+let bingoState=(()=>{try{const x=JSON.parse(localStorage.getItem('shinyHomeBingo_v1')||'null');return x&&typeof x==='object'?x:{ids:[],generatedAt:''}}catch(_){return {ids:[],generatedAt:''}}})();
 const individualScreenshots=JSON.parse(localStorage.getItem('shinyHomeIndividualScreenshots_v1')||'{}');
 const SCREENSHOT_DB_NAME='shinyHomeImages_v1', SCREENSHOT_STORE='screenshots';
 let screenshotDBReady=false;
@@ -1364,7 +1409,7 @@ async function loadSpecies(){
 }
 let backupRestoring=false;
 function currentDataSnapshot(){
-  return {state,boxState,dateState,gameState,individualState,targetState,huntState,monthImages};
+  return {state,boxState,dateState,gameState,individualState,targetState,huntState,monthImages,bingoState};
 }
 function safeLocalSet(key,value){
   try{localStorage.setItem(key,value);return true}
@@ -1391,6 +1436,7 @@ function save(){
   safeLocalSet('shinyHomeTargets_v1',JSON.stringify(targetState));
   safeLocalSet('shinyHomeHunts_v1',JSON.stringify(huntState));
   safeLocalSet('shinyHomeMonthImages_v1',JSON.stringify(monthImages));
+  safeLocalSet('shinyHomeBingo_v1',JSON.stringify(bingoState));
   // v120: 捕獲スクショは IndexedDB 専用。localStorage へは書き戻さない。
 }
 function newIndividual(seed={}){return {uid:seed.uid||Date.now().toString(36)+Math.random().toString(36).slice(2,7),date:seed.date||'',game:seed.game||'',box:seed.box||'',nickname:seed.nickname||'',source:seed.source||'',ball:seed.ball||'',memo:seed.memo||'',favorite:!!seed.favorite,huntCount:Number(seed.huntCount)||0,huntStart:seed.huntStart||'',huntMethod:seed.huntMethod||'',huntCharm:seed.huntCharm||'',huntTargetId:seed.huntTargetId||'',huntTargetName:seed.huntTargetName||'',huntJournal:Array.isArray(seed.huntJournal)?seed.huntJournal:[],huntSessions:Array.isArray(seed.huntSessions)?seed.huntSessions:[],huntElapsedMs:Number(seed.huntElapsedMs)||0,huntRecordMode:seed.huntRecordMode||'',nature:seed.nature||'',ability:seed.ability||'',teraType:seed.teraType||'',ribbons:seed.ribbons||'',otName:seed.otName||'',trainerId:seed.trainerId||'',catchLocation:seed.catchLocation||'',catchLevel:seed.catchLevel==null?'':seed.catchLevel,isAlpha:!!seed.isAlpha,size:seed.size||''};}
@@ -1438,7 +1484,17 @@ function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;',
 function sectionRank(p){return {base:0,region:1,gender:2,form:3,gmax:4}[p.section]??9}
 
 const gameOptions=['','赤・緑・青・ピカチュウ','金・銀・クリスタル','ルビー・サファイア・エメラルド','FRLG','DP・Pt','HGSS','BW','BW2','XY','ORAS','SM','USUM','Let’s Go','剣盾','BDSP','Pokémon LEGENDS アルセウス','SV','Pokémon GO','交換・その他'];
-function gameOptionsHTML(selected=''){return gameOptions.map(g=>`<option value="${esc(g)}" ${selected===g?'selected':''}>${g||'入手ソフト'}</option>`).join('')}
+function gameOptionsHTML(selected=''){
+  const cur=String(selected||''),vals=[...gameOptions];
+  if(cur&&!vals.includes(cur))vals.splice(1,0,cur);
+  return vals.map(g=>`<option value="${esc(g)}" ${cur===g?'selected':''}>${g||'入手ソフト'}</option>`).join('')
+}
+const SOURCE_OPTIONS=['自己産','交換','配布','その他'];
+function sourceOptionsHTML(selected=''){
+  const cur=String(selected||''),vals=[...SOURCE_OPTIONS];
+  if(cur&&!vals.includes(cur))vals.unshift(cur);
+  return '<option value="">入手区分</option>'+vals.map(v=>`<option value="${esc(v)}" ${cur===v?'selected':''}>${esc(v)}</option>`).join('');
+}
 const NATURES=['','がんばりや','さみしがり','ゆうかん','いじっぱり','やんちゃ','ずぶとい','すなお','のんき','わんぱく','のうてんき','おくびょう','せっかち','まじめ','ようき','むじゃき','ひかえめ','おっとり','れいせい','てれや','うっかりや','おだやか','おとなしい','なまいき','しんちょう','きまぐれ'];
 const TERA_TYPES=['','ノーマル','ほのお','みず','でんき','くさ','こおり','かくとう','どく','じめん','ひこう','エスパー','むし','いわ','ゴースト','ドラゴン','あく','はがね','フェアリー','ステラ'];
 const SIZE_OPTIONS=['','最小','小さめ','標準','大きめ','最大'];
@@ -1490,6 +1546,31 @@ function restoreOpenIndividualPanels(){
     pendingIndividualFocus=null;
   }
 }
+
+function individualShowcaseHTML(p,ind,ord){
+  const result=individualHuntResultText(ind);
+  const ball=ind.ball?ballIcon(ind.ball):'';
+  const extra=[ind.nature,ind.ability,ind.teraType].filter(Boolean).join(' / ');
+  return `<div class="individual-showcase">
+    <div class="individual-showcase-media">
+      <img class="poke" src="${spriteURL(p)}" alt="${esc(p.name)} 色違い" onerror="this.src='${baseSpriteURL(p)}'">
+      ${ball?`<img class="ball-float" src="${ball}" alt="${esc(ballName(ind.ball))}">`:''}
+    </div>
+    <div class="individual-showcase-body">
+      <div class="individual-showcase-title"><div><strong>✨ ${esc(p.name)} ${ord}匹目</strong><small>No.${String(p.no).padStart(4,'0')} ・ MY SHINY</small></div><span class="individual-game-badge">${esc(ind.game||'ゲーム未登録')}</span></div>
+      <div class="individual-showcase-grid">
+        <div class="individual-showcase-item"><span>捕獲日</span><b>${esc(ind.date||'未登録')}</b></div>
+        <div class="individual-showcase-item"><span>ボール</span><b>${esc(ind.ball?ballName(ind.ball):'未登録')}</b></div>
+        <div class="individual-showcase-item"><span>厳選方法</span><b>${esc(ind.huntMethod||'未登録')}</b></div>
+        <div class="individual-showcase-item"><span>回数 / 時間</span><b>${esc(result)}</b></div>
+        <div class="individual-showcase-item"><span>入手区分</span><b>${esc(ind.source||'未登録')}</b></div>
+        <div class="individual-showcase-item"><span>個体情報</span><b>${esc(extra||'未登録')}</b></div>
+      </div>
+      <div class="individual-showcase-memo">${esc(ind.memo||'')}</div>
+    </div>
+  </div>`;
+}
+
 function individualRowHTML(p,ind,i){
   const ord=duplicateOrdinal(p.id,ind.uid);
   return `<div class="detail-card" data-individual-uid="${esc(ind.uid)}">
@@ -1497,13 +1578,14 @@ function individualRowHTML(p,ind,i){
       <div><strong>${esc(p.name)} ${ord}匹目</strong><div class="badge-row">${individualBadges(p.id,ind.uid).map(b=>`<span class="memory-badge">${esc(b)}</span>`).join('')}</div></div>
       <div class="detail-nav">${(individualState[p.id]||[]).length>1?`<button type="button" onclick="focusAdjacentIndividual('${esc(p.id)}','${esc(ind.uid)}',-1)">← 前の個体</button><button type="button" onclick="focusAdjacentIndividual('${esc(p.id)}','${esc(ind.uid)}',1)">次の個体 →</button>`:''}<button class="deletebtn" onclick="deleteIndividual('${esc(p.id)}',${i})">削除</button></div>
     </div>
+    ${individualShowcaseHTML(p,ind,ord)}
     <div class="detail-fields">
       <div class="detail-field"><label>捕獲日</label><input type="date" value="${esc(ind.date||'')}" oninput="setIndividualLive('${esc(p.id)}',${i},'date',this.value)" onchange="setIndividual('${esc(p.id)}',${i},'date',this.value)"></div>
       <div class="detail-field"><label>ゲーム</label><select oninput="setIndividualLive('${esc(p.id)}',${i},'game',this.value)" onchange="setIndividual('${esc(p.id)}',${i},'game',this.value)">${gameOptionsHTML(ind.game||'')}</select></div>
       <div class="detail-field"><label>ボール</label><div class="ball-select-wrap"><img id="ball-${encodeURIComponent(p.id)}-${i}" src="${ballIcon(ind.ball)}" alt=""><select oninput="setIndividualLive('${esc(p.id)}',${i},'ball',this.value);document.getElementById('ball-${encodeURIComponent(p.id)}-${i}').src=ballIcon(this.value)" onchange="setIndividual('${esc(p.id)}',${i},'ball',this.value);document.getElementById('ball-${encodeURIComponent(p.id)}-${i}').src=ballIcon(this.value)">${ballOptions(ind.ball)}</select></div></div>
       <div class="detail-field"><label>厳選方法</label><select oninput="setIndividualLive('${esc(p.id)}',${i},'huntMethod',this.value)" onchange="setIndividual('${esc(p.id)}',${i},'huntMethod',this.value)">${huntMethodOptions(ind.huntMethod||'')}</select></div>
       <div class="detail-field"><label>${esc(counterLabel(ind.huntMethod||''))}</label><input type="number" min="0" value="${Number(ind.huntCount||0)}" oninput="setManualHuntCountLive('${esc(p.id)}','${esc(ind.uid)}',this.value)" onchange="setManualHuntCount('${esc(p.id)}','${esc(ind.uid)}',this.value)"></div>
-      <div class="detail-field"><label>入手区分</label><select oninput="setIndividualLive('${esc(p.id)}',${i},'source',this.value)" onchange="setIndividual('${esc(p.id)}',${i},'source',this.value)"><option value="">入手区分</option><option ${ind.source==='自己産'?'selected':''}>自己産</option><option ${ind.source==='交換'?'selected':''}>交換</option><option ${ind.source==='配布'?'selected':''}>配布</option><option ${ind.source==='その他'?'selected':''}>その他</option></select></div>
+      <div class="detail-field"><label>入手区分</label><select oninput="setIndividualLive('${esc(p.id)}',${i},'source',this.value)" onchange="setIndividual('${esc(p.id)}',${i},'source',this.value)">${sourceOptionsHTML(ind.source||'')}</select></div>
       <div class="detail-field"><label>開始日</label><input type="date" value="${esc(ind.huntStart||'')}" oninput="setIndividualLive('${esc(p.id)}',${i},'huntStart',this.value)" onchange="setIndividual('${esc(p.id)}',${i},'huntStart',this.value)"></div>
     </div>
     <details class="individual-advanced">
@@ -1528,6 +1610,7 @@ function individualRowHTML(p,ind,i){
         <input id="shot-${safeId(p.id)}-${safeId(ind.uid)}" type="file" accept="image/*" style="display:none" onchange="setIndividualScreenshot('${esc(p.id)}','${esc(ind.uid)}',this.files?.[0])">
         <button type="button" onclick="document.getElementById('shot-${safeId(p.id)}-${safeId(ind.uid)}').click()">📷 捕獲スクショを登録・変更</button>
         <button type="button" class="hall-btn ${ind.favorite?'active':''}" onclick="toggleHallOfFame('${esc(p.id)}','${esc(ind.uid)}')">🏆 ${ind.favorite?'殿堂入り中':'殿堂入り'}</button>
+        <button type="button" class="card-shot-btn" onclick="generateIndividualCardImage('${esc(p.id)}','${esc(ind.uid)}')">📸 個体カード画像</button>
         <button type="button" onclick="generateSingleShinyImage('${esc(p.id)}','${esc(ind.uid)}')">✨ SHINY GET画像</button>
         ${individualScreenshot(p.id,ind.uid)?`<button type="button" onclick="removeIndividualScreenshot('${esc(p.id)}','${esc(ind.uid)}')">スクショ削除</button>`:''}
       </div>
@@ -1669,8 +1752,27 @@ function orderedActiveHunts(){return data.filter(p=>!p.locked&&targetState[p.id]
 function persistHuntOrder(ids){ids.forEach((id,i)=>huntData(id).order=i);save();requestAutoSyncAfterDataChange()}
 function enableHuntDrag(container,selector){if(!container||container.dataset.dragBound==='1')return;container.dataset.dragBound='1';let dragging=null;const move=e=>{if(!dragging)return;e.preventDefault();const hit=document.elementFromPoint(e.clientX,e.clientY)?.closest(selector);if(!hit||hit===dragging||hit.parentElement!==container)return;const r=hit.getBoundingClientRect();container.insertBefore(dragging,e.clientY<r.top+r.height/2?hit:hit.nextSibling)},up=()=>{if(!dragging)return;dragging.classList.remove('dragging');persistHuntOrder([...container.querySelectorAll(selector)].map(x=>x.dataset.key).filter(Boolean));dragging=null;window.removeEventListener('pointermove',move);window.removeEventListener('pointerup',up)};container.addEventListener('pointerdown',e=>{const h=e.target.closest('.drag-handle');if(!h)return;const card=h.closest(selector);if(!card)return;e.preventDefault();dragging=card;dragging.classList.add('dragging');window.addEventListener('pointermove',move,{passive:false});window.addEventListener('pointerup',up,{once:true})})}
 function appendCaptureEvent(targetId,caughtId,ind){const x=huntData(targetId);x.captureEvents=Array.isArray(x.captureEvents)?x.captureEvents:[];x.captureEvents.push({uid:ind.uid,caughtId,ind});x.captureEvents=x.captureEvents.slice(-20)}
-window.incHunt=(id,n)=>{const x=huntData(id);if(!methodUsesCount(x.method||''))return;ensureHuntSession(id);const old=Math.max(0,Number(x.count)||0),next=Math.max(0,old+n),applied=next-old;x.count=next;if(applied)addTodayHunt(id,applied);const ses=(Array.isArray(x.sessions)?x.sessions:[]).find(s=>s&&s.active);if(ses)ses.countEnd=next;save();if(typeof syncHuntCounterValue==='function')syncHuntCounterValue(id,x.count);if(typeof updateCounterDOM==='function')updateCounterDOM(id,x.count);updateHuntMetaDOM(id)};
+window.incHunt=(id,n)=>{const x=huntData(id);if(!methodUsesCount(x.method||''))return;if(n>0&&!x.start)x.start=localDateKey();ensureHuntSession(id);const old=Math.max(0,Number(x.count)||0),next=Math.max(0,old+n),applied=next-old;x.count=next;if(applied)addTodayHunt(id,applied);const ses=(Array.isArray(x.sessions)?x.sessions:[]).find(s=>s&&s.active);if(ses)ses.countEnd=next;save();if(typeof syncHuntCounterValue==='function')syncHuntCounterValue(id,x.count);if(typeof updateCounterDOM==='function')updateCounterDOM(id,x.count);updateHuntMetaDOM(id)};
 window.resetHuntCount=id=>{if(!confirm('厳選回数を0にリセットしますか？'))return;const x=huntData(id);x.count=0;save();if(typeof syncHuntCounterValue==='function')syncHuntCounterValue(id,0);if(typeof updateCounterDOM==='function')updateCounterDOM(id,0);updateHuntMetaDOM(id)};
+window.resetHuntProgress=id=>{
+  const p=data.find(x=>x.id===id),x=huntData(id);
+  if(!confirm(`${p?.name||'このポケモン'}の厳選記録を最初からやり直しますか？\n\n回数・本日の回数・開始日・経過時間・セッション・厳選日記をすべてクリアします。\nゲーム・厳選方法・ひかるおまもり・ボールなどの設定は残ります。`))return;
+  const keep={game:x.game||'',method:x.method||'',charm:x.charm||'',ball:x.ball||'',outbreak:x.outbreak||'0',sparkling:x.sparkling||'0',order:x.order};
+  for(const k of Object.keys(x))delete x[k];
+  const captureEvents=Array.isArray(x.captureEvents)?x.captureEvents:[];
+  Object.assign(x,{count:0,start:'',daily:{},timerElapsedMs:0,timerRunningAt:0,sessions:[],journal:[],captureEvents,...keep});
+  applyHuntMethodDefaults(id);
+  save();
+  if(typeof syncHuntCounterValue==='function')syncHuntCounterValue(id,0);
+  if(typeof requestAutoSyncAfterDataChange==='function')requestAutoSyncAfterDataChange();
+  if(typeof syncHuntSessionState==='function')syncHuntSessionState();
+  if(typeof updateCounterDOM==='function')updateCounterDOM(id,0);
+  updateHuntMetaDOM(id);
+  try{renderCurrentHunt()}catch(_){}
+  try{window.renderMobileMultiHunts?.()}catch(_){}
+  try{renderDesktopHome()}catch(_){}
+  showToast('厳選記録をリセットしました。次に厳選を始めると、その日から1日目として記録します。');
+};
 window.setHunt=(id,key,val)=>{const x=huntData(id);x[key]=val;if(key==='game'){const p=data.find(q=>q.id===id),allowed=allowedHuntMethods(p,val);if(x.method&&!allowed.includes(x.method))x.method=''}if(key==='method'){if(x.timerRunningAt&&!methodUsesTimer(val)){x.timerElapsedMs=huntElapsedMs(x);x.timerRunningAt=0}applyHuntMethodDefaults(id)}save();requestAutoSyncAfterDataChange();updateHuntMetaDOM(id)};
 let lastShinyCapture=null;
 window.captureHunt=id=>{
@@ -1766,7 +1868,7 @@ function finishActiveHuntSession(id,status='ended'){
   const x=huntData(id);if(x.timerRunningAt){x.timerElapsedMs=huntElapsedMs(x);x.timerRunningAt=0}
   const ses=(Array.isArray(x.sessions)?x.sessions:[]).find(s=>s&&s.active);if(ses){ses.active=false;ses.status=status;ses.endedAt=new Date().toISOString();ses.countEnd=Number(x.count)||0;ses.elapsedEndMs=huntElapsedMs(x)}
 }
-window.startHuntTimer=id=>{const x=huntData(id);if(!methodUsesTimer(x.method||''))return;if(!x.timerRunningAt){ensureHuntSession(id);x.timerRunningAt=Date.now();save();requestAutoSyncAfterDataChange();renderCurrentHunt();try{window.renderMobileMultiHunts?.()}catch(_){}}};
+window.startHuntTimer=id=>{const x=huntData(id);if(!methodUsesTimer(x.method||''))return;if(!x.timerRunningAt){if(!x.start)x.start=localDateKey();ensureHuntSession(id);x.timerRunningAt=Date.now();save();requestAutoSyncAfterDataChange();renderCurrentHunt();try{window.renderMobileMultiHunts?.()}catch(_){}}};
 window.pauseHuntTimer=id=>{const x=huntData(id);if(x.timerRunningAt){x.timerElapsedMs=huntElapsedMs(x);x.timerRunningAt=0;const ses=(Array.isArray(x.sessions)?x.sessions:[]).find(s=>s&&s.active);if(ses)ses.elapsedEndMs=x.timerElapsedMs;save();requestAutoSyncAfterDataChange();renderCurrentHunt();try{window.renderMobileMultiHunts?.()}catch(_){}}};
 window.resetHuntTimer=id=>{if(!confirm('今回の計測時間を0に戻しますか？'))return;const x=huntData(id);x.timerElapsedMs=0;x.timerRunningAt=x.timerRunningAt?Date.now():0;save();renderCurrentHunt();try{window.renderMobileMultiHunts?.()}catch(_){}};
 function huntTimerText(x){const elapsed=huntElapsedMs(x),target=Math.max(0,Number(x?.timerTargetSeconds)||0)*1000;if(target){const remain=Math.max(0,target-elapsed);return {main:'残り '+formatHuntDuration(remain),sub:'経過 '+formatHuntDuration(elapsed),done:remain<=0}}return {main:formatHuntDuration(elapsed),sub:'経過時間',done:false}}
@@ -1775,7 +1877,7 @@ setInterval(()=>{if(document.visibilityState==='visible')refreshHuntTimerDOM()},
 function applyHuntMethodDefaults(id){const x=huntData(id),d=huntMethodDef(x.method||'');x.recordMode=d.recordMode||'count';x.timerTargetSeconds=Number(d.timerSeconds)||0;x.sessions=Array.isArray(x.sessions)?x.sessions:[];}
 function huntSessionDurationMs(ss,x){return Math.max(0,(Number(ss?.elapsedEndMs)||((ss?.active&&x)?huntElapsedMs(x):0))-(Number(ss?.elapsedStartMs)||0))}
 function huntTotalSessionElapsedMs(x){const rows=Array.isArray(x?.sessions)?x.sessions:[];return rows.reduce((sum,ss)=>sum+huntSessionDurationMs(ss,x),0)}
-window.newHuntSession=id=>{const x=huntData(id);finishActiveHuntSession(id,'completed');if(methodUsesTimer(x.method||'')){x.timerElapsedMs=0;x.timerRunningAt=0}ensureHuntSession(id);save();requestAutoSyncAfterDataChange();renderCurrentHunt();try{window.renderMobileMultiHunts?.()}catch(_){}};
+window.newHuntSession=id=>{const x=huntData(id);if(!x.start)x.start=localDateKey();finishActiveHuntSession(id,'completed');if(methodUsesTimer(x.method||'')){x.timerElapsedMs=0;x.timerRunningAt=0}ensureHuntSession(id);save();requestAutoSyncAfterDataChange();renderCurrentHunt();try{window.renderMobileMultiHunts?.()}catch(_){}};
 
 function oddsFromRolls(rolls){
   const p=1-Math.pow(4095/4096,rolls);
@@ -2218,6 +2320,37 @@ function renderShotGallery(){
   box.innerHTML=rows.map(r=>`<div class="gallery-tile" onclick="openShotLightbox('${esc(r.id)}','${esc(r.ind.uid)}')"><img src="${individualScreenshot(r.id,r.ind.uid)}"><strong>${esc(r.p.name)} ${duplicateOrdinal(r.id,r.ind.uid)}匹目</strong><small>${esc(r.ind.date||'日付未登録')} · ${esc(r.ind.game||'ゲーム未登録')}</small></div>`).join('')||'<div class="empty">捕獲スクショはまだ登録されていません。</div>';
 }
 let lastSingleImageName='shiny-get';
+
+async function generateIndividualCardImage(id,uid){
+  const p=data.find(x=>x.id===id),ind=(individualState[id]||[]).find(x=>x.uid===uid);
+  if(!p||!ind)return;
+  const c=el('single-post-canvas'),ctx=c.getContext('2d'),W=1080,H=1350;c.width=W;c.height=H;
+  const bg=ctx.createLinearGradient(0,0,W,H);bg.addColorStop(0,'#0d314d');bg.addColorStop(.56,'#081a2a');bg.addColorStop(1,'#06111d');ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+  const glow=ctx.createRadialGradient(W*.23,H*.23,20,W*.23,H*.23,430);glow.addColorStop(0,'rgba(93,213,255,.25)');glow.addColorStop(1,'rgba(93,213,255,0)');ctx.fillStyle=glow;ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='#92dcff';ctx.font='800 28px system-ui,"Yu Gothic",sans-serif';ctx.fillText('MY SHINY COLLECTION',58,72);
+  ctx.fillStyle='#fff';ctx.font='900 58px system-ui,"Yu Gothic",sans-serif';ctx.fillText(p.name,58,142);
+  ctx.fillStyle='#9eb9ca';ctx.font='700 24px system-ui,"Yu Gothic",sans-serif';ctx.fillText(`No.${String(p.no).padStart(4,'0')}  •  ${duplicateOrdinal(id,uid)}匹目`,60,182);
+
+  const media={x:55,y:225,w:970,h:470};ctx.fillStyle='rgba(4,17,29,.78)';ctx.strokeStyle='rgba(112,205,255,.34)';ctx.lineWidth=2;roundRect(ctx,media.x,media.y,media.w,media.h,26);ctx.fill();ctx.stroke();
+  const im=await loadCanvasImage(individualScreenshot(id,uid)||spriteURL(p))||await loadCanvasImage(baseSpriteURL(p));
+  if(im){const sc=Math.min((media.w-46)/im.width,(media.h-46)/im.height),dw=im.width*sc,dh=im.height*sc;ctx.drawImage(im,media.x+(media.w-dw)/2,media.y+(media.h-dh)/2,dw,dh)}
+  const ball=ind.ball?await loadCanvasImage(ballIcon(ind.ball)):null;if(ball)ctx.drawImage(ball,930,616,58,58);
+
+  const items=[
+    ['捕獲日',ind.date||'未登録'],['ゲーム',ind.game||'未登録'],
+    ['ボール',ind.ball?ballName(ind.ball):'未登録'],['入手区分',ind.source||'未登録'],
+    ['厳選方法',ind.huntMethod||'未登録'],['回数 / 時間',individualHuntResultText(ind)],
+    ['性格',ind.nature||'未登録'],['特性',ind.ability||'未登録'],
+    ['テラスタイプ',ind.teraType||'未登録'],['証・リボン',ind.ribbons||'未登録']
+  ];
+  const sx=55,sy=735,cw=470,ch=82,gap=14;
+  items.forEach((it,i)=>{const col=i%2,row=Math.floor(i/2),x=sx+col*(cw+gap),y=sy+row*(ch+gap);ctx.fillStyle='rgba(11,34,52,.86)';ctx.strokeStyle='rgba(76,125,157,.48)';roundRect(ctx,x,y,cw,ch,16);ctx.fill();ctx.stroke();ctx.fillStyle='#7fa7bf';ctx.font='700 17px system-ui,"Yu Gothic",sans-serif';ctx.fillText(it[0],x+18,y+25);ctx.fillStyle='#f4fbff';const fs=fitText(ctx,String(it[1]),cw-36,25,17);ctx.font=`800 ${fs}px system-ui,"Yu Gothic",sans-serif`;ctx.fillText(String(it[1]),x+18,y+59)});
+  if(ind.memo){ctx.fillStyle='rgba(6,20,33,.82)';roundRect(ctx,55,1220,970,82,16);ctx.fill();ctx.fillStyle='#92aabd';ctx.font='700 16px system-ui,"Yu Gothic",sans-serif';ctx.fillText('MEMO',74,1247);ctx.fillStyle='#dceaf3';ctx.font='500 19px system-ui,"Yu Gothic",sans-serif';wrapCanvasText(ctx,ind.memo,74,1275,925,25,2)}
+  ctx.fillStyle='#6f8ba0';ctx.font='600 15px system-ui,sans-serif';ctx.textAlign='right';ctx.fillText('SHINY HOME COLLECTION',1025,1325);ctx.textAlign='left';
+  lastSingleImageName=`shiny_card_${p.name}_${ind.date||'record'}`;
+  el('single-post-preview').classList.add('show');el('single-post-preview').scrollIntoView({behavior:'smooth',block:'center'});
+}
+
 async function generateSingleShinyImage(id,uid){
   const p=data.find(x=>x.id===id),ind=(individualState[id]||[]).find(x=>x.uid===uid);
   if(!p||!ind)return;
@@ -2725,7 +2858,7 @@ async function diagnoseScreenshotStorage(){
       const v=localStorage.getItem(k),n=countDataImagesDeep(v);
       if(n)rows.push({where:'localStorage: '+k,count:null,deep:n,note:'別キー内で画像を検出'});
     }
-    const lines=['【画像データ診断 v120】','※ 読み取り専用。データの復元・削除・上書きはしていません。',''];
+    const lines=['【画像データ診断 v124】','※ 読み取り専用。データの復元・削除・上書きはしていません。',''];
     for(const r of rows){
       if(r.error){lines.push(`⚠ ${r.where}: ${r.error}`);continue}
       const exact=r.count==null?'':`捕獲スクショ ${r.count}枚`;
@@ -2774,6 +2907,74 @@ function updatePreUpdateButtonState(){
 }
 setTimeout(updatePreUpdateButtonState,0);
 
+
+// ===== v121 non-destructive individual metadata guard =====
+const V121_GUARD_KEY='shinyHomePendingUpgradeCheck_v1';
+const V121_CRITICAL_FIELDS=['date','game','ball','huntMethod','source','huntStart'];
+function individualDataStats(src=individualState){
+  const rows=[];
+  for(const [id,arr] of Object.entries(src||{}))if(Array.isArray(arr))for(const ind of arr||[])if(ind&&typeof ind==='object')rows.push({id,ind});
+  const filled={};for(const f of V121_CRITICAL_FIELDS)filled[f]=rows.filter(r=>String(r.ind?.[f]??'').trim()!=='').length;
+  filled.huntCount=rows.filter(r=>Number(r.ind?.huntCount)>0).length;
+  return {individualCount:rows.length,filled};
+}
+function regressionStatus(text,bad=false){const e=document.getElementById('regression-status');if(e){e.textContent='データ回帰チェック：'+text;e.style.color=bad?'#ff9c9c':'#8fe6b0'}}
+function readV121Guard(){try{return JSON.parse(localStorage.getItem(V121_GUARD_KEY)||'null')}catch(_){return null}}
+window.runDataRegressionCheck=async function(manual=false){
+  const guard=readV121Guard(),now=individualDataStats();
+  if(!guard?.fingerprint){
+    const msg=`現在 個体 ${now.individualCount}件 / 厳選方法 ${now.filled.huntMethod}件 / 入手区分 ${now.filled.source}件 / ゲーム ${now.filled.game}件 / ボール ${now.filled.ball}件`;
+    regressionStatus(msg,false);if(manual)alert('【現在の個体データ】\n'+msg+'\n\n比較用の更新直前指紋はありません。データは変更していません。');return {ok:true,now};
+  }
+  const before=guard.fingerprint,problems=[];
+  if(now.individualCount<Number(before.individualCount||0))problems.push(`個体数 ${before.individualCount} → ${now.individualCount}`);
+  for(const f of V121_CRITICAL_FIELDS){const b=Number(before.filled?.[f]||0),n=Number(now.filled?.[f]||0);if(n<b)problems.push(`${f} ${b} → ${n}`)}
+  const bh=Number(before.filled?.huntCount||0),nh=Number(now.filled?.huntCount||0);if(nh<bh)problems.push(`huntCount ${bh} → ${nh}`);
+  const ok=!problems.length;
+  regressionStatus(ok?`OK（個体 ${now.individualCount}件・重要項目の減少なし）`:`⚠ ${problems.join(' / ')}`,!ok);
+  if(manual)alert(ok?'更新前後で、個体数・厳選方法・入手区分・ゲーム・ボール・捕獲日・開始日の減少は検出されませんでした。':'⚠ 更新前より減っている項目があります。\n'+problems.join('\n')+'\n\n自動では復元・上書きしていません。「空欄の個体項目を救出」を利用できます。');
+  return {ok,problems,before,now};
+};
+function parseIndividualsFromBackupEntry(b){
+  try{
+    if(b?.values?.shinyHomeIndividuals_v1)return JSON.parse(b.values.shinyHomeIndividuals_v1||'{}')||{};
+    if(b?.individualState)return b.individualState||{};
+    if(b?.data?.individualState)return b.data.individualState||{};
+  }catch(_){ }
+  return {};
+}
+async function loadAllPreUpdateEntries(){
+  const entries=[];
+  try{
+    const db=await openBackupDB();
+    try{const all=await new Promise((resolve,reject)=>{const tx=db.transaction(PREUPDATE_IDB_STORE,'readonly'),r=tx.objectStore(PREUPDATE_IDB_STORE).getAll();r.onsuccess=()=>resolve(r.result||[]);r.onerror=()=>reject(r.error)});entries.push(...all)}finally{db.close()}
+  }catch(_){ }
+  const local=getPreUpdateBackup();if(local)entries.push(local);
+  return entries.filter(Boolean).sort((a,b)=>String(b.createdAt||'').localeCompare(String(a.createdAt||'')));
+}
+window.recoverMissingIndividualMetadata=async function(){
+  const fields=['date','game','ball','huntMethod','source','huntStart'];
+  let entries=[];try{entries=await loadAllPreUpdateEntries()}catch(e){alert('更新前バックアップを確認できませんでした。 '+(e?.message||''));return}
+  if(!entries.length){alert('確認できる更新前バックアップがありません。');return}
+  const history=new Map();
+  for(const b of entries){const src=parseIndividualsFromBackupEntry(b);for(const [id,arr] of Object.entries(src||{})){if(!Array.isArray(arr))continue;for(const ind of arr){if(!ind?.uid)continue;const k=id+'::'+ind.uid;if(!history.has(k))history.set(k,[]);history.get(k).push(ind)}}}
+  const changes=[];
+  for(const [id,arr] of Object.entries(individualState||{})){if(!Array.isArray(arr))continue;for(const ind of arr){if(!ind?.uid)continue;const oldRows=history.get(id+'::'+ind.uid)||[];for(const f of fields){if(String(ind[f]??'').trim()!=='')continue;const found=oldRows.find(x=>String(x?.[f]??'').trim()!=='');if(found){changes.push({id,uid:ind.uid,field:f,value:found[f]})}}
+    if(!(Number(ind.huntCount)>0)){const found=oldRows.find(x=>Number(x?.huntCount)>0);if(found)changes.push({id,uid:ind.uid,field:'huntCount',value:Number(found.huntCount)})}
+  }}
+  if(!changes.length){alert('過去バックアップから、現在空欄になっている個体項目は見つかりませんでした。\n現在のデータは変更していません。');return}
+  const counts={};for(const c of changes)counts[c.field]=(counts[c.field]||0)+1;
+  const msg=Object.entries(counts).map(([k,v])=>`${k}: ${v}件`).join('\n');
+  if(!confirm(`過去の更新前バックアップから、現在空欄の項目だけを救出します。\n既に値がある項目は一切上書きしません。\n\n${msg}\n\n実行しますか？`))return;
+  // 実行直前の状態も通常の自動バックアップへ残す。
+  try{save()}catch(_){ }
+  for(const c of changes){const ind=(individualState[c.id]||[]).find(x=>x?.uid===c.uid);if(ind&&((c.field==='huntCount'&&!(Number(ind.huntCount)>0))||(c.field!=='huntCount'&&String(ind[c.field]??'').trim()==='')))ind[c.field]=c.value}
+  save();render();try{renderExtraPanels()}catch(_){ }
+  alert(`空欄の個体項目を ${changes.length}件 救出しました。\n既存値は上書きしていません。`);
+  runDataRegressionCheck(false);
+};
+setTimeout(()=>{try{runDataRegressionCheck(false)}catch(_){ }},1200);
+
 function restoreSnapshotObject(d){
   for(const [target,src] of [[state,d.state],[boxState,d.boxState],[dateState,d.dateState],[gameState,d.gameState],[individualState,d.individualState],[targetState,d.targetState],[huntState,d.huntState],[monthImages,d.monthImages],[individualScreenshots,d.individualScreenshots]]){
     Object.keys(target).forEach(k=>delete target[k]);Object.assign(target,src||{});
@@ -2820,24 +3021,51 @@ async function fetchDexApi(no){
 }
 function dexStatName(n){return ({hp:'HP',attack:'こうげき',defense:'ぼうぎょ','special-attack':'とくこう','special-defense':'とくぼう',speed:'すばやさ'})[n]||n}
 function dexTypeName(n){return ({normal:'ノーマル',fire:'ほのお',water:'みず',electric:'でんき',grass:'くさ',ice:'こおり',fighting:'かくとう',poison:'どく',ground:'じめん',flying:'ひこう',psychic:'エスパー',bug:'むし',rock:'いわ',ghost:'ゴースト',dragon:'ドラゴン',dark:'あく',steel:'はがね',fairy:'フェアリー'})[n]||n}
+function generationRegionName(gen){return ({1:'カントー',2:'ジョウト',3:'ホウエン',4:'シンオウ',5:'イッシュ',6:'カロス',7:'アローラ',8:'ガラル',9:'パルデア'})[Number(gen)]||'—'}
+function individualHuntResultText(ind){
+  const c=Number(ind?.huntCount)||0,ms=Number(ind?.huntElapsedMs)||0,mode=ind?.huntRecordMode||'';
+  if((mode==='timer'||mode==='both')&&ms>0)return `${formatHuntDuration(ms)}${c?` / ${c.toLocaleString()}回`:''}`;
+  return c?`${c.toLocaleString()}回`:'—';
+}
 function abilityDisplay(a){return (a||[]).map(x=>(x.is_hidden?'隠れ特性: ':'')+(x.ability?.name||'')).join(' / ')||'—'}
+function dexCaptureDate(ind){return /^\d{4}-\d{2}-\d{2}$/.test(String(ind?.date||''))?String(ind.date):''}
+function dexFirstCapture(inds){const ds=inds.map(dexCaptureDate).filter(Boolean).sort();return ds[0]||'—'}
+function dexHuntRecords(inds){
+  const counts=inds.filter(x=>Number(x?.huntCount)>0).map(x=>({v:Number(x.huntCount),text:`${Number(x.huntCount).toLocaleString()}回`,ind:x}));
+  if(counts.length){counts.sort((a,b)=>a.v-b.v);return {shortest:counts[0].text,longest:counts[counts.length-1].text,note:'回数記録'}}
+  const times=inds.filter(x=>Number(x?.huntElapsedMs)>0).map(x=>({v:Number(x.huntElapsedMs),text:formatHuntDuration(Number(x.huntElapsedMs)),ind:x}));
+  if(times.length){times.sort((a,b)=>a.v-b.v);return {shortest:times[0].text,longest:times[times.length-1].text,note:'時間記録'}}
+  return {shortest:'—',longest:'—',note:'厳選記録なし'};
+}
+function dexCaptureHistoryHTML(inds){
+  const rows=[...inds].sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
+  if(!rows.length)return '<div class="dex-history-empty">まだ捕獲履歴はありません。</div>';
+  return rows.map(ind=>`<div class="dex-history-row"><span class="date">${esc(ind.date||'日付未登録')}</span><span>${esc(ind.game||'ゲーム未登録')}</span><span>${esc(ind.huntMethod||'方法未登録')}</span><span class="hide-mobile">${esc(individualHuntResultText(ind))}</span><span class="muted hide-mobile">${esc(BALL_NAME[ballSlugFromValue(ind.ball)]||ind.ball||'ボール未登録')}</span></div>`).join('');
+}
 function showPokemonDetail(id){
   const p=data.find(x=>x.id===id),box=el('pokemon-modal-content');if(!p||!box)return;
   const rel=data.filter(x=>x.no===p.no&&!x.locked),inds=individualState[id]||[];
-  const owned=inds.length;
+  const owned=inds.length,firstCapture=dexFirstCapture(inds),records=dexHuntRecords(inds);
   box.innerHTML=`<div class="dex-detail-shell">
     <div class="dex-detail-title"><div><small>No.${String(p.no).padStart(4,'0')} ・ ${esc(kindLabel(p))}</small><h2>${esc(p.name)}</h2><div class="dex-form-badges">${p.form&&p.form!=='通常'?`<span class="tag form">${esc(p.form)}</span>`:''}${p.gender?`<span class="tag gender">${esc(p.gender)}</span>`:''}${owned?`<span class="countbadge">✓ ${owned}匹所持</span>`:'<span class="countbadge">未所持</span>'}</div></div></div>
     <div class="dex-compare">
-      <div class="dex-compare-card"><div class="dex-compare-label">通常のすがた</div><img src="${normalSpriteURL(p)}" onerror="this.src='${offlineSpriteURL(p.no)}'" alt="${esc(p.name)} 通常色"></div>
-      <div class="dex-compare-card shiny"><div class="dex-compare-label">✨ 色違いのすがた</div><img src="${spriteURL(p)}" onerror="this.src='${baseSpriteURL(p)}'" alt="${esc(p.name)} 色違い"></div>
+      <div class="dex-compare-card"><div class="dex-compare-label">通常色</div><img src="${normalSpriteURL(p)}" onerror="this.src='${offlineSpriteURL(p.no)}'" alt="${esc(p.name)} 通常色"><div class="dex-compare-caption">NORMAL</div></div>
+      <div class="dex-compare-card shiny"><div class="dex-compare-label">✨ 色違い</div><img src="${spriteURL(p)}" onerror="this.src='${baseSpriteURL(p)}'" alt="${esc(p.name)} 色違い"><div class="dex-compare-caption">SHINY</div></div>
+    </div>
+    <div class="dex-collection-summary">
+      <div class="dex-summary-card"><span>初捕獲日</span><b>${esc(firstCapture)}</b></div>
+      <div class="dex-summary-card"><span>所持数</span><b>${owned.toLocaleString()}匹</b></div>
+      <div class="dex-summary-card accent"><span>最短厳選</span><b>${esc(records.shortest)}</b></div>
+      <div class="dex-summary-card accent"><span>最長厳選</span><b>${esc(records.longest)}</b></div>
     </div>
     <div class="dex-detail-grid">
       <section class="dex-info-panel"><h3>📖 図鑑説明</h3><div id="dex-flavor-${safeId(id)}" class="dex-flavor dex-loading">図鑑データを読み込んでいます…</div><div class="dex-source-note">図鑑情報はオンライン時にPokeAPIから取得します。</div></section>
       <section class="dex-info-panel"><h3>🔎 基本情報</h3><div id="dex-basic-${safeId(id)}" class="dex-basic-grid"><div class="dex-loading">読み込み中…</div></div></section>
     </div>
     <section class="dex-info-panel"><h3>📊 種族値</h3><div id="dex-stats-${safeId(id)}" class="dex-stat-list"><div class="dex-loading">読み込み中…</div></div></section>
-    ${rel.length>1?`<section class="dex-info-panel"><h3>🧬 同じ図鑑No.の姿</h3><div class="dex-related">${rel.map(x=>`<button class="${x.id===id?'active':''}" onclick="showPokemonDetail('${esc(x.id)}')">${esc(kindLabel(x))}${x.form&&x.form!=='通常'?'・'+esc(x.form):''}${ownedCountFor(x.id)?' ✓':''}</button>`).join('')}</div></section>`:''}
-    <section class="dex-info-panel"><div class="dex-owned-head"><h3>✨ 自分の色違い個体 ${owned}匹</h3><button class="smallbtn" onclick="addIndividual('${esc(id)}');setTimeout(()=>showPokemonDetail('${esc(id)}'),30)">＋ 個体を追加</button></div><div class="dex-owned-grid">${inds.map((ind,i)=>`<div class="dex-owned-card"><img src="${individualScreenshot(id,ind.uid)||spriteURL(p)}" onerror="this.src='${baseSpriteURL(p)}'"><div><b>${i+1}匹目 ${ind.nickname?'・'+esc(ind.nickname):''}</b><small>${esc(ind.date||'日付未登録')} / ${esc(ind.game||'ゲーム未登録')}<br>${esc(BALL_NAME[ballSlugFromValue(ind.ball)]||ind.ball||'ボール未登録')} / ${esc(ind.huntMethod||'方法未登録')}${Number(ind.huntCount)?`<br>${Number(ind.huntCount).toLocaleString()}回でGET`:''}${ind.memo?`<br>メモ：${esc(ind.memo)}`:''}</small></div></div>`).join('')||'<div class="empty" style="padding:24px">まだ色違い個体は登録されていません。</div>'}</div></section>
+    ${rel.length>1?`<section class="dex-info-panel"><div class="dex-form-switch-title"><h3>🧬 姿違い切替</h3><small>${rel.length}種類</small></div><div class="dex-related">${rel.map(x=>`<button class="${x.id===id?'active':''}" onclick="showPokemonDetail('${esc(x.id)}')">${esc(kindLabel(x))}${x.form&&x.form!=='通常'?'・'+esc(x.form):''}${ownedCountFor(x.id)?` ✓${ownedCountFor(x.id)}`:''}</button>`).join('')}</div></section>`:''}
+    <section class="dex-info-panel"><h3>📜 捕獲履歴</h3><div class="dex-capture-history">${dexCaptureHistoryHTML(inds)}</div></section>
+    <section class="dex-info-panel"><div class="dex-owned-head"><h3>✨ 自分の色違い個体 ${owned}匹</h3><button class="smallbtn" onclick="addIndividual('${esc(id)}');setTimeout(()=>showPokemonDetail('${esc(id)}'),30)">＋ 個体を追加</button></div><div class="dex-owned-grid">${inds.map((ind,i)=>`<div class="dex-owned-card"><img src="${individualScreenshot(id,ind.uid)||spriteURL(p)}" onerror="this.src='${baseSpriteURL(p)}'"><div><b>${i+1}匹目 ${ind.nickname?'・'+esc(ind.nickname):''}${ind.favorite?' ★':''}</b><div class="dex-owned-meta"><span>捕獲日<strong>${esc(ind.date||'未登録')}</strong></span><span>ゲーム<strong>${esc(ind.game||'未登録')}</strong></span><span>ボール<strong>${esc(BALL_NAME[ballSlugFromValue(ind.ball)]||ind.ball||'未登録')}</strong></span><span>厳選方法<strong>${esc(ind.huntMethod||'未登録')}</strong></span><span>回数 / 時間<strong>${esc(individualHuntResultText(ind))}</strong></span><span>入手区分<strong>${esc(ind.source||'未登録')}</strong></span></div>${ind.memo?`<div class="dex-owned-memo">${esc(ind.memo)}</div>`:''}</div></div>`).join('')||'<div class="empty" style="padding:24px">まだ色違い個体は登録されていません。</div>'}</div></section>
   </div>`;
   el('pokemon-modal').classList.add('show');
   fetchDexApi(p.no).then(api=>{
@@ -2847,6 +3075,8 @@ function showPokemonDetail(id){
     if(b){const pk=api.pokemon,sp=api.species;const genus=jpGenus(sp);b.innerHTML=`
       <div class="dex-kv"><span>分類</span><b>${esc(genus||'—')}</b></div>
       <div class="dex-kv"><span>タイプ</span><b class="dex-types">${(pk.types||[]).map(x=>`<span class="dex-type">${esc(dexTypeName(x.type?.name))}</span>`).join('')||'—'}</b></div>
+      <div class="dex-kv"><span>初登場地方</span><b>${esc(generationRegionName(p.gen))}</b></div>
+      <div class="dex-kv"><span>世代</span><b>第${Number(p.gen)||'—'}世代</b></div>
       <div class="dex-kv"><span>高さ</span><b>${Number(pk.height||0)/10} m</b></div>
       <div class="dex-kv"><span>重さ</span><b>${Number(pk.weight||0)/10} kg</b></div>
       <div class="dex-kv" style="grid-column:1/-1"><span>特性</span><b>${esc(abilityDisplay(pk.abilities))}</b></div>`}
@@ -2910,6 +3140,46 @@ async function downloadShinyShareImage(){
   const a=document.createElement('a');a.download=`shiny-get-${String(p.no).padStart(4,'0')}-${p.name}-${ind.date||'today'}.png`;a.href=canvas.toDataURL('image/png');a.click();
 }
 
+
+function bingoCandidates(){return data.filter(p=>!p.locked&&p.section==='base').sort((a,b)=>a.no-b.no)}
+function bingoEnsureBoard(){
+  const valid=new Set(bingoCandidates().map(p=>p.id));
+  const ids=Array.isArray(bingoState?.ids)?bingoState.ids.filter(id=>valid.has(id)):[];
+  if(ids.length===25&&new Set(ids).size===25){bingoState.ids=ids;return}
+  const pool=bingoCandidates().slice();
+  for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]]}
+  bingoState={ids:pool.slice(0,25).map(p=>p.id),generatedAt:new Date().toISOString()};safeLocalSet('shinyHomeBingo_v1',JSON.stringify(bingoState));
+}
+function bingoLineCount(ids){
+  const hit=ids.map(id=>ownedCountFor(id)>0),lines=[];
+  for(let r=0;r<5;r++)lines.push([0,1,2,3,4].map(c=>r*5+c));
+  for(let c=0;c<5;c++)lines.push([0,1,2,3,4].map(r=>r*5+c));
+  lines.push([0,6,12,18,24],[4,8,12,16,20]);
+  return lines.filter(line=>line.every(i=>hit[i])).length;
+}
+function renderShinyBingo(){
+  const board=el('bingo-board');if(!board||!data.length)return;bingoEnsureBoard();
+  const ids=bingoState.ids||[],rows=ids.map(id=>data.find(p=>p.id===id)).filter(Boolean),owned=ids.filter(id=>ownedCountFor(id)>0).length,lines=bingoLineCount(ids);
+  board.innerHTML=rows.map(p=>`<button type="button" class="bingo-cell ${ownedCountFor(p.id)?'owned':''}" onclick="showPokemonDetail('${esc(p.id)}')" title="No.${String(p.no).padStart(4,'0')} ${esc(p.name)}"><small>No.${String(p.no).padStart(3,'0')}</small><img src="${spriteURL(p)}" onerror="this.src='${baseSpriteURL(p)}'" alt=""><b>${esc(p.name)}</b></button>`).join('');
+  if(el('bingo-owned'))el('bingo-owned').textContent=`${owned} / 25`;
+  if(el('bingo-lines'))el('bingo-lines').textContent=lines?`${lines} BINGO ✨`:'0 BINGO';
+  if(el('bingo-note')){const d=bingoState.generatedAt?new Date(bingoState.generatedAt):null;el('bingo-note').textContent=`達成 ${owned}/25 ・ ${lines} BINGO${d&&!Number.isNaN(d.getTime())?' ・ 作成 '+d.toLocaleDateString('ja-JP'):''}。捕獲登録すると自動で反映されます。`}
+}
+function generateShinyBingo(){
+  if(Array.isArray(bingoState?.ids)&&bingoState.ids.length===25&&!confirm('現在のBINGOを作り直しますか？\n盤面だけを更新し、コレクションデータは変更しません。'))return;
+  const pool=bingoCandidates().slice();for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]]}
+  bingoState={ids:pool.slice(0,25).map(p=>p.id),generatedAt:new Date().toISOString()};safeLocalSet('shinyHomeBingo_v1',JSON.stringify(bingoState));renderShinyBingo();showToast('新しい色違いBINGOを作成しました。');
+}
+async function downloadBingoImage(){
+  bingoEnsureBoard();const ids=bingoState.ids||[],rows=ids.map(id=>data.find(p=>p.id===id)).filter(Boolean);if(rows.length!==25)return alert('BINGOを作成できませんでした。');
+  const canvas=el('bingo-canvas')||document.createElement('canvas');canvas.width=1200;canvas.height=1350;const ctx=canvas.getContext('2d');
+  const g=ctx.createLinearGradient(0,0,1200,1350);g.addColorStop(0,'#07111d');g.addColorStop(.55,'#102a43');g.addColorStop(1,'#24183c');ctx.fillStyle=g;ctx.fillRect(0,0,1200,1350);
+  ctx.textAlign='center';ctx.fillStyle='#eef7ff';ctx.font='900 58px system-ui';ctx.fillText('SHINY BINGO',600,82);ctx.fillStyle='#8faabd';ctx.font='600 22px system-ui';ctx.fillText('SHINY HOME COLLECTION',600,116);
+  const gap=12,x0=62,y0=158,cell=(1200-124-gap*4)/5;const images=await Promise.all(rows.map(p=>loadCanvasImage(spriteURL(p))));
+  rows.forEach((p,i)=>{const r=Math.floor(i/5),c=i%5,x=x0+c*(cell+gap),y=y0+r*(cell+gap),owned=ownedCountFor(p.id)>0;ctx.fillStyle=owned?'rgba(29,104,83,.92)':'rgba(8,25,39,.94)';roundRect(ctx,x,y,cell,cell,16);ctx.fill();ctx.strokeStyle=owned?'#61efb8':'#31536d';ctx.lineWidth=3;ctx.stroke();const img=images[i];if(img){const max=cell*.62,sc=Math.min(max/img.width,max/img.height),w=img.width*sc,h=img.height*sc;ctx.drawImage(img,x+(cell-w)/2,y+20+(max-h)/2,w,h)}ctx.textAlign='left';ctx.fillStyle='#6f90a7';ctx.font='800 15px system-ui';ctx.fillText(`No.${String(p.no).padStart(3,'0')}`,x+11,y+20);ctx.textAlign='center';ctx.fillStyle='#f4fbff';ctx.font='900 19px system-ui';ctx.fillText(p.name,x+cell/2,y+cell-19);if(owned){ctx.fillStyle='#65efbb';ctx.beginPath();ctx.arc(x+cell-24,y+24,17,0,Math.PI*2);ctx.fill();ctx.fillStyle='#06271d';ctx.font='1000 22px system-ui';ctx.fillText('✓',x+cell-24,y+31)}});
+  const owned=ids.filter(id=>ownedCountFor(id)>0).length,lines=bingoLineCount(ids);ctx.textAlign='center';ctx.fillStyle='#ffd86b';ctx.font='900 30px system-ui';ctx.fillText(`${owned} / 25  ・  ${lines} BINGO`,600,1322);
+  try{const a=document.createElement('a');a.download=`shiny-bingo-${localDateKey()}.png`;a.href=canvas.toDataURL('image/png');a.click()}catch(e){console.error(e);alert('BINGO画像を保存できませんでした。オンライン画像の読み込み後にもう一度お試しください。')}
+}
 
 function renderHomeBoxPage(){
   const sel=el('home-box-page-select'),board=el('home-box-page-board'),meta=el('home-box-page-meta');
@@ -3400,6 +3670,7 @@ function switchAppTab(name,btn){
   if(name==='stats'){renderYearSummary();renderHuntRankings();renderHuntStats();renderBallStats();renderMethodStats();renderCollectionTrend();populateYearImageSelect();renderDataQuality();renderBestRecords();renderRoadmap()}
   if(name==='homebox'){renderNationalHomeBox();initHomeSwipe()} if(name==='dex'){populateDexExtraFilters();renderDexView()} if(name==='collection'){renderHomeBoxes();renderHomeBoxBoard();renderIndividualSearch();renderCollectionGoals();renderDexHeatmap();renderHuntFocus()} if(name==='sync'){renderCloudSettings()}
   if(name==='gallery'){renderShotGallery();populateGameImageSelect();renderHallOfFame();renderMilestones()}
+  if(name==='bingo'){renderShinyBingo()}
 }
 function restoreAppTab(){
   const name=localStorage.getItem('shinyHomeActiveTab_v1')||(window.innerWidth>=1000?'home':'collection');
@@ -3407,7 +3678,7 @@ function restoreAppTab(){
   if(btn)switchAppTab(btn.dataset.tab,btn);
 }
 
-function renderExtraPanels(){renderDesktopHome();renderMonthlyShinies();renderCaptureHistory();renderHuntStats();renderYearSummary();renderHuntRankings();renderCaptureCalendar();populateGameImageSelect();renderDexView();renderShotGallery();renderBallStats();renderMethodStats();renderHomeBoxes();renderHomeBoxBoard();renderIndividualSearch();renderCollectionTrend();populateYearImageSelect();renderCollectionGoals();renderHallOfFame();renderCaptureTimeline();renderDataQuality();populateDexExtraFilters();renderDexHeatmap();renderYearAlbum();renderMilestones();renderNationalHomeBox();renderHuntFocus();renderBestRecords();renderRoadmap();renderCloudSettings();renderNationalHomeBox();initHomeSwipe();if(isMobileCounterDevice()&&!document.querySelector('#mobile-multi-hunt-list .mobile-hunt-card'))renderMobileCounter();}
+function renderExtraPanels(){renderDesktopHome();renderMonthlyShinies();renderCaptureHistory();renderHuntStats();renderYearSummary();renderHuntRankings();renderCaptureCalendar();populateGameImageSelect();renderDexView();renderShotGallery();renderBallStats();renderMethodStats();renderHomeBoxes();renderHomeBoxBoard();renderIndividualSearch();renderCollectionTrend();populateYearImageSelect();renderCollectionGoals();renderHallOfFame();renderCaptureTimeline();renderDataQuality();populateDexExtraFilters();renderDexHeatmap();renderYearAlbum();renderMilestones();renderNationalHomeBox();renderHuntFocus();renderBestRecords();renderRoadmap();renderCloudSettings();renderShinyBingo();renderNationalHomeBox();initHomeSwipe();if(isMobileCounterDevice()&&!document.querySelector('#mobile-multi-hunt-list .mobile-hunt-card'))renderMobileCounter();}
 function shinyOdds(game,method,charm,hunt={}){
   const c=charm==='あり';
   if(!game)return {text:'—',note:'厳選ソフトを選択してください'};
@@ -3555,7 +3826,7 @@ function renderCurrentHunt(){
       <div class="hunt-session-list"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><b>セッション記録</b><button class="hunt-action" onclick="newHuntSession('${esc(p.id)}')">＋ 新セッション</button></div>${sessions.length?sessions.map((ss,i)=>`<div class="hunt-session-row">${ss.active?'● 進行中':'✓'} ${esc(ss.method||x.method||'方法未設定')} ・ ${ss.startedAt?new Date(ss.startedAt).toLocaleString('ja-JP'):''}${methodUsesCount(ss.method||x.method||'')?` ・ ${Math.max(0,(Number(ss.countEnd)||0)-(Number(ss.countStart)||0))}回`:''}${methodUsesTimer(ss.method||x.method||'')?` ・ ${formatHuntDuration(huntSessionDurationMs(ss,x))}`:''}</div>`).join(''):'<div class="hunt-session-row">開始するとここに1回ごとの厳選記録が残ります。</div>'}</div>
       ${supportsAlternateCatch(x.method||'')?`<details class="alt-catch"><summary>✨ 別のポケモンが光った</summary><div class="alt-catch-row"><input id="alt-q-${safeId(p.id)}" type="text" placeholder="名前または図鑑No.で検索" oninput="altCatchSearch('${esc(p.id)}')"></div><div id="alt-r-${safeId(p.id)}" class="alt-results"></div><div id="alt-c-${safeId(p.id)}" class="alt-confirm"></div></details>`:''}
       <div class="hunt-journal"><div class="counter-row"><button class="hunt-action" onclick="addHuntJournal('${esc(p.id)}')">＋ 厳選日記</button>${x.start?`<span class="hunt-days">${huntElapsedDays(x.start)}</span>`:''}</div><div class="hunt-journal-list">${(Array.isArray(x.journal)?x.journal:[]).slice().reverse().map(j=>`<div class="hunt-journal-entry">${new Date(j.at).toLocaleString('ja-JP')}　${Number(j.count)||0}回　${esc(j.text||'')}</div>`).join('')||'<div class="hunt-journal-entry">途中経過を残せます</div>'}</div></div>
-      <div class="counter-row"><button class="hunt-action danger" onclick="stopHunt('${esc(p.id)}')">厳選終了</button>${x.start?`<span style="color:var(--muted);font-size:11px">開始日 ${esc(x.start)}</span>`:''}${x.method?`<span style="color:var(--muted);font-size:11px">${esc(x.method)}</span>`:''}</div></div>`;
+      <div class="counter-row"><button class="hunt-action danger" onclick="resetHuntProgress('${esc(p.id)}')">↺ 厳選記録を完全リセット</button><button class="hunt-action danger" onclick="stopHunt('${esc(p.id)}')">厳選終了</button>${x.start?`<span style="color:var(--muted);font-size:11px">開始日 ${esc(x.start)}</span>`:''}${x.method?`<span style="color:var(--muted);font-size:11px">${esc(x.method)}</span>`:''}</div></div>`;
   }).join('');
   enableHuntDrag(wrap,'.hunt-chip');refreshHuntTimerDOM();
 }
@@ -3586,8 +3857,8 @@ el('imageBackupInput').onchange=e=>{
     }catch(err){console.error(err);alert('画像バックアップを読み込めませんでした')}
   };r.readAsText(f);
 };
-el('exportBtn').onclick=()=>{const blob=new Blob([JSON.stringify({version:DATA_VERSION,state,boxState,dateState,gameState,individualState,targetState,huntState,monthImages,individualScreenshots},null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='shiny-home-backup.json';a.click();URL.revokeObjectURL(a.href)};
-el('importBtn').onclick=()=>el('fileInput').click();el('fileInput').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=async()=>{try{const d=JSON.parse(r.result);Object.assign(state,d.state||{});Object.assign(boxState,d.boxState||{});Object.assign(dateState,d.dateState||{});Object.assign(gameState,d.gameState||{});if(d.individualState)Object.assign(individualState,d.individualState);if(d.targetState)Object.assign(targetState,d.targetState);if(d.huntState)Object.assign(huntState,d.huntState);if(d.monthImages)Object.assign(monthImages,d.monthImages);if(d.individualScreenshots){for(const [key,dataUrl] of Object.entries(d.individualScreenshots)){if(dataUrl)await screenshotDBPut(key,dataUrl)}await initScreenshotStore()}ensureLegacyIndividuals();save();render()}catch(err){console.error(err);alert('バックアップファイルを読み込めませんでした')}};r.readAsText(f)};
+el('exportBtn').onclick=()=>{const blob=new Blob([JSON.stringify({version:DATA_VERSION,state,boxState,dateState,gameState,individualState,targetState,huntState,monthImages,bingoState,individualScreenshots},null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='shiny-home-backup.json';a.click();URL.revokeObjectURL(a.href)};
+el('importBtn').onclick=()=>el('fileInput').click();el('fileInput').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=async()=>{try{const d=JSON.parse(r.result);Object.assign(state,d.state||{});Object.assign(boxState,d.boxState||{});Object.assign(dateState,d.dateState||{});Object.assign(gameState,d.gameState||{});if(d.individualState)Object.assign(individualState,d.individualState);if(d.targetState)Object.assign(targetState,d.targetState);if(d.huntState)Object.assign(huntState,d.huntState);if(d.monthImages)Object.assign(monthImages,d.monthImages);if(d.bingoState&&typeof d.bingoState==='object'){bingoState=d.bingoState;safeLocalSet('shinyHomeBingo_v1',JSON.stringify(bingoState));}if(d.individualScreenshots){for(const [key,dataUrl] of Object.entries(d.individualScreenshots)){if(dataUrl)await screenshotDBPut(key,dataUrl)}await initScreenshotStore()}ensureLegacyIndividuals();save();render()}catch(err){console.error(err);alert('バックアップファイルを読み込めませんでした')}};r.readAsText(f)};
 for(const g of gameOptions.filter(Boolean)){const o=document.createElement('option');o.value=g;o.textContent=g;el('gameFilter').appendChild(o);}for(const [slug,name] of BALLS){const o=document.createElement('option');o.value=slug;o.textContent=name;el('ballFilter').appendChild(o);}
 
 // v108: mobile collection bootstrap. Hunt counters remain on their dedicated sync table.
@@ -3893,14 +4164,14 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 // ===== v56 automatic update / cache repair =====
 (function(){
-  const APP_VERSION='v120';
+  const APP_VERSION='v127';
   const UPDATE_KEY='shinyHomeReloadedForSW_'+APP_VERSION;
 
   async function registerFreshWorker(){
     if(!('serviceWorker' in navigator) || location.protocol==='file:') return;
     try{
       const reg = await navigator.serviceWorker.register(
-        './service-worker.js?v=120',
+        './service-worker.js?v=127',
         {updateViaCache:'none'}
       );
 
@@ -4103,7 +4374,7 @@ function requestAutoSyncAfterDataChange(){try{if(typeof syncHuntSessionState==='
         ${useCount?`<div class="mobile-hunt-actions"><button class="btn primary-plus" data-delta="1">+1</button><button class="btn minor" data-delta="10">+10</button><button class="btn minor" data-delta="100">+100</button><button class="btn minor" data-delta="-1">-1</button><button class="btn minor" data-action="reset">0に戻す</button></div>`:''}
         ${useCount&&!useTimer?`<div style="margin-top:8px"><button class="btn" style="width:100%" data-action="new-session">＋ 新しい厳選セッション</button></div>`:''}
         ${useTimer?`<div class="mobile-timer-panel"><div class="mobile-timer-clock" data-hunt-timer-id="${e.key}">${timer.main}</div><div class="mobile-session-note" data-hunt-timer-sub="${e.key}">${timer.sub}</div><div class="mobile-timer-actions">${e.hunt.timerRunningAt?`<button class="btn" data-action="timer-pause">⏸ 一時停止</button>`:`<button class="btn" data-action="timer-start">▶ 開始</button>`}<button class="btn" data-action="timer-reset">↺ リセット</button><button class="btn" data-action="new-session">＋ 新セッション</button></div><div class="mobile-session-note">セッション ${sessions.length}件 ・ サンドイッチ系は30分を自動設定</div></div>`:''}
-        <div class="mobile-hunt-bottom"><button class="btn capture-mobile" data-action="capture">✨ 捕獲！</button><button class="btn end-mobile" data-action="end">厳選終了</button></div>`;
+        <div class="mobile-hunt-bottom"><button class="btn capture-mobile" data-action="capture">✨ 捕獲！</button><button class="btn" data-action="full-reset">↺ 完全リセット</button><button class="btn end-mobile" data-action="end">厳選終了</button></div>`;
       card.addEventListener('change',ev=>{
         const f=ev.target?.dataset?.field;if(!f)return;ev.stopPropagation();
         if(typeof window.setHunt==='function')window.setHunt(e.key,f,ev.target.value);
@@ -4121,6 +4392,7 @@ function requestAutoSyncAfterDataChange(){try{if(typeof syncHuntSessionState==='
           if(a==='timer-pause'){ev.stopPropagation();window.pauseHuntTimer?.(e.key);return}
           if(a==='timer-reset'){ev.stopPropagation();window.resetHuntTimer?.(e.key);return}
           if(a==='new-session'){ev.stopPropagation();window.newHuntSession?.(e.key);return}
+          if(a==='full-reset'){ev.stopPropagation();window.resetHuntProgress?.(e.key);return}
           if(a==='end'){ev.stopPropagation();finishHunt(e.key,false);return}
         }
         focusHunt(e.key);
