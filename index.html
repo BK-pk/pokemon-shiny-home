@@ -140,7 +140,7 @@
 /* v128: Mobile hunt cards can collapse; Bingo only counts captures after board creation. */
 .bingo-shell{max-width:980px;margin:0 auto}.bingo-hero{display:flex;justify-content:space-between;gap:14px;align-items:flex-end;background:linear-gradient(135deg,#102b45,#0a1b2b 58%,#291d43);border:1px solid #335773;border-radius:18px;padding:18px;margin-bottom:12px}.bingo-hero h2{margin:3px 0 5px;font-size:25px}.bingo-hero p{margin:0;color:#8ea8bc;font-size:12px}.bingo-actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}.bingo-actions button{border:1px solid #335873;background:#102a40;color:#e9f7ff;border-radius:10px;padding:9px 12px;font-weight:900;cursor:pointer}.bingo-actions button.primary{background:#194e6e;border-color:#4e93bb}.bingo-progress{display:flex;align-items:center;justify-content:space-between;gap:10px;background:#091725;border:1px solid #29445f;border-radius:12px;padding:10px 13px;margin-bottom:10px}.bingo-progress strong{font-size:18px;color:#ffd86b}.bingo-board{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px;background:#07121e;border:1px solid #29445f;border-radius:16px;padding:9px}.bingo-cell{aspect-ratio:1/1.08;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:0;border:1px solid #29445f;border-radius:11px;background:radial-gradient(circle at 50% 36%,rgba(83,166,208,.14),rgba(8,22,35,.92) 62%);overflow:hidden;cursor:pointer}.bingo-cell img{width:72%;height:65%;object-fit:contain;filter:drop-shadow(0 6px 7px rgba(0,0,0,.35))}.bingo-cell small{position:absolute;left:5px;top:5px;font-size:8px;color:#67859b;font-weight:900}.bingo-cell b{width:92%;font-size:10px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bingo-cell.owned{border-color:#59e3b0;background:radial-gradient(circle at 50% 36%,rgba(89,227,176,.25),rgba(8,37,37,.96) 65%);box-shadow:inset 0 0 0 1px rgba(89,227,176,.12)}.bingo-cell.owned:after{content:'✓';position:absolute;right:5px;top:5px;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:#59e3b0;color:#05251c;font-size:14px;font-weight:1000}.bingo-lines{font-size:12px;color:#91aabc}.bingo-note{margin-top:10px;color:#718ca1;font-size:11px;text-align:center}.bingo-canvas-wrap{display:none}
 
-/* v129: compact individual tabs + clearer BINGO hits */
+/* v130: simplify individual image actions */
 .individual-tabs{display:flex;gap:6px;overflow-x:auto;padding:3px 1px 8px;scrollbar-width:thin}.individual-tab{flex:0 0 auto;border:1px solid #2b4a63;background:#0b1c2c;color:#bcd5e6;border-radius:9px;padding:7px 10px;font-size:10px;font-weight:900;cursor:pointer}.individual-tab.active{border-color:#66cfff;background:#123553;color:#fff;box-shadow:0 0 0 1px rgba(102,207,255,.15)}.individual-tab small{display:block;font-size:8px;color:#7f9db2;margin-top:2px}.individual-tab-add{color:#8fe6c4}.bingo-cell.owned{filter:saturate(.72)}.bingo-cell.owned:before{content:'○';position:absolute;inset:0;display:grid;place-items:center;color:#fff;font-size:64px;line-height:1;font-weight:1000;text-shadow:0 2px 10px rgba(0,0,0,.8);z-index:3;pointer-events:none}.bingo-cell.owned:after{content:'GET';right:6px;top:6px;width:auto;height:auto;padding:3px 6px;border-radius:999px;font-size:8px;z-index:4}.bingo-cell.bingo-line{box-shadow:inset 0 0 0 2px #ffd86b,0 0 14px rgba(255,216,107,.35);border-color:#ffd86b}
 @media(max-width:700px){.bingo-hero{align-items:stretch;flex-direction:column}.bingo-actions{justify-content:flex-start}.bingo-board{gap:4px;padding:5px}.bingo-cell{border-radius:8px}.bingo-cell b{font-size:8px}.bingo-cell small{font-size:7px}.bingo-cell.owned:after{width:17px;height:17px;font-size:11px}}
 
@@ -1071,10 +1071,6 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 <canvas id="single-post-canvas"></canvas>
 <div class="x-post-actions"><button onclick="downloadSingleShinyImage()" type="button">PNGで保存</button><button onclick="el('single-post-preview').classList.remove('show')" type="button">閉じる</button></div>
 </div><details class="extra-panel" open="">
-<summary><img alt="" class="panel-poke-icon" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/250.png"/> 殿堂入りギャラリー</summary>
-<div class="extra-head"><span class="section-count">個体詳細の「殿堂入り」で選んだ思い出の個体</span></div>
-<div class="hall-grid" id="hall-of-fame-grid"></div>
-</details><details class="extra-panel" open="">
 <summary><img alt="" class="panel-poke-icon" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/385.png"/> 記念個体</summary>
 <div class="extra-head"><span class="section-count">1・10・50・100匹目、その後100匹ごとを自動抽出</span></div>
 <div class="milestone-grid" id="milestone-grid"></div>
@@ -1139,7 +1135,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
       <div id="cloud-status" class="home-help">未設定です。</div>
       <div id="auto-sync-status" class="home-help" style="margin-top:8px">同期：v95 外出向け省通信</div><div id="network-status" class="net-pill">● 通信状態を確認中</div>
       <div class="home-help" style="margin-top:8px">
-        v129では色違いBINGOの達成マスに大きな○とGET表示を重ね、BINGO成立ラインも強調します。個体一覧は複数個体を縦に並べず、1匹目・2匹目…のタブで切り替え、選択中の1個体だけを表示します。個体編集欄の上にあった大型要約カードは削除し、詳細情報は折りたたみのまま維持します。既存のコレクション・個体・画像・厳選データ構造は変更しません。スマホ起動時は安全クラウドバックアップからコレクションを一方向で取り込み、厳選データは専用同期します。
+        v130では個体編集画面の画像関連操作を整理し、「殿堂入り」と「SHINY GET画像」を廃止しました。画像作成は「個体画像を作成」1つにまとめ、捕獲スクショの登録・変更と削除だけを残します。既存のコレクション・個体・画像・厳選・BINGOデータ構造は変更しません。スマホ起動時は安全クラウドバックアップからコレクションを一方向で取り込み、厳選データは専用同期します。
       </div>
       <div class="home-help" style="margin-top:10px">初回は「設定保存」→「接続テスト」の順に確認してください。既存データがある場合、確認前にクラウドへ保存しないでください。</div>
     </div>
@@ -1147,7 +1143,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 </section>
 
 <script>
-const DATA_VERSION='full-2026-09-12-v129';
+const DATA_VERSION='full-2026-09-12-v130';
 const SPECIES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species.csv';
 const NAMES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
 const MAX_DEX=1025;
@@ -1638,9 +1634,7 @@ function individualRowHTML(p,ind,i){
       <div class="ind-shot-actions">
         <input id="shot-${safeId(p.id)}-${safeId(ind.uid)}" type="file" accept="image/*" style="display:none" onchange="setIndividualScreenshot('${esc(p.id)}','${esc(ind.uid)}',this.files?.[0])">
         <button type="button" onclick="document.getElementById('shot-${safeId(p.id)}-${safeId(ind.uid)}').click()">📷 捕獲スクショを登録・変更</button>
-        <button type="button" class="hall-btn ${ind.favorite?'active':''}" onclick="toggleHallOfFame('${esc(p.id)}','${esc(ind.uid)}')">🏆 ${ind.favorite?'殿堂入り中':'殿堂入り'}</button>
-        <button type="button" class="card-shot-btn" onclick="generateIndividualCardImage('${esc(p.id)}','${esc(ind.uid)}')">📸 個体カード画像</button>
-        <button type="button" onclick="generateSingleShinyImage('${esc(p.id)}','${esc(ind.uid)}')">✨ SHINY GET画像</button>
+        <button type="button" class="card-shot-btn" onclick="generateIndividualCardImage('${esc(p.id)}','${esc(ind.uid)}')">📸 個体画像を作成</button>
         ${individualScreenshot(p.id,ind.uid)?`<button type="button" onclick="removeIndividualScreenshot('${esc(p.id)}','${esc(ind.uid)}')">スクショ削除</button>`:''}
       </div>
       ${individualScreenshot(p.id,ind.uid)?`<div class="detail-shot"><img src="${individualScreenshot(p.id,ind.uid)}" alt="捕獲スクショ"></div>`:''}
@@ -4226,14 +4220,14 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 // ===== v56 automatic update / cache repair =====
 (function(){
-  const APP_VERSION='v129';
+  const APP_VERSION='v130';
   const UPDATE_KEY='shinyHomeReloadedForSW_'+APP_VERSION;
 
   async function registerFreshWorker(){
     if(!('serviceWorker' in navigator) || location.protocol==='file:') return;
     try{
       const reg = await navigator.serviceWorker.register(
-        './service-worker.js?v=129',
+        './service-worker.js?v=130',
         {updateViaCache:'none'}
       );
 
