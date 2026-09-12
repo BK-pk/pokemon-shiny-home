@@ -1143,7 +1143,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
       <div id="cloud-status" class="home-help">未設定です。</div>
       <div id="auto-sync-status" class="home-help" style="margin-top:8px">同期：v95 外出向け省通信</div><div id="network-status" class="net-pill">● 通信状態を確認中</div>
       <div class="home-help" style="margin-top:8px">
-        v143ではHOMEスクショ反映時に親名がBK/bk/バッカーなら入手区分を自動で「自己産」に設定します。v142ではHOMEスクショのボール判定だけを作り直し、実画像の正しい位置からアイコンを切り出して背景除去後に既存ボールアイコンと比較する方式へ変更しました。v141ではHOMEスクショのボールと性別の切り出し座標を実画像に合わせて再修正し、ボールは判定が曖昧な場合に誤登録せず未設定へ戻す安全判定を追加しました。v140ではHOMEスクショのボール・性別アイコンの固定位置判定を実画面に合わせて修正しました。v139ではHOMEスクショ読取を「捕獲日・ボール・性格・性別・親・ID」の6項目だけに整理し、確認画面も簡潔にしました。ボールはHOME画面上部のアイコンから画像判定します。v138ではHOMEスクショ読取の性別・特性・技4枠を専用領域で再解析し、残りの読取精度を改善しました。v137ではHOMEスクショ読取を画面全体OCRからHOME専用の領域別OCRへ変更し、Lv・性別・性格・特性・親名・ID・捕獲日・地方・能力値・技を各領域ごとに拡大して読み取るよう改善しました。v136ではHOMEの個体画面スクリーンショットをOCRで読み取り、確認後に個体情報へ反映できる機能を追加しました。v135ではスマホ厳選カードのリージョン・姿違い画像のフォールバック処理を修正し、アローララッタなどがNo.000表示になる不具合を直しました。v134ではコレクションカードの「✓ ○匹所持」がスマホ幅でも改行されないよう表示を調整しました。保存データ構造は変更しません。v133では世代別進捗を「通常個体・リージョン・オス/メス違い・その他の姿違い・キョダイマックス」に分けて表示します。各カテゴリ内で第1〜第9世代の所持率を個別集計します。v132では月別の色違い一覧の集計レイアウトを整理し、上段に4つのサマリー、下段に厳選回数の横長集計カードを表示します。重複していた捕獲数表示も整理しました。v131では個体編集画面の厳選回数ラベルを選択した厳選方法に即時追従させ、個体画像作成時にその場でプレビューを表示するよう修正しました。v130では、「殿堂入り」と「SHINY GET画像」を廃止しました。画像作成は「個体画像を作成」1つにまとめ、捕獲スクショの登録・変更と削除だけを残します。既存のコレクション・個体・画像・厳選・BINGOデータ構造は変更しません。スマホ起動時は安全クラウドバックアップからコレクションを一方向で取り込み、厳選データは専用同期します。
+        v144ではHOMEスクショからLv.1なら厳選方法を国際孵化に、カロス地方→XY・ガラル地方→剣盾・ヒスイ地方→Pokémon LEGENDS アルセウス・パルデア地方→SVを空欄時のみ自動補完します。v143ではHOMEスクショ反映時に親名がBK/bk/バッカーなら入手区分を自動で「自己産」に設定します。v142ではHOMEスクショのボール判定だけを作り直し、実画像の正しい位置からアイコンを切り出して背景除去後に既存ボールアイコンと比較する方式へ変更しました。v141ではHOMEスクショのボールと性別の切り出し座標を実画像に合わせて再修正し、ボールは判定が曖昧な場合に誤登録せず未設定へ戻す安全判定を追加しました。v140ではHOMEスクショのボール・性別アイコンの固定位置判定を実画面に合わせて修正しました。v139ではHOMEスクショ読取を「捕獲日・ボール・性格・性別・親・ID」の6項目だけに整理し、確認画面も簡潔にしました。ボールはHOME画面上部のアイコンから画像判定します。v138ではHOMEスクショ読取の性別・特性・技4枠を専用領域で再解析し、残りの読取精度を改善しました。v137ではHOMEスクショ読取を画面全体OCRからHOME専用の領域別OCRへ変更し、Lv・性別・性格・特性・親名・ID・捕獲日・地方・能力値・技を各領域ごとに拡大して読み取るよう改善しました。v136ではHOMEの個体画面スクリーンショットをOCRで読み取り、確認後に個体情報へ反映できる機能を追加しました。v135ではスマホ厳選カードのリージョン・姿違い画像のフォールバック処理を修正し、アローララッタなどがNo.000表示になる不具合を直しました。v134ではコレクションカードの「✓ ○匹所持」がスマホ幅でも改行されないよう表示を調整しました。保存データ構造は変更しません。v133では世代別進捗を「通常個体・リージョン・オス/メス違い・その他の姿違い・キョダイマックス」に分けて表示します。各カテゴリ内で第1〜第9世代の所持率を個別集計します。v132では月別の色違い一覧の集計レイアウトを整理し、上段に4つのサマリー、下段に厳選回数の横長集計カードを表示します。重複していた捕獲数表示も整理しました。v131では個体編集画面の厳選回数ラベルを選択した厳選方法に即時追従させ、個体画像作成時にその場でプレビューを表示するよう修正しました。v130では、「殿堂入り」と「SHINY GET画像」を廃止しました。画像作成は「個体画像を作成」1つにまとめ、捕獲スクショの登録・変更と削除だけを残します。既存のコレクション・個体・画像・厳選・BINGOデータ構造は変更しません。スマホ起動時は安全クラウドバックアップからコレクションを一方向で取り込み、厳選データは専用同期します。
       </div>
       <div class="home-help" style="margin-top:10px">初回は「設定保存」→「接続テスト」の順に確認してください。既存データがある場合、確認前にクラウドへ保存しないでください。</div>
     </div>
@@ -1151,7 +1151,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 </section>
 
 <script>
-const DATA_VERSION='full-2026-09-12-v143';
+const DATA_VERSION='full-2026-09-12-v144';
 const SPECIES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species.csv';
 const NAMES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
 const MAX_DEX=1025;
@@ -2049,6 +2049,8 @@ function detectHomeGender(img){
 function parseHomeHeader(raw,img){
   const text=normalizeHomeOCRText(raw),out={};
   if(/[♂]/.test(text))out.gender='♂';else if(/[♀]/.test(text))out.gender='♀';else{const g=detectHomeGender(img);if(g)out.gender=g}
+  // v144: レベルは確認画面には出さず、自動補完判定（Lv.1→国際孵化）だけに使う。
+  let m=text.match(/(?:Lv|LV|レベル)[\.．:\s]*([0-9]{1,3})/i);if(m)out._homeLevel=Number(m[1]);
   return out;
 }
 function parseHomeBottomLeft(raw){
@@ -2061,6 +2063,8 @@ function parseHomeBottomRight(raw){
   const text=normalizeHomeOCRText(raw),lines=text.split('\n').map(x=>x.trim()).filter(Boolean),out={};let m;
   m=text.match(/(20\d{2})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日/);if(m)out.date=`${m[1]}-${String(m[2]).padStart(2,'0')}-${String(m[3]).padStart(2,'0')}`;
   m=text.match(/ID\s*No[\.：:\s|｜]*([0-9]{3,})/i);if(m)out.trainerId=m[1];
+  // v144: 出会った地方は確認画面には出さず、ゲーム自動補完だけに使う。
+  m=text.match(/(カロス|ガラル|ヒスイ|パルデア)地方/);if(m)out._homeRegion=m[1]+'地方';
   for(const line of lines){let z=line.replace(/[|｜]/g,' ').replace(/\s+/g,' ').trim();let mm=z.match(/親\s*[:：]?\s*([^\s]{1,20})/);if(mm&&!/ID/i.test(mm[1])){out.otName=mm[1];break}mm=z.match(/^([^\s]{1,20})\s+ID\s*No/i);if(mm&&mm[1]&&!/^(親|No)$/i.test(mm[1])){out.otName=mm[1];break}}
   return out;
 }
@@ -2147,10 +2151,13 @@ async function readHomeScreenshot(id,uid,file){
     status.textContent='ボールを判定しています…';
     const ball=await detectHomeBall(img);
     const parsed=mergeHomeParsed(parseHomeHeader(results.header?.data?.text||'',img),parseHomeBottomLeft(results.bottomLeft?.data?.text||''),parseHomeBottomRight(results.bottomRight?.data?.text||''),ball?{ball}:null);
+    ov.dataset.homeLevel=parsed._homeLevel==null?'':String(parsed._homeLevel);ov.dataset.homeRegion=parsed._homeRegion||'';
     const raw=`【上部（性別）】\n${results.header?.data?.text||'（未検出）'}\n\n【基本情報（性格）】\n${results.bottomLeft?.data?.text||'（未検出）'}\n\n【捕獲情報（日付・親・ID）】\n${results.bottomRight?.data?.text||'（未検出）'}\n\n【ボール判定】\n${ball?ballName(ball):'未検出'}${detectHomeBall.lastDebug?`\n候補: ${ballName(detectHomeBall.lastDebug.best)||detectHomeBall.lastDebug.best} / score ${Number(detectHomeBall.lastDebug.score||0).toFixed(2)}`:''}`;document.getElementById('home-ocr-raw').textContent=raw;
     const defs=[['date','捕獲日','date'],['ball','ボール'],['nature','性格'],['gender','性別'],['otName','親'],['trainerId','ID']];
     document.getElementById('home-ocr-fields').innerHTML=defs.map(([k,l,t])=>homeOcrFieldHTML(k,l,parsed[k]??'',t)).join('');
-    const detected=defs.filter(([k])=>parsed[k]!==''&&parsed[k]!=null).length;status.textContent=`読取完了：6項目中 ${detected}項目を検出しました。内容を確認してから反映してください。`;
+    const detected=defs.filter(([k])=>parsed[k]!==''&&parsed[k]!=null).length;
+    const auto=[];if(Number(parsed._homeLevel)===1)auto.push('国際孵化');const rg={'カロス地方':'XY','ガラル地方':'剣盾','ヒスイ地方':'Pokémon LEGENDS アルセウス','パルデア地方':'SV'}[parsed._homeRegion||''];if(rg)auto.push(rg);
+    status.textContent=`読取完了：6項目中 ${detected}項目を検出しました。${auto.length?' 自動補完候補：'+auto.join('・')+'。':''} 内容を確認してから反映してください。`;
     ov.dataset.id=id;ov.dataset.uid=uid;ov.dataset.dataUrl=dataUrl;apply.disabled=false;apply.onclick=()=>applyHomeOcrResult();
   }catch(e){console.error(e);status.textContent='読取に失敗しました。ネット接続を確認して、もう一度試してください。';document.getElementById('home-ocr-raw').textContent=String(e?.message||e)}finally{if(worker){try{await worker.terminate()}catch(_){}}}
 }
@@ -2171,6 +2178,12 @@ async function applyHomeOcrResult(){
   // HOMEの親名が自分のOTなら、入手区分を自動で「自己産」にする。
   // BK/Bk/bK/bk、全角・半角スペース入り、バッカーを同一扱いにする。
   if(isSelfProducedOtName(ind.otName)&&ind.source!=='自己産'){ind.source='自己産';changed++;}
+  // v144: HOME画面から裏で読んだLv/地方を使い、空欄だけ安全に自動補完する。
+  // Lv.1 は国際孵化。地方から一意に判断できる作品だけゲームを設定する。
+  const homeLevel=Number(ov.dataset.homeLevel||0),homeRegion=ov.dataset.homeRegion||'';
+  if(homeLevel===1&&!ind.huntMethod){ind.huntMethod='国際孵化';changed++;}
+  const homeGame={'カロス地方':'XY','ガラル地方':'剣盾','ヒスイ地方':'Pokémon LEGENDS アルセウス','パルデア地方':'SV'}[homeRegion]||'';
+  if(homeGame&&!ind.game){ind.game=homeGame;changed++;}
   // HOMEスクショとしても保存する。画像保存失敗時は個体情報を壊さない。
   try{if(ov.dataset.dataUrl){const key=screenshotKey(id,uid);await screenshotDBPut(key,ov.dataset.dataUrl);individualScreenshots[key]=ov.dataset.dataUrl;screenshotDBReady=true}}catch(e){console.error(e);showToast('情報は反映しましたが、スクショ画像は保存できませんでした。')}
   openIndividualPanels.add(id);activeIndividualTabs.set(id,uid);save();requestAutoSyncAfterDataChange();closeHomeOcrModal();render();renderExtraPanels();showToast(`HOMEスクショから ${changed}項目を反映しました。`);
@@ -4485,14 +4498,14 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 // ===== v56 automatic update / cache repair =====
 (function(){
-  const APP_VERSION='v143';
+  const APP_VERSION='v144';
   const UPDATE_KEY='shinyHomeReloadedForSW_'+APP_VERSION;
 
   async function registerFreshWorker(){
     if(!('serviceWorker' in navigator) || location.protocol==='file:') return;
     try{
       const reg = await navigator.serviceWorker.register(
-        './service-worker.js?v=143',
+        './service-worker.js?v=144',
         {updateViaCache:'none'}
       );
 
