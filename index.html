@@ -1143,7 +1143,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
       <div id="cloud-status" class="home-help">未設定です。</div>
       <div id="auto-sync-status" class="home-help" style="margin-top:8px">同期：v95 外出向け省通信</div><div id="network-status" class="net-pill">● 通信状態を確認中</div>
       <div class="home-help" style="margin-top:8px">
-        v149では厳選方法の旧項目「国際」を廃止し、既存の「国際」は「国際孵化」として扱います。またHOMEスクショのモンスターボールだけ専用の赤・白・中央帯判定を追加し、通常のボール比較で未検出になった場合でもモンスターボールを拾えるよう改善しました。v148ではHOMEスクショの親名セルを左側まで含む複数領域で再読取し、BK/bkは英字専用OCRでも判定します。v147ではHOMEスクショの性格・親名を3種類の画像処理で複数回読み取り、性格25種との照合とBK/bk/バッカー専用判定を追加しました。v146ではHOMEスクショの親名・性格の切り出し範囲を実画面に合わせてさらに狭くし、親名は下段の出会った地方テキストを拾わないよう専用値領域だけをOCRします。性格も値部分だけを読むよう変更しました。v145ではHOMEスクショの「親」「性格」を専用領域で読み取り、♂♀がない場合は性別を「不明」にします。v144ではHOMEスクショからLv.1なら厳選方法を国際孵化に、カロス地方→XY・ガラル地方→剣盾・ヒスイ地方→Pokémon LEGENDS アルセウス・パルデア地方→SVを空欄時のみ自動補完します。v143ではHOMEスクショ反映時に親名がBK/bk/バッカーなら入手区分を自動で「自己産」に設定します。v142ではHOMEスクショのボール判定だけを作り直し、実画像の正しい位置からアイコンを切り出して背景除去後に既存ボールアイコンと比較する方式へ変更しました。v141ではHOMEスクショのボールと性別の切り出し座標を実画像に合わせて再修正し、ボールは判定が曖昧な場合に誤登録せず未設定へ戻す安全判定を追加しました。v140ではHOMEスクショのボール・性別アイコンの固定位置判定を実画面に合わせて修正しました。v139ではHOMEスクショ読取を「捕獲日・ボール・性格・性別・親・ID」の6項目だけに整理し、確認画面も簡潔にしました。ボールはHOME画面上部のアイコンから画像判定します。v138ではHOMEスクショ読取の性別・特性・技4枠を専用領域で再解析し、残りの読取精度を改善しました。v137ではHOMEスクショ読取を画面全体OCRからHOME専用の領域別OCRへ変更し、Lv・性別・性格・特性・親名・ID・捕獲日・地方・能力値・技を各領域ごとに拡大して読み取るよう改善しました。v136ではHOMEの個体画面スクリーンショットをOCRで読み取り、確認後に個体情報へ反映できる機能を追加しました。v135ではスマホ厳選カードのリージョン・姿違い画像のフォールバック処理を修正し、アローララッタなどがNo.000表示になる不具合を直しました。v134ではコレクションカードの「✓ ○匹所持」がスマホ幅でも改行されないよう表示を調整しました。保存データ構造は変更しません。v133では世代別進捗を「通常個体・リージョン・オス/メス違い・その他の姿違い・キョダイマックス」に分けて表示します。各カテゴリ内で第1〜第9世代の所持率を個別集計します。v132では月別の色違い一覧の集計レイアウトを整理し、上段に4つのサマリー、下段に厳選回数の横長集計カードを表示します。重複していた捕獲数表示も整理しました。v131では個体編集画面の厳選回数ラベルを選択した厳選方法に即時追従させ、個体画像作成時にその場でプレビューを表示するよう修正しました。v130では、「殿堂入り」と「SHINY GET画像」を廃止しました。画像作成は「個体画像を作成」1つにまとめ、捕獲スクショの登録・変更と削除だけを残します。既存のコレクション・個体・画像・厳選・BINGOデータ構造は変更しません。スマホ起動時は安全クラウドバックアップからコレクションを一方向で取り込み、厳選データは専用同期します。
+        v150では個体画像・SHINY GET画像でポケモン画像が空白になる不具合を修正し、Canvas生成時は登録スクショ・外部画像fetch・PokeAPI HOME色違い画像・図鑑No画像の順で多段フォールバックします。アローララッタなどリージョン個体もPokeAPIのフォーム画像を優先してCanvasへ描画します。v149では厳選方法の旧項目「国際」を廃止し、既存の「国際」は「国際孵化」として扱います。またHOMEスクショのモンスターボールだけ専用の赤・白・中央帯判定を追加し、通常のボール比較で未検出になった場合でもモンスターボールを拾えるよう改善しました。v148ではHOMEスクショの親名セルを左側まで含む複数領域で再読取し、BK/bkは英字専用OCRでも判定します。v147ではHOMEスクショの性格・親名を3種類の画像処理で複数回読み取り、性格25種との照合とBK/bk/バッカー専用判定を追加しました。v146ではHOMEスクショの親名・性格の切り出し範囲を実画面に合わせてさらに狭くし、親名は下段の出会った地方テキストを拾わないよう専用値領域だけをOCRします。性格も値部分だけを読むよう変更しました。v145ではHOMEスクショの「親」「性格」を専用領域で読み取り、♂♀がない場合は性別を「不明」にします。v144ではHOMEスクショからLv.1なら厳選方法を国際孵化に、カロス地方→XY・ガラル地方→剣盾・ヒスイ地方→Pokémon LEGENDS アルセウス・パルデア地方→SVを空欄時のみ自動補完します。v143ではHOMEスクショ反映時に親名がBK/bk/バッカーなら入手区分を自動で「自己産」に設定します。v142ではHOMEスクショのボール判定だけを作り直し、実画像の正しい位置からアイコンを切り出して背景除去後に既存ボールアイコンと比較する方式へ変更しました。v141ではHOMEスクショのボールと性別の切り出し座標を実画像に合わせて再修正し、ボールは判定が曖昧な場合に誤登録せず未設定へ戻す安全判定を追加しました。v140ではHOMEスクショのボール・性別アイコンの固定位置判定を実画面に合わせて修正しました。v139ではHOMEスクショ読取を「捕獲日・ボール・性格・性別・親・ID」の6項目だけに整理し、確認画面も簡潔にしました。ボールはHOME画面上部のアイコンから画像判定します。v138ではHOMEスクショ読取の性別・特性・技4枠を専用領域で再解析し、残りの読取精度を改善しました。v137ではHOMEスクショ読取を画面全体OCRからHOME専用の領域別OCRへ変更し、Lv・性別・性格・特性・親名・ID・捕獲日・地方・能力値・技を各領域ごとに拡大して読み取るよう改善しました。v136ではHOMEの個体画面スクリーンショットをOCRで読み取り、確認後に個体情報へ反映できる機能を追加しました。v135ではスマホ厳選カードのリージョン・姿違い画像のフォールバック処理を修正し、アローララッタなどがNo.000表示になる不具合を直しました。v134ではコレクションカードの「✓ ○匹所持」がスマホ幅でも改行されないよう表示を調整しました。保存データ構造は変更しません。v133では世代別進捗を「通常個体・リージョン・オス/メス違い・その他の姿違い・キョダイマックス」に分けて表示します。各カテゴリ内で第1〜第9世代の所持率を個別集計します。v132では月別の色違い一覧の集計レイアウトを整理し、上段に4つのサマリー、下段に厳選回数の横長集計カードを表示します。重複していた捕獲数表示も整理しました。v131では個体編集画面の厳選回数ラベルを選択した厳選方法に即時追従させ、個体画像作成時にその場でプレビューを表示するよう修正しました。v130では、「殿堂入り」と「SHINY GET画像」を廃止しました。画像作成は「個体画像を作成」1つにまとめ、捕獲スクショの登録・変更と削除だけを残します。既存のコレクション・個体・画像・厳選・BINGOデータ構造は変更しません。スマホ起動時は安全クラウドバックアップからコレクションを一方向で取り込み、厳選データは専用同期します。
       </div>
       <div class="home-help" style="margin-top:10px">初回は「設定保存」→「接続テスト」の順に確認してください。既存データがある場合、確認前にクラウドへ保存しないでください。</div>
     </div>
@@ -1151,7 +1151,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 </section>
 
 <script>
-const DATA_VERSION='full-2026-09-12-v149';
+const DATA_VERSION='full-2026-09-13-v150';
 const SPECIES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species.csv';
 const NAMES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
 const MAX_DEX=1025;
@@ -2327,6 +2327,51 @@ function loadCanvasImage(src){
     img.src=src;
   });
 }
+async function loadCanvasImageByFetch(src){
+  if(!src)return null;
+  try{
+    const r=await fetch(src,{cache:'force-cache',mode:'cors'});
+    if(!r.ok)throw new Error('image fetch '+r.status);
+    const b=await r.blob();
+    if('createImageBitmap' in window)return await createImageBitmap(b);
+    const u=URL.createObjectURL(b);
+    try{return await loadCanvasImage(u)}finally{setTimeout(()=>URL.revokeObjectURL(u),1000)}
+  }catch(_){return null}
+}
+async function pokeApiCanvasSprite(p){
+  if(!p)return null;
+  try{
+    let key=String(p.no);
+    const sl=showdownSpriteSlug(p);
+    if(sl)key=sl;
+    const r=await fetch(`https://pokeapi.co/api/v2/pokemon/${encodeURIComponent(key)}`,{cache:'force-cache'});
+    if(!r.ok&&sl){
+      const r2=await fetch(`https://pokeapi.co/api/v2/pokemon/${p.no}`,{cache:'force-cache'});
+      if(!r2.ok)return null;
+      const j2=await r2.json();
+      const u2=(p.section==='gender'&&p.gender==='♀')?(j2.sprites?.other?.home?.front_shiny_female||j2.sprites?.front_shiny_female):(j2.sprites?.other?.home?.front_shiny||j2.sprites?.front_shiny);
+      return await loadCanvasImageByFetch(u2);
+    }
+    if(!r.ok)return null;
+    const j=await r.json();
+    const u=(p.section==='gender'&&p.gender==='♀')?(j.sprites?.other?.home?.front_shiny_female||j.sprites?.front_shiny_female):(j.sprites?.other?.home?.front_shiny||j.sprites?.front_shiny);
+    return await loadCanvasImageByFetch(u);
+  }catch(_){return null}
+}
+async function loadPokemonCanvasImage(p,preferred=''){
+  // Canvas生成では <img> 表示と違い外部画像のCORSで失敗することがあるため、
+  // data URL/登録スクショ → fetch(blob) → PokeAPI HOME sprite → 図鑑No sprite の順に安全に読み込む。
+  if(preferred){
+    const a=await loadCanvasImage(preferred); if(a)return a;
+    const b=await loadCanvasImageByFetch(preferred); if(b)return b;
+  }
+  const primary=spriteURL(p);
+  let im=await loadCanvasImageByFetch(primary); if(im)return im;
+  im=await pokeApiCanvasSprite(p); if(im)return im;
+  const base=baseSpriteURL(p);
+  im=await loadCanvasImageByFetch(base); if(im)return im;
+  return await loadCanvasImage(base);
+}
 function roundRect(ctx,x,y,w,h,r){
   const rr=Math.min(r,w/2,h/2);
   ctx.beginPath();
@@ -2718,7 +2763,7 @@ async function generateIndividualCardImage(id,uid){
   ctx.fillStyle='#9eb9ca';ctx.font='700 24px system-ui,"Yu Gothic",sans-serif';ctx.fillText(`No.${String(p.no).padStart(4,'0')}  •  ${duplicateOrdinal(id,uid)}匹目`,60,182);
 
   const media={x:55,y:225,w:970,h:470};ctx.fillStyle='rgba(4,17,29,.78)';ctx.strokeStyle='rgba(112,205,255,.34)';ctx.lineWidth=2;roundRect(ctx,media.x,media.y,media.w,media.h,26);ctx.fill();ctx.stroke();
-  const im=await loadCanvasImage(individualScreenshot(id,uid)||spriteURL(p))||await loadCanvasImage(baseSpriteURL(p));
+  const im=await loadPokemonCanvasImage(p,individualScreenshot(id,uid));
   if(im){const sc=Math.min((media.w-46)/im.width,(media.h-46)/im.height),dw=im.width*sc,dh=im.height*sc;ctx.drawImage(im,media.x+(media.w-dw)/2,media.y+(media.h-dh)/2,dw,dh)}
   const ball=ind.ball?await loadCanvasImage(ballIcon(ind.ball)):null;if(ball)ctx.drawImage(ball,930,616,58,58);
 
@@ -2763,7 +2808,7 @@ async function generateSingleShinyImage(id,uid){
   if(!p||!ind)return;
   const c=el('single-post-canvas'),ctx=c.getContext('2d'),W=1600,H=900;c.width=W;c.height=H;
   const g=ctx.createLinearGradient(0,0,W,H);g.addColorStop(0,'#092a45');g.addColorStop(1,'#071522');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
-  const im=await loadCanvasImage(individualScreenshot(id,uid)||spriteURL(p))||await loadCanvasImage(baseSpriteURL(p));
+  const im=await loadPokemonCanvasImage(p,individualScreenshot(id,uid));
   ctx.fillStyle='#fff';ctx.font='900 72px system-ui,"Yu Gothic",sans-serif';ctx.fillText('✨ SHINY GET!',60,95);
   ctx.font='900 66px system-ui,"Yu Gothic",sans-serif';ctx.fillText(p.name,880,210);
   ctx.font='600 28px system-ui,"Yu Gothic",sans-serif';ctx.fillStyle='#bfe8ff';
@@ -3562,7 +3607,7 @@ async function downloadShinyShareImage(){
   const g=ctx.createLinearGradient(0,0,1200,675);g.addColorStop(0,'#071427');g.addColorStop(.55,'#102a52');g.addColorStop(1,'#321a4d');ctx.fillStyle=g;ctx.fillRect(0,0,1200,675);
   for(let i=0;i<80;i++){const x=Math.random()*1200,y=Math.random()*675,r=Math.random()*2+1;ctx.globalAlpha=Math.random()*.55+.2;ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill()}ctx.globalAlpha=1;
   ctx.fillStyle='#ffe083';ctx.font='900 76px system-ui';ctx.textAlign='center';ctx.fillText('✨ SHINY GET! ✨',600,92);
-  let img=null;try{const res=await fetch(spriteURL(p),{cache:'force-cache'});const blob=await res.blob();img=await createImageBitmap(blob)}catch(_){}
+  const img=await loadPokemonCanvasImage(p,individualScreenshot(p.id,ind.uid));
   if(img){const max=330,scale=Math.min(max/img.width,max/img.height),w=img.width*scale,hh=img.height*scale;ctx.drawImage(img,155+(330-w)/2,160+(330-hh)/2,w,hh)}
   ctx.textAlign='left';ctx.fillStyle='#fff';ctx.font='900 46px system-ui';ctx.fillText(`${p.name}`,565,185);ctx.font='600 24px system-ui';ctx.fillStyle='#9ec2e4';ctx.fillText(`No.${String(p.no).padStart(4,'0')}`,565,220);
   const rows=[['ゲーム',ind.game||'未設定'],['方法',ind.huntMethod||'未設定'],[counterLabel(ind.huntMethod||''),`${Number(ind.huntCount)||0}回`],['確率',odds],['捕獲日',ind.date||'—'],['ボール',BALLS.find(x=>x[0]===ind.ball)?.[1]||ind.ball||'未設定']];
@@ -4615,14 +4660,14 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 // ===== v56 automatic update / cache repair =====
 (function(){
-  const APP_VERSION='v149';
+  const APP_VERSION='v150';
   const UPDATE_KEY='shinyHomeReloadedForSW_'+APP_VERSION;
 
   async function registerFreshWorker(){
     if(!('serviceWorker' in navigator) || location.protocol==='file:') return;
     try{
       const reg = await navigator.serviceWorker.register(
-        './service-worker.js?v=149',
+        './service-worker.js?v=150',
         {updateViaCache:'none'}
       );
 
