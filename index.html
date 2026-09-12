@@ -1143,7 +1143,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
       <div id="cloud-status" class="home-help">未設定です。</div>
       <div id="auto-sync-status" class="home-help" style="margin-top:8px">同期：v95 外出向け省通信</div><div id="network-status" class="net-pill">● 通信状態を確認中</div>
       <div class="home-help" style="margin-top:8px">
-        v155ではリージョンカードが通常個体の画像に戻ってしまう不具合を修正し、フォーム名をカード上に明示しつつPokeAPIの該当リージョン色違い画像を再取得します。v154では複数個体を所持しているカードのボールアイコン更新を修正し、ボール変更後に全個体を再集計して、重複を除き既存の固定ボール順で全種類を即時表示します。v153ではSHINY GET画像の左右バランスを再調整し、左画像と右情報の間隔を広げ、右情報を中央寄りへ移動、下部ロゴを画像全体の中央に配置しました。v152ではSHINY GET画像の左右バランスを調整し、登録スクショ/ポケモン画像を左側で約1.2倍大きく表示、右側の名前・個体情報を20px左へ寄せました。v151では「個体画像を作成」のデザインを捕獲時のSHINY GET画像に統一しました。横長1200×675で、ポケモン画像・ゲーム・方法・回数・確率・捕獲日・ボールを同じレイアウトで表示します。v150では個体画像・SHINY GET画像でポケモン画像が空白になる不具合を修正し、Canvas生成時は登録スクショ・外部画像fetch・PokeAPI HOME色違い画像・図鑑No画像の順で多段フォールバックします。アローララッタなどリージョン個体もPokeAPIのフォーム画像を優先してCanvasへ描画します。v149では厳選方法の旧項目「国際」を廃止し、既存の「国際」は「国際孵化」として扱います。またHOMEスクショのモンスターボールだけ専用の赤・白・中央帯判定を追加し、通常のボール比較で未検出になった場合でもモンスターボールを拾えるよう改善しました。v148ではHOMEスクショの親名セルを左側まで含む複数領域で再読取し、BK/bkは英字専用OCRでも判定します。v147ではHOMEスクショの性格・親名を3種類の画像処理で複数回読み取り、性格25種との照合とBK/bk/バッカー専用判定を追加しました。v146ではHOMEスクショの親名・性格の切り出し範囲を実画面に合わせてさらに狭くし、親名は下段の出会った地方テキストを拾わないよう専用値領域だけをOCRします。性格も値部分だけを読むよう変更しました。v145ではHOMEスクショの「親」「性格」を専用領域で読み取り、♂♀がない場合は性別を「不明」にします。v144ではHOMEスクショからLv.1なら厳選方法を国際孵化に、カロス地方→XY・ガラル地方→剣盾・ヒスイ地方→Pokémon LEGENDS アルセウス・パルデア地方→SVを空欄時のみ自動補完します。v143ではHOMEスクショ反映時に親名がBK/bk/バッカーなら入手区分を自動で「自己産」に設定します。v142ではHOMEスクショのボール判定だけを作り直し、実画像の正しい位置からアイコンを切り出して背景除去後に既存ボールアイコンと比較する方式へ変更しました。v141ではHOMEスクショのボールと性別の切り出し座標を実画像に合わせて再修正し、ボールは判定が曖昧な場合に誤登録せず未設定へ戻す安全判定を追加しました。v140ではHOMEスクショのボール・性別アイコンの固定位置判定を実画面に合わせて修正しました。v139ではHOMEスクショ読取を「捕獲日・ボール・性格・性別・親・ID」の6項目だけに整理し、確認画面も簡潔にしました。ボールはHOME画面上部のアイコンから画像判定します。v138ではHOMEスクショ読取の性別・特性・技4枠を専用領域で再解析し、残りの読取精度を改善しました。v137ではHOMEスクショ読取を画面全体OCRからHOME専用の領域別OCRへ変更し、Lv・性別・性格・特性・親名・ID・捕獲日・地方・能力値・技を各領域ごとに拡大して読み取るよう改善しました。v136ではHOMEの個体画面スクリーンショットをOCRで読み取り、確認後に個体情報へ反映できる機能を追加しました。v135ではスマホ厳選カードのリージョン・姿違い画像のフォールバック処理を修正し、アローララッタなどがNo.000表示になる不具合を直しました。v134ではコレクションカードの「✓ ○匹所持」がスマホ幅でも改行されないよう表示を調整しました。保存データ構造は変更しません。v133では世代別進捗を「通常個体・リージョン・オス/メス違い・その他の姿違い・キョダイマックス」に分けて表示します。各カテゴリ内で第1〜第9世代の所持率を個別集計します。v132では月別の色違い一覧の集計レイアウトを整理し、上段に4つのサマリー、下段に厳選回数の横長集計カードを表示します。重複していた捕獲数表示も整理しました。v131では個体編集画面の厳選回数ラベルを選択した厳選方法に即時追従させ、個体画像作成時にその場でプレビューを表示するよう修正しました。v130では、「殿堂入り」と「SHINY GET画像」を廃止しました。画像作成は「個体画像を作成」1つにまとめ、捕獲スクショの登録・変更と削除だけを残します。既存のコレクション・個体・画像・厳選・BINGOデータ構造は変更しません。スマホ起動時は安全クラウドバックアップからコレクションを一方向で取り込み、厳選データは専用同期します。
+        v156ではリージョン画像をフォーム固有IDで直接表示し、通常個体へ戻る誤フォールバックを修正しました。v155ではリージョンカードが通常個体の画像に戻ってしまう不具合を修正し、フォーム名をカード上に明示しつつPokeAPIの該当リージョン色違い画像を再取得します。v154では複数個体を所持しているカードのボールアイコン更新を修正し、ボール変更後に全個体を再集計して、重複を除き既存の固定ボール順で全種類を即時表示します。v153ではSHINY GET画像の左右バランスを再調整し、左画像と右情報の間隔を広げ、右情報を中央寄りへ移動、下部ロゴを画像全体の中央に配置しました。v152ではSHINY GET画像の左右バランスを調整し、登録スクショ/ポケモン画像を左側で約1.2倍大きく表示、右側の名前・個体情報を20px左へ寄せました。v151では「個体画像を作成」のデザインを捕獲時のSHINY GET画像に統一しました。横長1200×675で、ポケモン画像・ゲーム・方法・回数・確率・捕獲日・ボールを同じレイアウトで表示します。v150では個体画像・SHINY GET画像でポケモン画像が空白になる不具合を修正し、Canvas生成時は登録スクショ・外部画像fetch・PokeAPI HOME色違い画像・図鑑No画像の順で多段フォールバックします。アローララッタなどリージョン個体もPokeAPIのフォーム画像を優先してCanvasへ描画します。v149では厳選方法の旧項目「国際」を廃止し、既存の「国際」は「国際孵化」として扱います。またHOMEスクショのモンスターボールだけ専用の赤・白・中央帯判定を追加し、通常のボール比較で未検出になった場合でもモンスターボールを拾えるよう改善しました。v148ではHOMEスクショの親名セルを左側まで含む複数領域で再読取し、BK/bkは英字専用OCRでも判定します。v147ではHOMEスクショの性格・親名を3種類の画像処理で複数回読み取り、性格25種との照合とBK/bk/バッカー専用判定を追加しました。v146ではHOMEスクショの親名・性格の切り出し範囲を実画面に合わせてさらに狭くし、親名は下段の出会った地方テキストを拾わないよう専用値領域だけをOCRします。性格も値部分だけを読むよう変更しました。v145ではHOMEスクショの「親」「性格」を専用領域で読み取り、♂♀がない場合は性別を「不明」にします。v144ではHOMEスクショからLv.1なら厳選方法を国際孵化に、カロス地方→XY・ガラル地方→剣盾・ヒスイ地方→Pokémon LEGENDS アルセウス・パルデア地方→SVを空欄時のみ自動補完します。v143ではHOMEスクショ反映時に親名がBK/bk/バッカーなら入手区分を自動で「自己産」に設定します。v142ではHOMEスクショのボール判定だけを作り直し、実画像の正しい位置からアイコンを切り出して背景除去後に既存ボールアイコンと比較する方式へ変更しました。v141ではHOMEスクショのボールと性別の切り出し座標を実画像に合わせて再修正し、ボールは判定が曖昧な場合に誤登録せず未設定へ戻す安全判定を追加しました。v140ではHOMEスクショのボール・性別アイコンの固定位置判定を実画面に合わせて修正しました。v139ではHOMEスクショ読取を「捕獲日・ボール・性格・性別・親・ID」の6項目だけに整理し、確認画面も簡潔にしました。ボールはHOME画面上部のアイコンから画像判定します。v138ではHOMEスクショ読取の性別・特性・技4枠を専用領域で再解析し、残りの読取精度を改善しました。v137ではHOMEスクショ読取を画面全体OCRからHOME専用の領域別OCRへ変更し、Lv・性別・性格・特性・親名・ID・捕獲日・地方・能力値・技を各領域ごとに拡大して読み取るよう改善しました。v136ではHOMEの個体画面スクリーンショットをOCRで読み取り、確認後に個体情報へ反映できる機能を追加しました。v135ではスマホ厳選カードのリージョン・姿違い画像のフォールバック処理を修正し、アローララッタなどがNo.000表示になる不具合を直しました。v134ではコレクションカードの「✓ ○匹所持」がスマホ幅でも改行されないよう表示を調整しました。保存データ構造は変更しません。v133では世代別進捗を「通常個体・リージョン・オス/メス違い・その他の姿違い・キョダイマックス」に分けて表示します。各カテゴリ内で第1〜第9世代の所持率を個別集計します。v132では月別の色違い一覧の集計レイアウトを整理し、上段に4つのサマリー、下段に厳選回数の横長集計カードを表示します。重複していた捕獲数表示も整理しました。v131では個体編集画面の厳選回数ラベルを選択した厳選方法に即時追従させ、個体画像作成時にその場でプレビューを表示するよう修正しました。v130では、「殿堂入り」と「SHINY GET画像」を廃止しました。画像作成は「個体画像を作成」1つにまとめ、捕獲スクショの登録・変更と削除だけを残します。既存のコレクション・個体・画像・厳選・BINGOデータ構造は変更しません。スマホ起動時は安全クラウドバックアップからコレクションを一方向で取り込み、厳選データは専用同期します。
       </div>
       <div class="home-help" style="margin-top:10px">初回は「設定保存」→「接続テスト」の順に確認してください。既存データがある場合、確認前にクラウドへ保存しないでください。</div>
     </div>
@@ -1151,7 +1151,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 </section>
 
 <script>
-const DATA_VERSION='full-2026-09-13-v151';
+const DATA_VERSION='full-2026-09-13-v156';
 const SPECIES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species.csv';
 const NAMES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
 const MAX_DEX=1025;
@@ -1489,14 +1489,20 @@ document.addEventListener('error',e=>{
   // v135: リージョン/姿違いの外部スプライトが失敗した場合、
   // いきなり No.000 の代替画像へ落とさず、まず同じ図鑑No.の HOME 色違い画像へフォールバックする。
   const fallback=img.dataset.fallbackSrc||'';
-  if(fallback&&!img.dataset.baseFallbackTried&&img.src!==fallback){
-    img.dataset.baseFallbackTried='1';
+  const fallback2=img.dataset.fallback2Src||'';
+  if(fallback&&!img.dataset.firstFallbackTried&&img.src!==fallback){
+    img.dataset.firstFallbackTried='1';
     img.src=fallback;
+    return;
+  }
+  if(fallback2&&!img.dataset.secondFallbackTried&&img.src!==fallback2){
+    img.dataset.secondFallbackTried='1';
+    img.src=fallback2;
     return;
   }
   if(!img.dataset.offlineFallback){
     img.dataset.offlineFallback='1';
-    const m=(fallback||img.src||'').match(/(?:shiny\/|home\/|pokemon\/)(\d+)\.png/i);
+    const m=(fallback2||fallback||img.src||'').match(/(?:shiny\/|home\/|pokemon\/)(\d+)\.png/i);
     const no=img.dataset.pokeNo||(m?m[1]:'');
     img.src=offlineSpriteURL(no);
   }
@@ -1520,8 +1526,20 @@ function showdownSpriteSlug(p){
   }
   return null;
 }
-function spriteURL(p){const sl=showdownSpriteSlug(p);return sl?`https://play.pokemonshowdown.com/sprites/home-shiny/${sl}.png`:baseSpriteURL(p)}
-// v155: リージョンカードは通常個体へ化けないよう、PokeAPI のフォーム名から色違い HOME 画像も取得する。
+const REGIONAL_POKEAPI_IDS={
+  '19|アローラのすがた':10091,'20|アローラのすがた':10092,'26|アローラのすがた':10100,'27|アローラのすがた':10101,'28|アローラのすがた':10102,'37|アローラのすがた':10103,'38|アローラのすがた':10104,'50|アローラのすがた':10105,'51|アローラのすがた':10106,'52|アローラのすがた':10107,'53|アローラのすがた':10108,'74|アローラのすがた':10109,'75|アローラのすがた':10110,'76|アローラのすがた':10111,'88|アローラのすがた':10112,'89|アローラのすがた':10113,'103|アローラのすがた':10114,'105|アローラのすがた':10115,
+  '52|ガラルのすがた':10161,'77|ガラルのすがた':10162,'78|ガラルのすがた':10163,'79|ガラルのすがた':10164,'80|ガラルのすがた':10165,'83|ガラルのすがた':10166,'110|ガラルのすがた':10167,'122|ガラルのすがた':10168,'144|ガラルのすがた':10169,'145|ガラルのすがた':10170,'146|ガラルのすがた':10171,'199|ガラルのすがた':10172,'222|ガラルのすがた':10173,'263|ガラルのすがた':10174,'264|ガラルのすがた':10175,'554|ガラルのすがた':10176,'555|ガラルのすがた':10177,'562|ガラルのすがた':10179,'618|ガラルのすがた':10180,
+  '58|ヒスイのすがた':10229,'59|ヒスイのすがた':10230,'100|ヒスイのすがた':10231,'101|ヒスイのすがた':10232,'157|ヒスイのすがた':10233,'211|ヒスイのすがた':10234,'215|ヒスイのすがた':10235,'503|ヒスイのすがた':10236,'549|ヒスイのすがた':10237,'570|ヒスイのすがた':10238,'571|ヒスイのすがた':10239,'628|ヒスイのすがた':10240,'705|ヒスイのすがた':10241,'706|ヒスイのすがた':10242,'713|ヒスイのすがた':10243,'724|ヒスイのすがた':10244,
+  '128|パルデア・コンバット種':10250,'128|パルデア・ブレイズ種':10251,'128|パルデア・ウォーター種':10252,'194|パルデアのすがた':10253
+};
+function regionalStaticSpriteURL(p){
+  if(!p||p.section!=='region')return '';
+  const id=REGIONAL_POKEAPI_IDS[`${p.no}|${p.form}`];
+  return id?`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/${id}.png`:'';
+}
+function regionalShowdownSpriteURL(p){const sl=showdownSpriteSlug(p);return sl?`https://play.pokemonshowdown.com/sprites/home-shiny/${sl}.png`:''}
+function spriteURL(p){return regionalStaticSpriteURL(p)||regionalShowdownSpriteURL(p)||baseSpriteURL(p)}
+// v156: リージョン画像はフォーム固有のPokeAPI sprite IDを直接使用。失敗時はShowdown→通常個体→オフラインの順で段階的にフォールバックする。
 function regionalPokeApiName(p){
   if(!p||p.section!=='region')return '';
   let base=showdownBase(p.en);
@@ -1731,8 +1749,9 @@ function selectIndividualTab(id,uid){
 function cardHTML(p){
   const inds=individualState[p.id]||[], count=inds.length, targeted=!!targetState[p.id];
   const regionApi=regionalPokeApiName(p);
+  const regionFallback=regionalShowdownSpriteURL(p);
   const formBadge=p.section==='region'?`<div class="tags"><span class="tag region">${esc(p.form)}</span></div>`:'';
-  return `<article class="card ${count?'owned':''}" data-id="${esc(p.id)}" style="${p.locked?'opacity:.68;':''}"><div class="sprite" onclick="showPokemonDetail('${esc(p.id)}')"><img loading="lazy" src="${spriteURL(p)}" ${regionApi?`data-region-api="${esc(regionApi)}"`:''} data-fallback-src="${baseSpriteURL(p)}" data-poke-no="${p.no}" alt="" onerror="if(!this.dataset.fallback){this.dataset.fallback='1';this.src='${baseSpriteURL(p)}'}else{this.style.display='none'}"></div><div><div class="number">No.${String(p.no).padStart(4,'0')} · GEN ${p.gen}</div><div class="name" onclick="showPokemonDetail('${esc(p.id)}')">${esc(p.name)} ${hasRecentIndividual(p.id,7)?'<span class="new-badge">NEW</span>':''}</div>${formBadge}${targeted?'<div class="tags"><span class="tag target-tag">🎯 次に狙う</span></div>':''}${ownedBallIcons(p.id)}</div>${p.locked?'':`<div class="individual-summary"><div class="individual-head"><span class="countbadge">${count?`✓ ${count}匹所持`:'未所持'}</span><div><button class="target-btn ${targeted?'active':''}" onclick="toggleTarget('${esc(p.id)}')">🎯 ${targeted?'厳選中':'厳選する'}</button> <button class="smallbtn" onclick="addIndividual('${esc(p.id)}')">＋ 個体を追加</button>${count?` <button class="smallbtn" onclick="toggleIndividuals('${esc(p.id)}')">個体一覧</button>`:''}</div></div><div class="individuals" id="inds-${encodeURIComponent(p.id)}">${individualTabsHTML(p,inds)}</div></div>`}${p.locked?'<div class="individual-summary"><span class="countbadge">🔒 色違い未解禁</span></div>':''}</article>`;
+  return `<article class="card ${count?'owned':''}" data-id="${esc(p.id)}" style="${p.locked?'opacity:.68;':''}"><div class="sprite" onclick="showPokemonDetail('${esc(p.id)}')"><img loading="lazy" src="${spriteURL(p)}" ${regionApi?`data-region-api="${esc(regionApi)}"`:''} data-fallback-src="${regionFallback||baseSpriteURL(p)}" data-fallback2-src="${baseSpriteURL(p)}" data-poke-no="${p.no}" alt=""></div><div><div class="number">No.${String(p.no).padStart(4,'0')} · GEN ${p.gen}</div><div class="name" onclick="showPokemonDetail('${esc(p.id)}')">${esc(p.name)} ${hasRecentIndividual(p.id,7)?'<span class="new-badge">NEW</span>':''}</div>${formBadge}${targeted?'<div class="tags"><span class="tag target-tag">🎯 次に狙う</span></div>':''}${ownedBallIcons(p.id)}</div>${p.locked?'':`<div class="individual-summary"><div class="individual-head"><span class="countbadge">${count?`✓ ${count}匹所持`:'未所持'}</span><div><button class="target-btn ${targeted?'active':''}" onclick="toggleTarget('${esc(p.id)}')">🎯 ${targeted?'厳選中':'厳選する'}</button> <button class="smallbtn" onclick="addIndividual('${esc(p.id)}')">＋ 個体を追加</button>${count?` <button class="smallbtn" onclick="toggleIndividuals('${esc(p.id)}')">個体一覧</button>`:''}</div></div><div class="individuals" id="inds-${encodeURIComponent(p.id)}">${individualTabsHTML(p,inds)}</div></div>`}${p.locked?'<div class="individual-summary"><span class="countbadge">🔒 色違い未解禁</span></div>':''}</article>`;
 }
 function refreshSingleCollectionCard(id,{openIndividuals=false,focusUid=null}={}){
   const p=data.find(x=>x.id===id); if(!p)return false;
@@ -4697,14 +4716,14 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 // ===== v56 automatic update / cache repair =====
 (function(){
-  const APP_VERSION='v155';
+  const APP_VERSION='v156';
   const UPDATE_KEY='shinyHomeReloadedForSW_'+APP_VERSION;
 
   async function registerFreshWorker(){
     if(!('serviceWorker' in navigator) || location.protocol==='file:') return;
     try{
       const reg = await navigator.serviceWorker.register(
-        './service-worker.js?v=155',
+        './service-worker.js?v=156',
         {updateViaCache:'none'}
       );
 
