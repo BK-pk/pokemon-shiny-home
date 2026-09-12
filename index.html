@@ -1143,7 +1143,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
       <div id="cloud-status" class="home-help">未設定です。</div>
       <div id="auto-sync-status" class="home-help" style="margin-top:8px">同期：v95 外出向け省通信</div><div id="network-status" class="net-pill">● 通信状態を確認中</div>
       <div class="home-help" style="margin-top:8px">
-        v140ではHOMEスクショのボール・性別アイコンの固定位置判定を実画面に合わせて修正しました。v139ではHOMEスクショ読取を「捕獲日・ボール・性格・性別・親・ID」の6項目だけに整理し、確認画面も簡潔にしました。ボールはHOME画面上部のアイコンから画像判定します。v138ではHOMEスクショ読取の性別・特性・技4枠を専用領域で再解析し、残りの読取精度を改善しました。v137ではHOMEスクショ読取を画面全体OCRからHOME専用の領域別OCRへ変更し、Lv・性別・性格・特性・親名・ID・捕獲日・地方・能力値・技を各領域ごとに拡大して読み取るよう改善しました。v136ではHOMEの個体画面スクリーンショットをOCRで読み取り、確認後に個体情報へ反映できる機能を追加しました。v135ではスマホ厳選カードのリージョン・姿違い画像のフォールバック処理を修正し、アローララッタなどがNo.000表示になる不具合を直しました。v134ではコレクションカードの「✓ ○匹所持」がスマホ幅でも改行されないよう表示を調整しました。保存データ構造は変更しません。v133では世代別進捗を「通常個体・リージョン・オス/メス違い・その他の姿違い・キョダイマックス」に分けて表示します。各カテゴリ内で第1〜第9世代の所持率を個別集計します。v132では月別の色違い一覧の集計レイアウトを整理し、上段に4つのサマリー、下段に厳選回数の横長集計カードを表示します。重複していた捕獲数表示も整理しました。v131では個体編集画面の厳選回数ラベルを選択した厳選方法に即時追従させ、個体画像作成時にその場でプレビューを表示するよう修正しました。v130では、「殿堂入り」と「SHINY GET画像」を廃止しました。画像作成は「個体画像を作成」1つにまとめ、捕獲スクショの登録・変更と削除だけを残します。既存のコレクション・個体・画像・厳選・BINGOデータ構造は変更しません。スマホ起動時は安全クラウドバックアップからコレクションを一方向で取り込み、厳選データは専用同期します。
+        v141ではHOMEスクショのボールと性別の切り出し座標を実画像に合わせて再修正し、ボールは判定が曖昧な場合に誤登録せず未設定へ戻す安全判定を追加しました。v140ではHOMEスクショのボール・性別アイコンの固定位置判定を実画面に合わせて修正しました。v139ではHOMEスクショ読取を「捕獲日・ボール・性格・性別・親・ID」の6項目だけに整理し、確認画面も簡潔にしました。ボールはHOME画面上部のアイコンから画像判定します。v138ではHOMEスクショ読取の性別・特性・技4枠を専用領域で再解析し、残りの読取精度を改善しました。v137ではHOMEスクショ読取を画面全体OCRからHOME専用の領域別OCRへ変更し、Lv・性別・性格・特性・親名・ID・捕獲日・地方・能力値・技を各領域ごとに拡大して読み取るよう改善しました。v136ではHOMEの個体画面スクリーンショットをOCRで読み取り、確認後に個体情報へ反映できる機能を追加しました。v135ではスマホ厳選カードのリージョン・姿違い画像のフォールバック処理を修正し、アローララッタなどがNo.000表示になる不具合を直しました。v134ではコレクションカードの「✓ ○匹所持」がスマホ幅でも改行されないよう表示を調整しました。保存データ構造は変更しません。v133では世代別進捗を「通常個体・リージョン・オス/メス違い・その他の姿違い・キョダイマックス」に分けて表示します。各カテゴリ内で第1〜第9世代の所持率を個別集計します。v132では月別の色違い一覧の集計レイアウトを整理し、上段に4つのサマリー、下段に厳選回数の横長集計カードを表示します。重複していた捕獲数表示も整理しました。v131では個体編集画面の厳選回数ラベルを選択した厳選方法に即時追従させ、個体画像作成時にその場でプレビューを表示するよう修正しました。v130では、「殿堂入り」と「SHINY GET画像」を廃止しました。画像作成は「個体画像を作成」1つにまとめ、捕獲スクショの登録・変更と削除だけを残します。既存のコレクション・個体・画像・厳選・BINGOデータ構造は変更しません。スマホ起動時は安全クラウドバックアップからコレクションを一方向で取り込み、厳選データは専用同期します。
       </div>
       <div class="home-help" style="margin-top:10px">初回は「設定保存」→「接続テスト」の順に確認してください。既存データがある場合、確認前にクラウドへ保存しないでください。</div>
     </div>
@@ -1151,7 +1151,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 </section>
 
 <script>
-const DATA_VERSION='full-2026-09-12-v140';
+const DATA_VERSION='full-2026-09-12-v141';
 const SPECIES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species.csv';
 const NAMES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
 const MAX_DEX=1025;
@@ -2031,16 +2031,20 @@ function homeCropCanvas(img,box,scale=3){
   ctx.putImageData(d,0,0);return c;
 }
 function detectHomeGender(img){
-  // Pokémon HOME「ようすをみる」の名前右側にある性別アイコンだけを狙う。
-  // 1280x720基準で♂はおよそ x=371,y=88。比率指定なので同じ16:9スクショの縮小にも追従する。
-  const c=document.createElement('canvas'),x=Math.round(img.naturalWidth*.278),y=Math.round(img.naturalHeight*.095),w=Math.round(img.naturalWidth*.035),h=Math.round(img.naturalHeight*.060);
-  c.width=Math.max(1,w);c.height=Math.max(1,h);const ctx=c.getContext('2d',{willReadFrequently:true});ctx.drawImage(img,x,y,w,h,0,0,w,h);const a=ctx.getImageData(0,0,w,h).data;let male=0,female=0;
-  for(let i=0;i<a.length;i+=4){const r=a[i],g=a[i+1],b=a[i+2],mx=Math.max(r,g,b),mn=Math.min(r,g,b);if(mx-mn<35)continue;
-    // HOMEの♂は鮮やかな青、♀は赤～桃。背景の薄緑を拾わないよう青/赤の優位差を強めに見る。
-    if(b>145&&b-r>45&&b-g>18)male++;
-    if(r>165&&r-b>45&&r-g>25)female++;
+  // HOME「ようすをみる」の性別アイコンはポケモン名の右側に固定表示される。
+  // 実画面(1280x720)では中心がおよそ x=552,y=87。以前の切り出し位置が左にずれていたため修正。
+  const c=document.createElement('canvas'),x=Math.round(img.naturalWidth*.412),y=Math.round(img.naturalHeight*.078),w=Math.round(img.naturalWidth*.038),h=Math.round(img.naturalHeight*.075);
+  c.width=Math.max(1,w);c.height=Math.max(1,h);const ctx=c.getContext('2d',{willReadFrequently:true});ctx.drawImage(img,x,y,w,h,0,0,w,h);
+  const a=ctx.getImageData(0,0,w,h).data;let male=0,female=0,blueStrong=0,pinkStrong=0;
+  for(let i=0;i<a.length;i+=4){const r=a[i],g=a[i+1],b=a[i+2],mx=Math.max(r,g,b),mn=Math.min(r,g,b),sat=mx-mn;if(sat<32)continue;
+    // ♂はHOMEの濃い青、♀は赤～桃。背景の緑/水色を避けるため色差と彩度を併用。
+    if(b>150&&b-r>55&&b-g>20){male++;if(b>190&&r<120)blueStrong++}
+    if(r>165&&r-b>45&&r-g>20){female++;if(r>205&&b<170)pinkStrong++}
   }
-  if(male>=8&&male>female*1.35)return '♂';if(female>=8&&female>male*1.35)return '♀';return '';
+  const maleScore=male+blueStrong*1.8,femaleScore=female+pinkStrong*1.8;
+  if(maleScore>=10&&maleScore>femaleScore*1.35)return '♂';
+  if(femaleScore>=10&&femaleScore>maleScore*1.35)return '♀';
+  return '';
 }
 function parseHomeHeader(raw,img){
   const text=normalizeHomeOCRText(raw),out={};
@@ -2075,23 +2079,27 @@ function homeBallSignatureFromCanvas(c){
   if(!n)return null;return [rr/n,gg/n,bb/n,bright/n,dark/n,red/n,blue/n,yellow/n,purple/n,green/n,n/(c.width*c.height)];
 }
 function homeBallCrop(img){
-  // Pokémon HOME「ようすをみる」のポケモン名左側のボールアイコン。
-  // 1280x720基準で中心はおよそ x=302,y=88。文字や名前を混ぜずアイコンだけを切り出す。
-  const sx=Math.round(img.naturalWidth*.226),sy=Math.round(img.naturalHeight*.098),sw=Math.round(img.naturalWidth*.027),sh=Math.round(img.naturalHeight*.052);
-  const c=document.createElement('canvas');c.width=48;c.height=48;const ctx=c.getContext('2d',{willReadFrequently:true});ctx.clearRect(0,0,48,48);ctx.drawImage(img,sx,sy,sw,sh,0,0,48,48);return c;
+  // HOME「ようすをみる」のボールはポケモン名の左側。
+  // 実画面(1280x720)でアイコン外接矩形はおよそ x=267..296 / y=74..102。
+  // v140は右へずれて名前の文字を含んでいたため、アイコン中央に合わせ直す。
+  const sx=Math.round(img.naturalWidth*.207),sy=Math.round(img.naturalHeight*.096),sw=Math.round(img.naturalWidth*.028),sh=Math.round(img.naturalHeight*.046);
+  const c=document.createElement('canvas');c.width=56;c.height=56;const ctx=c.getContext('2d',{willReadFrequently:true});ctx.clearRect(0,0,56,56);ctx.drawImage(img,sx,sy,sw,sh,5,5,46,46);return c;
 }
 async function detectHomeBall(img){
   try{
-    const target=homeBallSignatureFromCanvas(homeBallCrop(img));if(!target)return '';
+    const crop=homeBallCrop(img),target=homeBallSignatureFromCanvas(crop);if(!target)return '';
     const candidates=BALLS.filter(([slug])=>slug&&!slug.startsWith('la-')&&!['feather-ball','wing-ball','jet-ball','leaden-ball','gigaton-ball','origin-ball','strange-ball'].includes(slug));
-    let best='',bestScore=1e9;
+    let best='',bestScore=1e9,secondScore=1e9;
     for(const [slug] of candidates){
-      try{const ref=await homeImagePromise(ballIcon(slug));const c=document.createElement('canvas');c.width=48;c.height=48;const x=6,y=6,w=36,h=36;c.getContext('2d',{willReadFrequently:true}).drawImage(ref,x,y,w,h);const sig=homeBallSignatureFromCanvas(c);if(!sig)continue;
-        let score=0;for(let i=0;i<3;i++)score+=Math.abs(target[i]-sig[i])/255;for(let i=3;i<10;i++)score+=Math.abs(target[i]-sig[i])*1.8;score+=Math.abs(target[10]-sig[10])*.6;
-        if(score<bestScore){bestScore=score;best=slug}
+      try{const ref=await homeImagePromise(ballIcon(slug));const c=document.createElement('canvas');c.width=56;c.height=56;const ctx=c.getContext('2d',{willReadFrequently:true});ctx.clearRect(0,0,56,56);ctx.drawImage(ref,7,7,42,42);const sig=homeBallSignatureFromCanvas(c);if(!sig)continue;
+        let score=0;for(let i=0;i<3;i++)score+=Math.abs(target[i]-sig[i])/255;for(let i=3;i<10;i++)score+=Math.abs(target[i]-sig[i])*2.15;score+=Math.abs(target[10]-sig[10])*.8;
+        if(score<bestScore){secondScore=bestScore;bestScore=score;best=slug}else if(score<secondScore){secondScore=score}
       }catch(_){ }
     }
-    return bestScore<2.8?best:'';
+    // 誤判定を成功扱いしない。候補同士が近すぎる場合は「未設定」にしてユーザー確認を優先。
+    if(bestScore>=2.65)return '';
+    if(Number.isFinite(secondScore)&&secondScore-bestScore<0.10)return '';
+    return best;
   }catch(e){console.warn('HOME ball detect failed',e);return ''}
 }
 function mergeHomeParsed(...parts){const out={};parts.forEach(p=>{if(!p)return;Object.entries(p).forEach(([k,v])=>{if(v!==''&&v!=null)out[k]=v})});return out}
@@ -4453,14 +4461,14 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 // ===== v56 automatic update / cache repair =====
 (function(){
-  const APP_VERSION='v140';
+  const APP_VERSION='v141';
   const UPDATE_KEY='shinyHomeReloadedForSW_'+APP_VERSION;
 
   async function registerFreshWorker(){
     if(!('serviceWorker' in navigator) || location.protocol==='file:') return;
     try{
       const reg = await navigator.serviceWorker.register(
-        './service-worker.js?v=139',
+        './service-worker.js?v=141',
         {updateViaCache:'none'}
       );
 
