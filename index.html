@@ -1143,7 +1143,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
       <div id="cloud-status" class="home-help">未設定です。</div>
       <div id="auto-sync-status" class="home-help" style="margin-top:8px">同期：v95 外出向け省通信</div><div id="network-status" class="net-pill">● 通信状態を確認中</div>
       <div class="home-help" style="margin-top:8px">
-        v148ではHOMEスクショの親名セルを左側まで含む複数領域で再読取し、BK/bkは英字専用OCRでも判定します。v147ではHOMEスクショの性格・親名を3種類の画像処理で複数回読み取り、性格25種との照合とBK/bk/バッカー専用判定を追加しました。v146ではHOMEスクショの親名・性格の切り出し範囲を実画面に合わせてさらに狭くし、親名は下段の出会った地方テキストを拾わないよう専用値領域だけをOCRします。性格も値部分だけを読むよう変更しました。v145ではHOMEスクショの「親」「性格」を専用領域で読み取り、♂♀がない場合は性別を「不明」にします。v144ではHOMEスクショからLv.1なら厳選方法を国際孵化に、カロス地方→XY・ガラル地方→剣盾・ヒスイ地方→Pokémon LEGENDS アルセウス・パルデア地方→SVを空欄時のみ自動補完します。v143ではHOMEスクショ反映時に親名がBK/bk/バッカーなら入手区分を自動で「自己産」に設定します。v142ではHOMEスクショのボール判定だけを作り直し、実画像の正しい位置からアイコンを切り出して背景除去後に既存ボールアイコンと比較する方式へ変更しました。v141ではHOMEスクショのボールと性別の切り出し座標を実画像に合わせて再修正し、ボールは判定が曖昧な場合に誤登録せず未設定へ戻す安全判定を追加しました。v140ではHOMEスクショのボール・性別アイコンの固定位置判定を実画面に合わせて修正しました。v139ではHOMEスクショ読取を「捕獲日・ボール・性格・性別・親・ID」の6項目だけに整理し、確認画面も簡潔にしました。ボールはHOME画面上部のアイコンから画像判定します。v138ではHOMEスクショ読取の性別・特性・技4枠を専用領域で再解析し、残りの読取精度を改善しました。v137ではHOMEスクショ読取を画面全体OCRからHOME専用の領域別OCRへ変更し、Lv・性別・性格・特性・親名・ID・捕獲日・地方・能力値・技を各領域ごとに拡大して読み取るよう改善しました。v136ではHOMEの個体画面スクリーンショットをOCRで読み取り、確認後に個体情報へ反映できる機能を追加しました。v135ではスマホ厳選カードのリージョン・姿違い画像のフォールバック処理を修正し、アローララッタなどがNo.000表示になる不具合を直しました。v134ではコレクションカードの「✓ ○匹所持」がスマホ幅でも改行されないよう表示を調整しました。保存データ構造は変更しません。v133では世代別進捗を「通常個体・リージョン・オス/メス違い・その他の姿違い・キョダイマックス」に分けて表示します。各カテゴリ内で第1〜第9世代の所持率を個別集計します。v132では月別の色違い一覧の集計レイアウトを整理し、上段に4つのサマリー、下段に厳選回数の横長集計カードを表示します。重複していた捕獲数表示も整理しました。v131では個体編集画面の厳選回数ラベルを選択した厳選方法に即時追従させ、個体画像作成時にその場でプレビューを表示するよう修正しました。v130では、「殿堂入り」と「SHINY GET画像」を廃止しました。画像作成は「個体画像を作成」1つにまとめ、捕獲スクショの登録・変更と削除だけを残します。既存のコレクション・個体・画像・厳選・BINGOデータ構造は変更しません。スマホ起動時は安全クラウドバックアップからコレクションを一方向で取り込み、厳選データは専用同期します。
+        v149では厳選方法の旧項目「国際」を廃止し、既存の「国際」は「国際孵化」として扱います。またHOMEスクショのモンスターボールだけ専用の赤・白・中央帯判定を追加し、通常のボール比較で未検出になった場合でもモンスターボールを拾えるよう改善しました。v148ではHOMEスクショの親名セルを左側まで含む複数領域で再読取し、BK/bkは英字専用OCRでも判定します。v147ではHOMEスクショの性格・親名を3種類の画像処理で複数回読み取り、性格25種との照合とBK/bk/バッカー専用判定を追加しました。v146ではHOMEスクショの親名・性格の切り出し範囲を実画面に合わせてさらに狭くし、親名は下段の出会った地方テキストを拾わないよう専用値領域だけをOCRします。性格も値部分だけを読むよう変更しました。v145ではHOMEスクショの「親」「性格」を専用領域で読み取り、♂♀がない場合は性別を「不明」にします。v144ではHOMEスクショからLv.1なら厳選方法を国際孵化に、カロス地方→XY・ガラル地方→剣盾・ヒスイ地方→Pokémon LEGENDS アルセウス・パルデア地方→SVを空欄時のみ自動補完します。v143ではHOMEスクショ反映時に親名がBK/bk/バッカーなら入手区分を自動で「自己産」に設定します。v142ではHOMEスクショのボール判定だけを作り直し、実画像の正しい位置からアイコンを切り出して背景除去後に既存ボールアイコンと比較する方式へ変更しました。v141ではHOMEスクショのボールと性別の切り出し座標を実画像に合わせて再修正し、ボールは判定が曖昧な場合に誤登録せず未設定へ戻す安全判定を追加しました。v140ではHOMEスクショのボール・性別アイコンの固定位置判定を実画面に合わせて修正しました。v139ではHOMEスクショ読取を「捕獲日・ボール・性格・性別・親・ID」の6項目だけに整理し、確認画面も簡潔にしました。ボールはHOME画面上部のアイコンから画像判定します。v138ではHOMEスクショ読取の性別・特性・技4枠を専用領域で再解析し、残りの読取精度を改善しました。v137ではHOMEスクショ読取を画面全体OCRからHOME専用の領域別OCRへ変更し、Lv・性別・性格・特性・親名・ID・捕獲日・地方・能力値・技を各領域ごとに拡大して読み取るよう改善しました。v136ではHOMEの個体画面スクリーンショットをOCRで読み取り、確認後に個体情報へ反映できる機能を追加しました。v135ではスマホ厳選カードのリージョン・姿違い画像のフォールバック処理を修正し、アローララッタなどがNo.000表示になる不具合を直しました。v134ではコレクションカードの「✓ ○匹所持」がスマホ幅でも改行されないよう表示を調整しました。保存データ構造は変更しません。v133では世代別進捗を「通常個体・リージョン・オス/メス違い・その他の姿違い・キョダイマックス」に分けて表示します。各カテゴリ内で第1〜第9世代の所持率を個別集計します。v132では月別の色違い一覧の集計レイアウトを整理し、上段に4つのサマリー、下段に厳選回数の横長集計カードを表示します。重複していた捕獲数表示も整理しました。v131では個体編集画面の厳選回数ラベルを選択した厳選方法に即時追従させ、個体画像作成時にその場でプレビューを表示するよう修正しました。v130では、「殿堂入り」と「SHINY GET画像」を廃止しました。画像作成は「個体画像を作成」1つにまとめ、捕獲スクショの登録・変更と削除だけを残します。既存のコレクション・個体・画像・厳選・BINGOデータ構造は変更しません。スマホ起動時は安全クラウドバックアップからコレクションを一方向で取り込み、厳選データは専用同期します。
       </div>
       <div class="home-help" style="margin-top:10px">初回は「設定保存」→「接続テスト」の順に確認してください。既存データがある場合、確認前にクラウドへ保存しないでください。</div>
     </div>
@@ -1151,7 +1151,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 </section>
 
 <script>
-const DATA_VERSION='full-2026-09-12-v148';
+const DATA_VERSION='full-2026-09-12-v149';
 const SPECIES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species.csv';
 const NAMES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
 const MAX_DEX=1025;
@@ -1919,7 +1919,8 @@ function allowedHuntMethods(p,game){
   return vals;
 }
 function huntMethodOptions(v,game='',p=null){
-  const cur=String(v||''); let vals=allowedHuntMethods(p,game);
+  // v149: 旧項目「国際」は廃止し、表示・編集時は「国際孵化」へ統一する。
+  const cur=String(v||'')==='国際'?'国際孵化':String(v||''); let vals=allowedHuntMethods(p,game).filter(x=>x!=='国際');
   if(cur&&!vals.includes(cur))vals=[cur,...vals];
   return '<option value="">厳選方法を選択</option>'+vals.map(x=>`<option value="${esc(x)}" ${cur===x?'selected':''}>${esc(x)}</option>`).join('');
 }
@@ -2122,9 +2123,27 @@ function homeBallDescriptor(c,hasAlpha=false){
   if(n<18)return null;for(let i=0;i<hist.length;i++)hist[i]/=n;for(let i=0;i<lumHist.length;i++)lumHist[i]/=n;for(let q=0;q<4;q++){quad[q*3]/=n;quad[q*3+1]/=n;quad[q*3+2]/=n}return{hist,lumHist,quad,edge:edge/n,n};
 }
 function homeBallDistance(a,b){if(!a||!b)return 1e9;let s=0;for(let i=0;i<a.hist.length;i++)s+=Math.abs(a.hist[i]-b.hist[i])*2.8;for(let i=0;i<a.lumHist.length;i++)s+=Math.abs(a.lumHist[i]-b.lumHist[i])*1.5;for(let i=0;i<a.quad.length;i++)s+=Math.abs(a.quad[i]-b.quad[i])/255*.32;s+=Math.abs(a.edge-b.edge)*1.1;return s}
+function homeLooksLikePokeBall(c){
+  // v149: HOMEの小さいモンスターボール専用判定。
+  // 上半分の赤・下半分の白・中央の暗い帯が同時にある場合だけ採用する。
+  const ctx=c.getContext('2d',{willReadFrequently:true}),d=ctx.getImageData(0,0,c.width,c.height).data,w=c.width,h=c.height;
+  let top=0,bottom=0,mid=0,redTop=0,whiteBottom=0,darkMid=0,blue=0,yellow=0;
+  for(let y=6;y<h-6;y++)for(let x=6;x<w-6;x++){
+    const i=(y*w+x)*4,r=d[i],g=d[i+1],b=d[i+2],a=d[i+3];if(a<40)continue;
+    const mx=Math.max(r,g,b),mn=Math.min(r,g,b),lum=(r+g+b)/3;
+    if(g>r*1.08&&g>b*1.03&&lum>125&&mx-mn<115)continue;
+    if(y<h*.46){top++;if(r>125&&r>g*1.28&&r>b*1.18)redTop++;}
+    if(y>h*.54){bottom++;if(lum>155&&mx-mn<58)whiteBottom++;}
+    if(y>=h*.40&&y<=h*.60){mid++;if(lum<105)darkMid++;}
+    if(b>125&&b>r*1.22&&b>g*1.08)blue++;
+    if(r>145&&g>120&&b<105)yellow++;
+  }
+  const rr=redTop/Math.max(1,top),wr=whiteBottom/Math.max(1,bottom),dr=darkMid/Math.max(1,mid);
+  return rr>.20&&wr>.14&&dr>.10&&blue<22&&yellow<30;
+}
 async function detectHomeBall(img){
   try{
-    const targetCanvas=homeBallCrop(img),target=homeBallDescriptor(targetCanvas,false);if(!target)return '';
+    const targetCanvas=homeBallCrop(img),pokeBallSignature=homeLooksLikePokeBall(targetCanvas),target=homeBallDescriptor(targetCanvas,false);if(!target)return pokeBallSignature?'poke-ball':'';
     const candidates=BALLS.filter(([slug])=>slug&&!slug.startsWith('la-')&&!['feather-ball','wing-ball','jet-ball','leaden-ball','gigaton-ball','origin-ball','strange-ball'].includes(slug));
     let ranked=[];
     for(const [slug] of candidates){
@@ -2132,9 +2151,10 @@ async function detectHomeBall(img){
     }
     ranked.sort((a,b)=>a[1]-b[1]);const best=ranked[0],second=ranked[1];if(!best)return '';
     // v142: 誤登録防止は維持しつつ、正しい切り出し＋背景除去後の差が十分なら採用。
-    if(best[1]>3.9)return '';
-    if(second && second[1]-best[1]<0.12 && best[1]>1.35)return '';
-    detectHomeBall.lastDebug={best:best?.[0]||'',score:best?.[1],second:second?.[0]||'',secondScore:second?.[1]};
+    if(best[1]>3.9)return pokeBallSignature?'poke-ball':'';
+    if(second && second[1]-best[1]<0.12 && best[1]>1.35)return pokeBallSignature?'poke-ball':'';
+    detectHomeBall.lastDebug={best:best?.[0]||'',score:best?.[1],second:second?.[0]||'',secondScore:second?.[1],pokeBallSignature};
+    if(pokeBallSignature && best[0]!=='poke-ball' && best[1]>0.72)return 'poke-ball';
     return best[0];
   }catch(e){console.warn('HOME ball detect failed',e);return ''}
 }
@@ -4595,14 +4615,14 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 // ===== v56 automatic update / cache repair =====
 (function(){
-  const APP_VERSION='v148';
+  const APP_VERSION='v149';
   const UPDATE_KEY='shinyHomeReloadedForSW_'+APP_VERSION;
 
   async function registerFreshWorker(){
     if(!('serviceWorker' in navigator) || location.protocol==='file:') return;
     try{
       const reg = await navigator.serviceWorker.register(
-        './service-worker.js?v=148',
+        './service-worker.js?v=149',
         {updateViaCache:'none'}
       );
 
