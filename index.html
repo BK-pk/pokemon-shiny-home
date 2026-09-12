@@ -1143,7 +1143,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
       <div id="cloud-status" class="home-help">未設定です。</div>
       <div id="auto-sync-status" class="home-help" style="margin-top:8px">同期：v95 外出向け省通信</div><div id="network-status" class="net-pill">● 通信状態を確認中</div>
       <div class="home-help" style="margin-top:8px">
-        v134ではコレクションカードの「✓ ○匹所持」がスマホ幅でも改行されないよう表示を調整しました。保存データ構造は変更しません。v133では世代別進捗を「通常個体・リージョン・オス/メス違い・その他の姿違い・キョダイマックス」に分けて表示します。各カテゴリ内で第1〜第9世代の所持率を個別集計します。v132では月別の色違い一覧の集計レイアウトを整理し、上段に4つのサマリー、下段に厳選回数の横長集計カードを表示します。重複していた捕獲数表示も整理しました。v131では個体編集画面の厳選回数ラベルを選択した厳選方法に即時追従させ、個体画像作成時にその場でプレビューを表示するよう修正しました。v130では、「殿堂入り」と「SHINY GET画像」を廃止しました。画像作成は「個体画像を作成」1つにまとめ、捕獲スクショの登録・変更と削除だけを残します。既存のコレクション・個体・画像・厳選・BINGOデータ構造は変更しません。スマホ起動時は安全クラウドバックアップからコレクションを一方向で取り込み、厳選データは専用同期します。
+        v135ではスマホ厳選カードのリージョン・姿違い画像のフォールバック処理を修正し、アローララッタなどがNo.000表示になる不具合を直しました。v134ではコレクションカードの「✓ ○匹所持」がスマホ幅でも改行されないよう表示を調整しました。保存データ構造は変更しません。v133では世代別進捗を「通常個体・リージョン・オス/メス違い・その他の姿違い・キョダイマックス」に分けて表示します。各カテゴリ内で第1〜第9世代の所持率を個別集計します。v132では月別の色違い一覧の集計レイアウトを整理し、上段に4つのサマリー、下段に厳選回数の横長集計カードを表示します。重複していた捕獲数表示も整理しました。v131では個体編集画面の厳選回数ラベルを選択した厳選方法に即時追従させ、個体画像作成時にその場でプレビューを表示するよう修正しました。v130では、「殿堂入り」と「SHINY GET画像」を廃止しました。画像作成は「個体画像を作成」1つにまとめ、捕獲スクショの登録・変更と削除だけを残します。既存のコレクション・個体・画像・厳選・BINGOデータ構造は変更しません。スマホ起動時は安全クラウドバックアップからコレクションを一方向で取り込み、厳選データは専用同期します。
       </div>
       <div class="home-help" style="margin-top:10px">初回は「設定保存」→「接続テスト」の順に確認してください。既存データがある場合、確認前にクラウドへ保存しないでください。</div>
     </div>
@@ -1485,10 +1485,20 @@ function baseSpriteURL(p){return `https://raw.githubusercontent.com/PokeAPI/spri
 
 document.addEventListener('error',e=>{
   const img=e.target;
-  if(img&&img.tagName==='IMG'&&!img.dataset.offlineFallback){
+  if(!img||img.tagName!=='IMG')return;
+  // v135: リージョン/姿違いの外部スプライトが失敗した場合、
+  // いきなり No.000 の代替画像へ落とさず、まず同じ図鑑No.の HOME 色違い画像へフォールバックする。
+  const fallback=img.dataset.fallbackSrc||'';
+  if(fallback&&!img.dataset.baseFallbackTried&&img.src!==fallback){
+    img.dataset.baseFallbackTried='1';
+    img.src=fallback;
+    return;
+  }
+  if(!img.dataset.offlineFallback){
     img.dataset.offlineFallback='1';
-    const m=(img.src||'').match(/(?:shiny\/|home\/|pokemon\/)(\d+)\.png/i);
-    img.src=offlineSpriteURL(m?m[1]:'');
+    const m=(fallback||img.src||'').match(/(?:shiny\/|home\/|pokemon\/)(\d+)\.png/i);
+    const no=img.dataset.pokeNo||(m?m[1]:'');
+    img.src=offlineSpriteURL(no);
   }
 },true);
 
@@ -4281,14 +4291,14 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 // ===== v56 automatic update / cache repair =====
 (function(){
-  const APP_VERSION='v134';
+  const APP_VERSION='v135';
   const UPDATE_KEY='shinyHomeReloadedForSW_'+APP_VERSION;
 
   async function registerFreshWorker(){
     if(!('serviceWorker' in navigator) || location.protocol==='file:') return;
     try{
       const reg = await navigator.serviceWorker.register(
-        './service-worker.js?v=134',
+        './service-worker.js?v=135',
         {updateViaCache:'none'}
       );
 
@@ -4480,7 +4490,7 @@ function requestAutoSyncAfterDataChange(){try{if(typeof syncHuntSessionState==='
       card.dataset.key=e.key;
       card.innerHTML=`
         <div class="mobile-hunt-card-top compact-head">
-          <img class="mobile-hunt-thumb" src="${pokemonSprite(e.p)}" alt="" onerror="if(typeof baseSpriteURL==='function')this.src=baseSpriteURL(e.p)">
+          <img class="mobile-hunt-thumb" src="${pokemonSprite(e.p)}" data-fallback-src="${baseSpriteURL(e.p)}" data-poke-no="${e.p.no}" alt="">
           <div class="mobile-hunt-maininfo">
             <div class="mobile-hunt-name">${e.p.name}</div>
             <div class="mobile-hunt-meta">No.${String(e.p.no).padStart(4,'0')}${e.p.form&&e.p.form!=='通常'?' ・ '+e.p.form:''}</div>
