@@ -1143,7 +1143,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
       <div id="cloud-status" class="home-help">未設定です。</div>
       <div id="auto-sync-status" class="home-help" style="margin-top:8px">同期：v95 外出向け省通信</div><div id="network-status" class="net-pill">● 通信状態を確認中</div>
       <div class="home-help" style="margin-top:8px">
-        v136ではHOMEの個体画面スクリーンショットをOCRで読み取り、捕獲日・性格・特性・親名・ID・捕獲場所・レベル・能力値・技などを確認して個体情報へ反映できる機能を追加しました。v135ではスマホ厳選カードのリージョン・姿違い画像のフォールバック処理を修正し、アローララッタなどがNo.000表示になる不具合を直しました。v134ではコレクションカードの「✓ ○匹所持」がスマホ幅でも改行されないよう表示を調整しました。保存データ構造は変更しません。v133では世代別進捗を「通常個体・リージョン・オス/メス違い・その他の姿違い・キョダイマックス」に分けて表示します。各カテゴリ内で第1〜第9世代の所持率を個別集計します。v132では月別の色違い一覧の集計レイアウトを整理し、上段に4つのサマリー、下段に厳選回数の横長集計カードを表示します。重複していた捕獲数表示も整理しました。v131では個体編集画面の厳選回数ラベルを選択した厳選方法に即時追従させ、個体画像作成時にその場でプレビューを表示するよう修正しました。v130では、「殿堂入り」と「SHINY GET画像」を廃止しました。画像作成は「個体画像を作成」1つにまとめ、捕獲スクショの登録・変更と削除だけを残します。既存のコレクション・個体・画像・厳選・BINGOデータ構造は変更しません。スマホ起動時は安全クラウドバックアップからコレクションを一方向で取り込み、厳選データは専用同期します。
+        v137ではHOMEスクショ読取を画面全体OCRからHOME専用の領域別OCRへ変更し、Lv・性別・性格・特性・親名・ID・捕獲日・地方・能力値・技を各領域ごとに拡大して読み取るよう改善しました。v136ではHOMEの個体画面スクリーンショットをOCRで読み取り、確認後に個体情報へ反映できる機能を追加しました。v135ではスマホ厳選カードのリージョン・姿違い画像のフォールバック処理を修正し、アローララッタなどがNo.000表示になる不具合を直しました。v134ではコレクションカードの「✓ ○匹所持」がスマホ幅でも改行されないよう表示を調整しました。保存データ構造は変更しません。v133では世代別進捗を「通常個体・リージョン・オス/メス違い・その他の姿違い・キョダイマックス」に分けて表示します。各カテゴリ内で第1〜第9世代の所持率を個別集計します。v132では月別の色違い一覧の集計レイアウトを整理し、上段に4つのサマリー、下段に厳選回数の横長集計カードを表示します。重複していた捕獲数表示も整理しました。v131では個体編集画面の厳選回数ラベルを選択した厳選方法に即時追従させ、個体画像作成時にその場でプレビューを表示するよう修正しました。v130では、「殿堂入り」と「SHINY GET画像」を廃止しました。画像作成は「個体画像を作成」1つにまとめ、捕獲スクショの登録・変更と削除だけを残します。既存のコレクション・個体・画像・厳選・BINGOデータ構造は変更しません。スマホ起動時は安全クラウドバックアップからコレクションを一方向で取り込み、厳選データは専用同期します。
       </div>
       <div class="home-help" style="margin-top:10px">初回は「設定保存」→「接続テスト」の順に確認してください。既存データがある場合、確認前にクラウドへ保存しないでください。</div>
     </div>
@@ -1151,7 +1151,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 </section>
 
 <script>
-const DATA_VERSION='full-2026-09-12-v136';
+const DATA_VERSION='full-2026-09-12-v137';
 const SPECIES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species.csv';
 const NAMES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
 const MAX_DEX=1025;
@@ -2013,45 +2013,70 @@ function normalizeHomeOCRText(t){return String(t||'').replace(/\r/g,'').replace(
 function homeOcrLineValue(lines,label){
   const i=lines.findIndex(x=>x.includes(label));
   if(i<0)return '';
-  const same=lines[i].replace(label,'').replace(/^[：:\s|]+/,'').trim();
+  const same=lines[i].replace(label,'').replace(/^[：:\s|｜]+/,'').trim();
   if(same)return same;
   return (lines[i+1]||'').trim();
 }
-function parseHomeOCR(raw){
-  const text=normalizeHomeOCRText(raw),lines=text.split('\n').map(x=>x.trim()).filter(Boolean),out={};
-  let m=text.match(/(20\d{2})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日/);
-  if(m)out.date=`${m[1]}-${String(m[2]).padStart(2,'0')}-${String(m[3]).padStart(2,'0')}`;
-  m=text.match(/Lv[\.\s]*([0-9]{1,3})/i); if(m)out.catchLevel=m[1];
-  m=text.match(/ID\s*No[\.：:\s]*([0-9]{3,})/i); if(m)out.trainerId=m[1];
-  m=text.match(/([ァ-ヶー一-龠々]{2,}(?:地方|地方で))/); if(m)out.catchLocation=m[1].replace(/で$/,'');
-  if(/[♂]/.test(text))out.gender='♂'; else if(/[♀]/.test(text))out.gender='♀';
-  const labels=['せいかく','とくせい','もちもの'];
-  const vals={}; labels.forEach(l=>vals[l]=homeOcrLineValue(lines,l));
-  if(vals['せいかく'])out.nature=vals['せいかく'].split(/\s+/)[0];
-  if(vals['とくせい'])out.ability=vals['とくせい'].split(/\s+/)[0];
-  if(vals['もちもの'])out.heldItem=vals['もちもの'].split(/\s+/)[0];
-  // HOME下部の親/ID欄。OCRでは「親 bk」「親 | bk」などになりやすい。
-  for(const line of lines){
-    let mm=line.match(/(?:^|\s)親\s*[|｜:]?\s*([^\s|｜]{1,20})/); if(mm&&!/ID/i.test(mm[1])){out.otName=mm[1];break}
-  }
-  const statPatterns=[['statHP',/\bHP\s*([0-9]{1,3})/i],['statAtk',/こうげき\s*([0-9]{1,3})/],['statDef',/ぼうぎょ\s*([0-9]{1,3})/],['statSpA',/とくこう\s*([0-9]{1,3})/],['statSpD',/とくぼう\s*([0-9]{1,3})/],['statSpe',/すばやさ\s*([0-9]{1,3})/]];
-  statPatterns.forEach(([k,re])=>{const mm=text.match(re);if(mm)out[k]=mm[1]});
-  // 技名は「No.xxxx」の後～親欄の前に並ぶことが多い。明らかなUI語を除外して最大4件。
-  const uiWords=new Set(['ようすをみる','せいかく','とくせい','もちもの','なし','親','JPN','ヘルプ','もどる','連動ソフト','きそポイント','マーキング']);
-  const moveCandidates=[];
-  lines.forEach(line=>{
-    const z=line.replace(/[●○◯◉◎◇◆□■△▲☆★]/g,'').replace(/^No\.\d+\s*/i,'').trim();
-    if(!z||z.length<2||z.length>12||uiWords.has(z)||/^[0-9]+$/.test(z)||/^(HP|Lv|ID)/i.test(z)||/[0-9]{3,}/.test(z))return;
-    if(/^[ぁ-んァ-ヶー一-龠々]+$/.test(z)&&!['せいかく','とくせい','もちもの','すばやさ','こうげき','ぼうぎょ','とくこう','とくぼう'].includes(z))moveCandidates.push(z);
-  });
-  // 重複を除き、能力値ラベルやポケモン名らしき先頭項目を避けるため4文字以上の候補を優先。
-  out.moves=[...new Set(moveCandidates.filter(x=>x.length>=3))].slice(0,4);
+function homeLoadImage(src){
+  return new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=()=>reject(new Error('画像を解析できませんでした'));im.src=src});
+}
+function homeCropCanvas(img,box,scale=3){
+  const sx=Math.max(0,Math.round(img.naturalWidth*box.x)),sy=Math.max(0,Math.round(img.naturalHeight*box.y));
+  const sw=Math.min(img.naturalWidth-sx,Math.round(img.naturalWidth*box.w)),sh=Math.min(img.naturalHeight-sy,Math.round(img.naturalHeight*box.h));
+  const c=document.createElement('canvas');c.width=Math.max(1,sw*scale);c.height=Math.max(1,sh*scale);const ctx=c.getContext('2d',{willReadFrequently:true});
+  ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';ctx.drawImage(img,sx,sy,sw,sh,0,0,c.width,c.height);
+  // HOMEの細い文字を読みやすくするため、拡大後にグレースケール＋軽いコントラスト補正。
+  const d=ctx.getImageData(0,0,c.width,c.height),a=d.data;
+  for(let i=0;i<a.length;i+=4){let v=.299*a[i]+.587*a[i+1]+.114*a[i+2];v=Math.max(0,Math.min(255,(v-128)*1.65+128));a[i]=a[i+1]=a[i+2]=v}
+  ctx.putImageData(d,0,0);return c;
+}
+function detectHomeGender(img){
+  // HOMEの性別アイコンは名前の右側に固定表示される。青=♂、赤/桃=♀として色から補助判定する。
+  const c=document.createElement('canvas'),x=Math.round(img.naturalWidth*.285),y=Math.round(img.naturalHeight*.075),w=Math.round(img.naturalWidth*.055),h=Math.round(img.naturalHeight*.09);
+  c.width=Math.max(1,w);c.height=Math.max(1,h);const ctx=c.getContext('2d',{willReadFrequently:true});ctx.drawImage(img,x,y,w,h,0,0,w,h);const a=ctx.getImageData(0,0,w,h).data;let blue=0,red=0;
+  for(let i=0;i<a.length;i+=4){const r=a[i],g=a[i+1],b=a[i+2];if(b>135&&b-r>32&&b-g>5)blue++;if(r>155&&r-b>35&&r-g>12)red++}
+  if(blue>red*1.5&&blue>8)return '♂';if(red>blue*1.5&&red>8)return '♀';return '';
+}
+function parseHomeHeader(raw,img){
+  const text=normalizeHomeOCRText(raw),out={};let m=text.match(/Lv[\.\s]*([0-9]{1,3})/i);if(m)out.catchLevel=m[1];
+  if(/[♂]/.test(text))out.gender='♂';else if(/[♀]/.test(text))out.gender='♀';else{const g=detectHomeGender(img);if(g)out.gender=g}
   return out;
 }
+function parseHomeBottomLeft(raw){
+  const text=normalizeHomeOCRText(raw),out={};
+  const pats=[['nature',/せいか[くぐ]\s*[|｜:]?\s*([ぁ-んァ-ヶー一-龠々ー]+)/],['ability',/とくせい\s*[|｜:]?\s*([ぁ-んァ-ヶー一-龠々ー]+)/],['heldItem',/もちもの\s*[|｜:]?\s*([ぁ-んァ-ヶー一-龠々ー]+)/]];
+  pats.forEach(([k,re])=>{const m=text.match(re);if(m)out[k]=m[1]});return out;
+}
+function parseHomeBottomRight(raw){
+  const text=normalizeHomeOCRText(raw),lines=text.split('\n').map(x=>x.trim()).filter(Boolean),out={};let m;
+  m=text.match(/(20\d{2})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日/);if(m)out.date=`${m[1]}-${String(m[2]).padStart(2,'0')}-${String(m[3]).padStart(2,'0')}`;
+  m=text.match(/ID\s*No[\.：:\s|｜]*([0-9]{3,})/i);if(m)out.trainerId=m[1];
+  m=text.match(/([ァ-ヶー一-龠々]+地方)\s*で?/);if(m)out.catchLocation=m[1];
+  for(const line of lines){let z=line.replace(/[|｜]/g,' ').replace(/\s+/g,' ').trim();let mm=z.match(/親\s*[:：]?\s*([^\s]{1,20})/);if(mm&&!/ID/i.test(mm[1])){out.otName=mm[1];break}mm=z.match(/^([^\s]{1,20})\s+ID\s*No/i);if(mm&&mm[1]&&!/^(親|No)$/i.test(mm[1])){out.otName=mm[1];break}}
+  return out;
+}
+function parseHomeStats(result,canvas){
+  const out={},words=Array.isArray(result?.data?.words)?result.data.words:[],nums=[];
+  words.forEach(w=>{const t=String(w.text||'').replace(/[^0-9]/g,'');if(!/^\d{1,3}$/.test(t))return;const b=w.bbox||{};const cx=((Number(b.x0)||0)+(Number(b.x1)||0))/2/canvas.width,cy=((Number(b.y0)||0)+(Number(b.y1)||0))/2/canvas.height;nums.push({v:t,x:cx,y:cy})});
+  const nearest=(tx,ty,max=.28)=>{let best=null,bd=99;nums.forEach(n=>{const d=Math.hypot((n.x-tx)*1.15,n.y-ty);if(d<bd){bd=d;best=n}});return best&&bd<max?best.v:''};
+  // 六角形の周囲にある6能力値のHOME固定配置。
+  out.statHP=nearest(.53,.13,.24);out.statSpA=nearest(.17,.34,.24);out.statAtk=nearest(.82,.34,.24);out.statSpD=nearest(.17,.68,.25);out.statDef=nearest(.82,.68,.25);out.statSpe=nearest(.53,.88,.23);
+  // wordsが取れないブラウザ向けのフォールバック。HOMEの読み順は HP→特攻→攻撃→特防→防御→素早さになりやすい。
+  if(Object.values(out).filter(Boolean).length<4){const ns=(normalizeHomeOCRText(result?.data?.text||'').match(/\b\d{1,3}\b/g)||[]).filter(x=>Number(x)<=999);if(ns.length>=6){[out.statHP,out.statSpA,out.statAtk,out.statSpD,out.statDef,out.statSpe]=ns.slice(0,6)}}
+  Object.keys(out).forEach(k=>{if(!out[k])delete out[k]});return out;
+}
+function parseHomeMoves(raw,speciesName=''){
+  const lines=normalizeHomeOCRText(raw).split('\n').map(x=>x.replace(/[●○◯◉◎◇◆□■△▲☆★©@]/g,'').replace(/^\s*[|｜]+/,'').trim()).filter(Boolean);
+  const ng=new Set(['ようすをみる','せいかく','とくせい','もちもの','なし','親','JPN','ヘルプ','もどる','連動ソフト','きそポイント','マーキング','すばやさ','こうげき','ぼうぎょ','とくこう','とくぼう',speciesName]);
+  const moves=[];
+  lines.forEach(line=>{let z=line.replace(/^No\.\s*\d+\s*/i,'').replace(/^[^ぁ-んァ-ヶー一-龠々ー]+/,'').trim();if(!z||ng.has(z)||/Lv\.?\s*\d+/i.test(z)||/[0-9]{2,}/.test(z)||z.length<2||z.length>14)return;if(/^[ぁ-んァ-ヶー一-龠々ー]+$/.test(z))moves.push(z)});
+  return [...new Set(moves)].slice(0,4);
+}
+function mergeHomeParsed(...parts){const out={};parts.forEach(p=>{if(!p)return;Object.entries(p).forEach(([k,v])=>{if(k==='moves'){if(Array.isArray(v)&&v.length)out.moves=v}else if(v!==''&&v!=null)out[k]=v})});return out}
 function ensureHomeOcrModal(){
   let ov=document.getElementById('home-ocr-overlay'); if(ov)return ov;
   ov=document.createElement('div');ov.id='home-ocr-overlay';ov.style.cssText='position:fixed;inset:0;z-index:100050;background:rgba(1,7,15,.88);display:none;align-items:flex-start;justify-content:center;padding:18px;overflow:auto';
-  ov.innerHTML=`<div style="width:min(820px,96vw);margin:2vh auto;background:#0a1727;border:1px solid #315675;border-radius:18px;padding:18px;color:#eef8ff"><div style="display:flex;justify-content:space-between;gap:12px;align-items:center"><h2 style="margin:0">🔎 HOMEスクショ読取</h2><button type="button" onclick="closeHomeOcrModal()">✕</button></div><div id="home-ocr-status" style="margin:12px 0;color:#9ec8e8">画像を解析します。</div><img id="home-ocr-preview" alt="" style="width:100%;max-height:260px;object-fit:contain;background:#07111d;border-radius:12px;margin-bottom:12px"><div id="home-ocr-fields" class="detail-fields"></div><label style="display:flex;gap:8px;align-items:center;margin:12px 0"><input id="home-ocr-no-overwrite" type="checkbox" checked> すでに入力済みの項目は上書きしない</label><details><summary>OCRの生テキスト</summary><pre id="home-ocr-raw" style="white-space:pre-wrap;max-height:180px;overflow:auto;background:#06101a;padding:10px;border-radius:10px"></pre></details><div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px"><button type="button" class="btn" id="home-ocr-apply" disabled>この内容を個体情報へ反映</button><button type="button" onclick="closeHomeOcrModal()">閉じる</button></div></div>`;
+  ov.innerHTML=`<div style="width:min(820px,96vw);margin:2vh auto;background:#0a1727;border:1px solid #315675;border-radius:18px;padding:18px;color:#eef8ff"><div style="display:flex;justify-content:space-between;gap:12px;align-items:center"><h2 style="margin:0">🔎 HOMEスクショ読取</h2><button type="button" onclick="closeHomeOcrModal()">✕</button></div><div id="home-ocr-status" style="margin:12px 0;color:#9ec8e8">画像を解析します。</div><img id="home-ocr-preview" alt="" style="width:100%;max-height:260px;object-fit:contain;background:#07111d;border-radius:12px;margin-bottom:12px"><div id="home-ocr-fields" class="detail-fields"></div><label style="display:flex;gap:8px;align-items:center;margin:12px 0"><input id="home-ocr-no-overwrite" type="checkbox" checked> すでに入力済みの項目は上書きしない</label><details><summary>OCRの読取テキスト</summary><pre id="home-ocr-raw" style="white-space:pre-wrap;max-height:220px;overflow:auto;background:#06101a;padding:10px;border-radius:10px"></pre></details><div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px"><button type="button" class="btn" id="home-ocr-apply" disabled>この内容を個体情報へ反映</button><button type="button" onclick="closeHomeOcrModal()">閉じる</button></div></div>`;
   ov.onclick=e=>{if(e.target===ov)closeHomeOcrModal()};document.body.appendChild(ov);return ov;
 }
 function closeHomeOcrModal(){const ov=document.getElementById('home-ocr-overlay');if(ov)ov.style.display='none'}
@@ -2062,20 +2087,30 @@ function homeOcrFieldHTML(k,label,val,type='text'){
 }
 async function readHomeScreenshot(id,uid,file){
   if(!file)return;if(!file.type.startsWith('image/')){showToast('画像ファイルを選択してください。');return}
-  const arr=individualState[id]||[],ind=arr.find(x=>x.uid===uid);if(!ind)return;
+  const arr=individualState[id]||[],ind=arr.find(x=>x.uid===uid),p=data.find(x=>x.id===id);if(!ind)return;
   const ov=ensureHomeOcrModal(),status=document.getElementById('home-ocr-status'),apply=document.getElementById('home-ocr-apply');ov.style.display='flex';apply.disabled=true;
+  let worker=null;
   try{
     const dataUrl=await new Promise((resolve,reject)=>{const rd=new FileReader();rd.onload=()=>resolve(rd.result);rd.onerror=()=>reject(rd.error||new Error('画像を読み込めませんでした'));rd.readAsDataURL(file)});
-    document.getElementById('home-ocr-preview').src=dataUrl; status.textContent='OCRを準備しています…（初回は日本語データの読込に時間がかかります）';
-    const T=await loadHomeOCR();
-    const ret=await T.recognize(dataUrl,'jpn+eng',{logger:m=>{if(m.status==='recognizing text'&&Number.isFinite(m.progress))status.textContent=`文字を読み取っています… ${Math.round(m.progress*100)}%`}});
-    const raw=ret?.data?.text||'',parsed=parseHomeOCR(raw);document.getElementById('home-ocr-raw').textContent=raw||'（文字を検出できませんでした）';
+    document.getElementById('home-ocr-preview').src=dataUrl;status.textContent='HOME専用OCRを準備しています…（初回は日本語データの読込に時間がかかります）';
+    const [T,img]=await Promise.all([loadHomeOCR(),homeLoadImage(dataUrl)]);
+    const boxes={header:{x:.12,y:.065,w:.74,h:.115},stats:{x:.00,y:.17,w:.40,h:.58},moves:{x:.37,y:.18,w:.34,h:.43},bottomLeft:{x:.01,y:.745,w:.39,h:.22},bottomRight:{x:.39,y:.68,w:.60,h:.29}};
+    const canv={};Object.entries(boxes).forEach(([k,b])=>canv[k]=homeCropCanvas(img,b,3));
+    let progressText='';
+    worker=await T.createWorker('jpn+eng',1,{logger:m=>{if(m.status==='recognizing text'&&Number.isFinite(m.progress))status.textContent=`${progressText} ${Math.round(m.progress*100)}%`}});
+    await worker.setParameters({tessedit_pageseg_mode:'6',preserve_interword_spaces:'1'});
+    const results={};const order=[['header','上部（Lv・性別）'],['bottomLeft','基本情報（性格・特性）'],['bottomRight','捕獲情報（親・ID・日付）'],['stats','能力値'],['moves','技']];
+    for(let i=0;i<order.length;i++){
+      const [key,label]=order[i];progressText=`HOME専用解析 ${i+1}/5：${label}…`;status.textContent=progressText;
+      results[key]=await worker.recognize(canv[key]);
+    }
+    const parsed=mergeHomeParsed(parseHomeHeader(results.header?.data?.text||'',img),parseHomeBottomLeft(results.bottomLeft?.data?.text||''),parseHomeBottomRight(results.bottomRight?.data?.text||''),parseHomeStats(results.stats,canv.stats),{moves:parseHomeMoves(results.moves?.data?.text||'',p?.name||'')});
+    const raw=order.map(([k,label])=>`【${label}】\n${results[k]?.data?.text||'（未検出）'}`).join('\n\n');document.getElementById('home-ocr-raw').textContent=raw;
     const defs=[['date','捕獲日','date'],['catchLevel','レベル','number'],['gender','性別'],['nature','性格'],['ability','特性'],['heldItem','持ち物'],['otName','親名'],['trainerId','ID'],['catchLocation','捕獲場所'],['statHP','HP','number'],['statAtk','こうげき','number'],['statDef','ぼうぎょ','number'],['statSpA','とくこう','number'],['statSpD','とくぼう','number'],['statSpe','すばやさ','number'],['moves','技']];
     document.getElementById('home-ocr-fields').innerHTML=defs.map(([k,l,t])=>homeOcrFieldHTML(k,l,parsed[k]??'',t)).join('');
-    status.textContent=`読取完了：${Object.entries(parsed).filter(([k,v])=>k!=='moves'?(v!==''&&v!=null):(Array.isArray(v)&&v.length)).length}項目を検出しました。内容を確認・修正してから反映してください。`;
-    ov.dataset.id=id;ov.dataset.uid=uid;ov.dataset.dataUrl=dataUrl;apply.disabled=false;
-    apply.onclick=()=>applyHomeOcrResult();
-  }catch(e){console.error(e);status.textContent='読取に失敗しました。ネット接続を確認して、もう一度試してください。';document.getElementById('home-ocr-raw').textContent=String(e?.message||e)}
+    const detected=Object.entries(parsed).filter(([k,v])=>k!=='moves'?(v!==''&&v!=null):(Array.isArray(v)&&v.length)).length;status.textContent=`HOME専用読取完了：${detected}項目を検出しました。内容を確認・修正してから反映してください。`;
+    ov.dataset.id=id;ov.dataset.uid=uid;ov.dataset.dataUrl=dataUrl;apply.disabled=false;apply.onclick=()=>applyHomeOcrResult();
+  }catch(e){console.error(e);status.textContent='読取に失敗しました。ネット接続を確認して、もう一度試してください。';document.getElementById('home-ocr-raw').textContent=String(e?.message||e)}finally{if(worker){try{await worker.terminate()}catch(_){}}}
 }
 async function applyHomeOcrResult(){
   const ov=document.getElementById('home-ocr-overlay');if(!ov)return;const id=ov.dataset.id,uid=ov.dataset.uid,arr=individualState[id]||[],ind=arr.find(x=>x.uid===uid);if(!ind)return;
@@ -4399,14 +4434,14 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 // ===== v56 automatic update / cache repair =====
 (function(){
-  const APP_VERSION='v136';
+  const APP_VERSION='v137';
   const UPDATE_KEY='shinyHomeReloadedForSW_'+APP_VERSION;
 
   async function registerFreshWorker(){
     if(!('serviceWorker' in navigator) || location.protocol==='file:') return;
     try{
       const reg = await navigator.serviceWorker.register(
-        './service-worker.js?v=136',
+        './service-worker.js?v=137',
         {updateViaCache:'none'}
       );
 
