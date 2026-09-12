@@ -1143,7 +1143,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
       <div id="cloud-status" class="home-help">未設定です。</div>
       <div id="auto-sync-status" class="home-help" style="margin-top:8px">同期：v95 外出向け省通信</div><div id="network-status" class="net-pill">● 通信状態を確認中</div>
       <div class="home-help" style="margin-top:8px">
-        v146ではHOMEスクショの親名・性格の切り出し範囲を実画面に合わせてさらに狭くし、親名は下段の出会った地方テキストを拾わないよう専用値領域だけをOCRします。性格も値部分だけを読むよう変更しました。v145ではHOMEスクショの「親」「性格」を専用領域で読み取り、♂♀がない場合は性別を「不明」にします。v144ではHOMEスクショからLv.1なら厳選方法を国際孵化に、カロス地方→XY・ガラル地方→剣盾・ヒスイ地方→Pokémon LEGENDS アルセウス・パルデア地方→SVを空欄時のみ自動補完します。v143ではHOMEスクショ反映時に親名がBK/bk/バッカーなら入手区分を自動で「自己産」に設定します。v142ではHOMEスクショのボール判定だけを作り直し、実画像の正しい位置からアイコンを切り出して背景除去後に既存ボールアイコンと比較する方式へ変更しました。v141ではHOMEスクショのボールと性別の切り出し座標を実画像に合わせて再修正し、ボールは判定が曖昧な場合に誤登録せず未設定へ戻す安全判定を追加しました。v140ではHOMEスクショのボール・性別アイコンの固定位置判定を実画面に合わせて修正しました。v139ではHOMEスクショ読取を「捕獲日・ボール・性格・性別・親・ID」の6項目だけに整理し、確認画面も簡潔にしました。ボールはHOME画面上部のアイコンから画像判定します。v138ではHOMEスクショ読取の性別・特性・技4枠を専用領域で再解析し、残りの読取精度を改善しました。v137ではHOMEスクショ読取を画面全体OCRからHOME専用の領域別OCRへ変更し、Lv・性別・性格・特性・親名・ID・捕獲日・地方・能力値・技を各領域ごとに拡大して読み取るよう改善しました。v136ではHOMEの個体画面スクリーンショットをOCRで読み取り、確認後に個体情報へ反映できる機能を追加しました。v135ではスマホ厳選カードのリージョン・姿違い画像のフォールバック処理を修正し、アローララッタなどがNo.000表示になる不具合を直しました。v134ではコレクションカードの「✓ ○匹所持」がスマホ幅でも改行されないよう表示を調整しました。保存データ構造は変更しません。v133では世代別進捗を「通常個体・リージョン・オス/メス違い・その他の姿違い・キョダイマックス」に分けて表示します。各カテゴリ内で第1〜第9世代の所持率を個別集計します。v132では月別の色違い一覧の集計レイアウトを整理し、上段に4つのサマリー、下段に厳選回数の横長集計カードを表示します。重複していた捕獲数表示も整理しました。v131では個体編集画面の厳選回数ラベルを選択した厳選方法に即時追従させ、個体画像作成時にその場でプレビューを表示するよう修正しました。v130では、「殿堂入り」と「SHINY GET画像」を廃止しました。画像作成は「個体画像を作成」1つにまとめ、捕獲スクショの登録・変更と削除だけを残します。既存のコレクション・個体・画像・厳選・BINGOデータ構造は変更しません。スマホ起動時は安全クラウドバックアップからコレクションを一方向で取り込み、厳選データは専用同期します。
+        v147ではHOMEスクショの性格・親名を3種類の画像処理で複数回読み取り、性格25種との照合とBK/bk/バッカー専用判定を追加しました。v146ではHOMEスクショの親名・性格の切り出し範囲を実画面に合わせてさらに狭くし、親名は下段の出会った地方テキストを拾わないよう専用値領域だけをOCRします。性格も値部分だけを読むよう変更しました。v145ではHOMEスクショの「親」「性格」を専用領域で読み取り、♂♀がない場合は性別を「不明」にします。v144ではHOMEスクショからLv.1なら厳選方法を国際孵化に、カロス地方→XY・ガラル地方→剣盾・ヒスイ地方→Pokémon LEGENDS アルセウス・パルデア地方→SVを空欄時のみ自動補完します。v143ではHOMEスクショ反映時に親名がBK/bk/バッカーなら入手区分を自動で「自己産」に設定します。v142ではHOMEスクショのボール判定だけを作り直し、実画像の正しい位置からアイコンを切り出して背景除去後に既存ボールアイコンと比較する方式へ変更しました。v141ではHOMEスクショのボールと性別の切り出し座標を実画像に合わせて再修正し、ボールは判定が曖昧な場合に誤登録せず未設定へ戻す安全判定を追加しました。v140ではHOMEスクショのボール・性別アイコンの固定位置判定を実画面に合わせて修正しました。v139ではHOMEスクショ読取を「捕獲日・ボール・性格・性別・親・ID」の6項目だけに整理し、確認画面も簡潔にしました。ボールはHOME画面上部のアイコンから画像判定します。v138ではHOMEスクショ読取の性別・特性・技4枠を専用領域で再解析し、残りの読取精度を改善しました。v137ではHOMEスクショ読取を画面全体OCRからHOME専用の領域別OCRへ変更し、Lv・性別・性格・特性・親名・ID・捕獲日・地方・能力値・技を各領域ごとに拡大して読み取るよう改善しました。v136ではHOMEの個体画面スクリーンショットをOCRで読み取り、確認後に個体情報へ反映できる機能を追加しました。v135ではスマホ厳選カードのリージョン・姿違い画像のフォールバック処理を修正し、アローララッタなどがNo.000表示になる不具合を直しました。v134ではコレクションカードの「✓ ○匹所持」がスマホ幅でも改行されないよう表示を調整しました。保存データ構造は変更しません。v133では世代別進捗を「通常個体・リージョン・オス/メス違い・その他の姿違い・キョダイマックス」に分けて表示します。各カテゴリ内で第1〜第9世代の所持率を個別集計します。v132では月別の色違い一覧の集計レイアウトを整理し、上段に4つのサマリー、下段に厳選回数の横長集計カードを表示します。重複していた捕獲数表示も整理しました。v131では個体編集画面の厳選回数ラベルを選択した厳選方法に即時追従させ、個体画像作成時にその場でプレビューを表示するよう修正しました。v130では、「殿堂入り」と「SHINY GET画像」を廃止しました。画像作成は「個体画像を作成」1つにまとめ、捕獲スクショの登録・変更と削除だけを残します。既存のコレクション・個体・画像・厳選・BINGOデータ構造は変更しません。スマホ起動時は安全クラウドバックアップからコレクションを一方向で取り込み、厳選データは専用同期します。
       </div>
       <div class="home-help" style="margin-top:10px">初回は「設定保存」→「接続テスト」の順に確認してください。既存データがある場合、確認前にクラウドへ保存しないでください。</div>
     </div>
@@ -1151,7 +1151,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 </section>
 
 <script>
-const DATA_VERSION='full-2026-09-12-v146';
+const DATA_VERSION='full-2026-09-12-v147';
 const SPECIES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species.csv';
 const NAMES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
 const MAX_DEX=1025;
@@ -2151,6 +2151,39 @@ function homeOcrFieldHTML(k,label,val,type='text'){
   if(k==='ball')return `<div class="detail-field"><label>${label}</label><select data-home-ocr="${k}">${ballOptions(val)}</select></div>`;
   return `<div class="detail-field"><label>${label}</label><input data-home-ocr="${k}" type="${type}" value="${esc(val??'')}"></div>`;
 }
+function homeCropVariant(img,box,scale=8,mode='threshold'){
+  const sx=Math.max(0,Math.round(img.naturalWidth*box.x)),sy=Math.max(0,Math.round(img.naturalHeight*box.y));
+  const sw=Math.min(img.naturalWidth-sx,Math.round(img.naturalWidth*box.w)),sh=Math.min(img.naturalHeight-sy,Math.round(img.naturalHeight*box.h));
+  const c=document.createElement('canvas');c.width=Math.max(1,sw*scale);c.height=Math.max(1,sh*scale);const ctx=c.getContext('2d',{willReadFrequently:true});
+  ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';ctx.drawImage(img,sx,sy,sw,sh,0,0,c.width,c.height);
+  const d=ctx.getImageData(0,0,c.width,c.height),a=d.data;
+  for(let i=0;i<a.length;i+=4){let v=.299*a[i]+.587*a[i+1]+.114*a[i+2];
+    if(mode==='threshold')v=v>190?255:0;else if(mode==='soft')v=Math.max(0,Math.min(255,(v-150)*2.2+150));
+    a[i]=a[i+1]=a[i+2]=v;a[i+3]=255;
+  }
+  ctx.putImageData(d,0,0);return c;
+}
+function homeEditDistance(a,b){a=String(a||'');b=String(b||'');const d=Array.from({length:a.length+1},(_,i)=>[i]);for(let j=1;j<=b.length;j++)d[0][j]=j;for(let i=1;i<=a.length;i++)for(let j=1;j<=b.length;j++)d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1));return d[a.length][b.length]}
+function bestHomeNature(texts){
+  const all=texts.map(normalizeHomeOCRText).join(' ').replace(/[\s|｜:：・。,.]/g,'');
+  for(const n of NATURES.filter(Boolean))if(all.includes(n))return n;
+  // OCRが1文字だけ崩れた場合まで既知25性格から補正。短すぎる断片では推測しない。
+  const chunks=texts.flatMap(t=>normalizeHomeOCRText(t).split(/[^ぁ-んァ-ヶー一-龠々]+/)).filter(x=>x.length>=3);
+  let best='',score=99;for(const c of chunks)for(const n of NATURES.filter(Boolean)){const d=homeEditDistance(c,n);if(d<score){score=d;best=n}}
+  return score<=1?best:'';
+}
+function bestHomeParent(texts){
+  const cleaned=texts.map(t=>normalizeHomeOCRText(t).replace(/[|｜]/g,' ').trim()).filter(Boolean);
+  // 自己産OTは最優先で専用判定。OCRの大小文字・空白揺れを吸収。
+  for(const t of cleaned){const c=t.replace(/[\s　]/g,'');if(/^bk$/i.test(c))return c;if(c.includes('バッカー'))return 'バッカー'}
+  for(const t of cleaned){const p=parseHomeParent(t);if(p.otName)return p.otName}
+  return '';
+}
+async function recognizeHomeFieldVariants(worker,img,box,kind){
+  const variants=[homeCropCanvas(img,box,8),homeCropVariant(img,box,9,'soft'),homeCropVariant(img,box,10,'threshold')],texts=[];
+  for(const c of variants){const r=await worker.recognize(c);texts.push(r?.data?.text||'')}
+  return {texts,value:kind==='nature'?bestHomeNature(texts):bestHomeParent(texts)};
+}
 async function readHomeScreenshot(id,uid,file){
   if(!file)return;if(!file.type.startsWith('image/')){showToast('画像ファイルを選択してください。');return}
   const arr=individualState[id]||[],ind=arr.find(x=>x.uid===uid);if(!ind)return;
@@ -2164,22 +2197,26 @@ async function readHomeScreenshot(id,uid,file){
       header:{x:.12,y:.065,w:.74,h:.115},
       // v146: HOME実画面の「値」だけを切り出す。
       // 性格: 左下1行目の値欄 / 親: 右下の緑色ヘッダ内の親名だけ。
-      nature:{x:.145,y:.786,w:.205,h:.062},
-      parent:{x:.515,y:.695,w:.205,h:.074},
+      nature:{x:.155,y:.780,w:.195,h:.070},
+      parent:{x:.545,y:.690,w:.175,h:.080},
       bottomRight:{x:.39,y:.68,w:.60,h:.29}
     };
-    const canv={};Object.entries(boxes).forEach(([k,b])=>canv[k]=homeCropCanvas(img,b,(k==='nature'||k==='parent')?6:3));
+    const canv={};for(const k of ['header','bottomRight'])canv[k]=homeCropCanvas(img,boxes[k],3);
     worker=await T.createWorker('jpn+eng',1,{logger:m=>{if(m.status==='recognizing text'&&Number.isFinite(m.progress))status.textContent=`6項目を読取中… ${Math.round(m.progress*100)}%`}});
     const results={};
     await worker.setParameters({tessedit_pageseg_mode:'6',preserve_interword_spaces:'1'});
     for(const key of ['header','bottomRight'])results[key]=await worker.recognize(canv[key]);
     await worker.setParameters({tessedit_pageseg_mode:'7',preserve_interword_spaces:'1'});
-    results.nature=await worker.recognize(canv.nature);
-    results.parent=await worker.recognize(canv.parent);
+    status.textContent='性格を複数方式で照合しています…';
+    const natureMulti=await recognizeHomeFieldVariants(worker,img,boxes.nature,'nature');
+    status.textContent='親名を複数方式で照合しています…';
+    const parentMulti=await recognizeHomeFieldVariants(worker,img,boxes.parent,'parent');
+    results.nature={data:{text:natureMulti.texts.join(' / ')}};
+    results.parent={data:{text:parentMulti.texts.join(' / ')}};
     status.textContent='ボールを判定しています…';
     const ball=await detectHomeBall(img);
     const broad=parseHomeBottomRight(results.bottomRight?.data?.text||'');
-    const parsed=mergeHomeParsed(parseHomeHeader(results.header?.data?.text||'',img),parseHomeNature(results.nature?.data?.text||''),broad,parseHomeParent(results.parent?.data?.text||''),ball?{ball}:null);
+    const parsed=mergeHomeParsed(parseHomeHeader(results.header?.data?.text||'',img),natureMulti.value?{nature:natureMulti.value}:parseHomeNature(results.nature?.data?.text||''),broad,parentMulti.value?{otName:parentMulti.value}:parseHomeParent(results.parent?.data?.text||''),ball?{ball}:null);
     ov.dataset.homeLevel=parsed._homeLevel==null?'':String(parsed._homeLevel);ov.dataset.homeRegion=parsed._homeRegion||'';
     const raw=`【上部（性別・Lv）】\n${results.header?.data?.text||'（未検出）'}\n\n【性格・値専用領域】\n${results.nature?.data?.text||'（未検出）'}\n\n【親・値専用領域】\n${results.parent?.data?.text||'（未検出）'}\n\n【捕獲情報（日付・地方・ID）】\n${results.bottomRight?.data?.text||'（未検出）'}\n\n【ボール判定】\n${ball?ballName(ball):'未検出'}${detectHomeBall.lastDebug?`\n候補: ${ballName(detectHomeBall.lastDebug.best)||detectHomeBall.lastDebug.best} / score ${Number(detectHomeBall.lastDebug.score||0).toFixed(2)}`:''}`;document.getElementById('home-ocr-raw').textContent=raw;
     const defs=[['date','捕獲日','date'],['ball','ボール'],['nature','性格'],['gender','性別'],['otName','親'],['trainerId','ID']];
@@ -4527,14 +4564,14 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 // ===== v56 automatic update / cache repair =====
 (function(){
-  const APP_VERSION='v146';
+  const APP_VERSION='v147';
   const UPDATE_KEY='shinyHomeReloadedForSW_'+APP_VERSION;
 
   async function registerFreshWorker(){
     if(!('serviceWorker' in navigator) || location.protocol==='file:') return;
     try{
       const reg = await navigator.serviceWorker.register(
-        './service-worker.js?v=146',
+        './service-worker.js?v=147',
         {updateViaCache:'none'}
       );
 
