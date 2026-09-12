@@ -1135,7 +1135,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
       <div id="cloud-status" class="home-help">未設定です。</div>
       <div id="auto-sync-status" class="home-help" style="margin-top:8px">同期：v95 外出向け省通信</div><div id="network-status" class="net-pill">● 通信状態を確認中</div>
       <div class="home-help" style="margin-top:8px">
-        v130では個体編集画面の画像関連操作を整理し、「殿堂入り」と「SHINY GET画像」を廃止しました。画像作成は「個体画像を作成」1つにまとめ、捕獲スクショの登録・変更と削除だけを残します。既存のコレクション・個体・画像・厳選・BINGOデータ構造は変更しません。スマホ起動時は安全クラウドバックアップからコレクションを一方向で取り込み、厳選データは専用同期します。
+        v131では個体編集画面の厳選回数ラベルを選択した厳選方法に即時追従させ、個体画像作成時にその場でプレビューを表示するよう修正しました。v130では、「殿堂入り」と「SHINY GET画像」を廃止しました。画像作成は「個体画像を作成」1つにまとめ、捕獲スクショの登録・変更と削除だけを残します。既存のコレクション・個体・画像・厳選・BINGOデータ構造は変更しません。スマホ起動時は安全クラウドバックアップからコレクションを一方向で取り込み、厳選データは専用同期します。
       </div>
       <div class="home-help" style="margin-top:10px">初回は「設定保存」→「接続テスト」の順に確認してください。既存データがある場合、確認前にクラウドへ保存しないでください。</div>
     </div>
@@ -1608,8 +1608,8 @@ function individualRowHTML(p,ind,i){
       <div class="detail-field"><label>捕獲日</label><input type="date" value="${esc(ind.date||'')}" oninput="setIndividualLive('${esc(p.id)}',${i},'date',this.value)" onchange="setIndividual('${esc(p.id)}',${i},'date',this.value)"></div>
       <div class="detail-field"><label>ゲーム</label><select oninput="setIndividualLive('${esc(p.id)}',${i},'game',this.value)" onchange="setIndividual('${esc(p.id)}',${i},'game',this.value)">${gameOptionsHTML(ind.game||'')}</select></div>
       <div class="detail-field"><label>ボール</label><div class="ball-select-wrap"><img id="ball-${encodeURIComponent(p.id)}-${i}" src="${ballIcon(ind.ball)}" alt=""><select oninput="setIndividualLive('${esc(p.id)}',${i},'ball',this.value);document.getElementById('ball-${encodeURIComponent(p.id)}-${i}').src=ballIcon(this.value)" onchange="setIndividual('${esc(p.id)}',${i},'ball',this.value);document.getElementById('ball-${encodeURIComponent(p.id)}-${i}').src=ballIcon(this.value)">${ballOptions(ind.ball)}</select></div></div>
-      <div class="detail-field"><label>厳選方法</label><select oninput="setIndividualLive('${esc(p.id)}',${i},'huntMethod',this.value)" onchange="setIndividual('${esc(p.id)}',${i},'huntMethod',this.value)">${huntMethodOptions(ind.huntMethod||'')}</select></div>
-      <div class="detail-field"><label>${esc(counterLabel(ind.huntMethod||''))}</label><input type="number" min="0" value="${Number(ind.huntCount||0)}" oninput="setManualHuntCountLive('${esc(p.id)}','${esc(ind.uid)}',this.value)" onchange="setManualHuntCount('${esc(p.id)}','${esc(ind.uid)}',this.value)"></div>
+      <div class="detail-field"><label>厳選方法</label><select oninput="setIndividualLive('${esc(p.id)}',${i},'huntMethod',this.value);updateIndividualCounterLabel('${esc(p.id)}','${esc(ind.uid)}',this.value)" onchange="setIndividual('${esc(p.id)}',${i},'huntMethod',this.value);updateIndividualCounterLabel('${esc(p.id)}','${esc(ind.uid)}',this.value)">${huntMethodOptions(ind.huntMethod||'')}</select></div>
+      <div class="detail-field"><label id="hunt-count-label-${safeId(p.id)}-${safeId(ind.uid)}">${esc(counterLabel(ind.huntMethod||''))}</label><input type="number" min="0" value="${Number(ind.huntCount||0)}" oninput="setManualHuntCountLive('${esc(p.id)}','${esc(ind.uid)}',this.value)" onchange="setManualHuntCount('${esc(p.id)}','${esc(ind.uid)}',this.value)"></div>
       <div class="detail-field"><label>入手区分</label><select oninput="setIndividualLive('${esc(p.id)}',${i},'source',this.value)" onchange="setIndividual('${esc(p.id)}',${i},'source',this.value)">${sourceOptionsHTML(ind.source||'')}</select></div>
       <div class="detail-field"><label>開始日</label><input type="date" value="${esc(ind.huntStart||'')}" oninput="setIndividualLive('${esc(p.id)}',${i},'huntStart',this.value)" onchange="setIndividual('${esc(p.id)}',${i},'huntStart',this.value)"></div>
     </div>
@@ -1717,6 +1717,12 @@ window.setIndividualLive=(id,i,key,val)=>{
   if(key==='game')safeLocalSet('shinyHomeGames_v1',JSON.stringify(gameState));
   if(key==='box')safeLocalSet('shinyHomeBoxes_v1',JSON.stringify(boxState));
 };
+
+window.updateIndividualCounterLabel=(id,uid,method)=>{
+  const lab=el(`hunt-count-label-${safeId(id)}-${safeId(uid)}`);
+  if(lab) lab.textContent=counterLabel(method||'');
+};
+
 window.setManualHuntCountLive=(id,uid,val)=>{
   const arr=individualState[id]||[],ind=arr.find(x=>x.uid===uid);if(!ind)return;
   ind.huntCount=Math.max(0,Number(val)||0);openIndividualPanels.add(id);
@@ -2384,7 +2390,28 @@ async function generateIndividualCardImage(id,uid){
   if(ind.memo){ctx.fillStyle='rgba(6,20,33,.82)';roundRect(ctx,55,1220,970,82,16);ctx.fill();ctx.fillStyle='#92aabd';ctx.font='700 16px system-ui,"Yu Gothic",sans-serif';ctx.fillText('MEMO',74,1247);ctx.fillStyle='#dceaf3';ctx.font='500 19px system-ui,"Yu Gothic",sans-serif';wrapCanvasText(ctx,ind.memo,74,1275,925,25,2)}
   ctx.fillStyle='#6f8ba0';ctx.font='600 15px system-ui,sans-serif';ctx.textAlign='right';ctx.fillText('SHINY HOME COLLECTION',1025,1325);ctx.textAlign='left';
   lastSingleImageName=`shiny_card_${p.name}_${ind.date||'record'}`;
-  el('single-post-preview').classList.add('show');el('single-post-preview').scrollIntoView({behavior:'smooth',block:'center'});
+  showIndividualImagePreview(c,lastSingleImageName);
+}
+
+
+function showIndividualImagePreview(sourceCanvas,fileName='individual-image'){
+  let ov=el('individual-image-overlay');
+  if(!ov){
+    ov=document.createElement('div');
+    ov.id='individual-image-overlay';
+    ov.style.cssText='position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.86);display:none;align-items:center;justify-content:center;padding:16px;';
+    ov.innerHTML=`<div style="width:min(92vw,620px);max-height:92vh;overflow:auto;background:#081725;border:1px solid #315574;border-radius:16px;padding:12px;box-shadow:0 24px 80px rgba(0,0,0,.55)"><canvas id="individual-image-preview-canvas" style="display:block;width:100%;height:auto;border-radius:10px;background:#07111d"></canvas><div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap"><button type="button" id="individual-image-save-btn">PNGで保存</button><button type="button" id="individual-image-close-btn">閉じる</button></div></div>`;
+    document.body.appendChild(ov);
+    el('individual-image-close-btn').onclick=()=>{ov.style.display='none'};
+    ov.addEventListener('click',e=>{if(e.target===ov)ov.style.display='none'});
+  }
+  const dst=el('individual-image-preview-canvas');
+  dst.width=sourceCanvas.width;dst.height=sourceCanvas.height;
+  dst.getContext('2d').drawImage(sourceCanvas,0,0);
+  el('individual-image-save-btn').onclick=()=>{
+    const a=document.createElement('a');a.download=`${fileName}.png`;a.href=dst.toDataURL('image/png');a.click();
+  };
+  ov.style.display='flex';
 }
 
 async function generateSingleShinyImage(id,uid){
@@ -4220,14 +4247,14 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 // ===== v56 automatic update / cache repair =====
 (function(){
-  const APP_VERSION='v130';
+  const APP_VERSION='v131';
   const UPDATE_KEY='shinyHomeReloadedForSW_'+APP_VERSION;
 
   async function registerFreshWorker(){
     if(!('serviceWorker' in navigator) || location.protocol==='file:') return;
     try{
       const reg = await navigator.serviceWorker.register(
-        './service-worker.js?v=130',
+        './service-worker.js?v=131',
         {updateViaCache:'none'}
       );
 
