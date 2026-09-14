@@ -1137,9 +1137,6 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
       <div class="counter-row" style="margin-top:10px">
         <button class="btn" id="cloud-auto-backup-now" type="button">🛡 今すぐ安全バックアップ</button>
         <button class="btn" id="cloud-auto-backup-restore" type="button">↶ 安全バックアップから復元</button>
-        <button class="btn" id="cloud-safe-backup-check" type="button">🔍 安全バックアップを確認（復元しない）</button>
-        <button class="btn" id="browser-data-diagnostic" type="button">🔬 ブラウザ内データ総診断</button>
-        <button class="btn" id="image-individual-crosscheck" type="button">🧩 画像685件 ↔ 個体データ総照合</button>
       </div>
       <div id="cloud-auto-backup-status" class="home-help" style="margin-top:8px">自動バックアップ：待機中</div>
       <div id="regression-status" class="home-help" style="margin-top:8px">データ回帰チェック：未実行</div>
@@ -1154,7 +1151,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 </section>
 
 <script>
-const DATA_VERSION='full-2026-09-14-v166-image-individual-crosscheck';
+const DATA_VERSION='full-2026-09-14-v167-v157-rollback';
 const SPECIES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species.csv';
 const NAMES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
 const MAX_DEX=1025;
@@ -4714,225 +4711,6 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
       return true;
     }catch(e){status(e.message||'保存に失敗しました',true);return false}finally{running=false}
   }
-  function backupPayloadCounts(payload){
-    if(!payload||typeof payload!=='object')return {owned:0,individuals:0,version:'?',backedUpAt:null};
-    const snap=payload.data||payload;
-    let owned=Number(payload.ownedCount);
-    let individuals=Number(payload.individualCount);
-    if(!Number.isFinite(owned)){
-      const st=snap?.state;
-      owned=st&&typeof st==='object'?Object.values(st).filter(Boolean).length:0;
-    }
-    if(!Number.isFinite(individuals)){
-      const ind=snap?.individualState;
-      individuals=ind&&typeof ind==='object'?Object.values(ind).reduce((n,a)=>n+(Array.isArray(a)?a.length:0),0):0;
-    }
-    return {owned,individuals,version:payload.version||'?',backedUpAt:payload.backedUpAt||null};
-  }
-  async function inspectSafeBackups(){
-    const c=settings();
-    if(!c.url||!c.key||!c.userId){status('同期設定が未設定です',true);return}
-    if(!navigator.onLine){status('オフラインのため確認できません',true);return}
-    const btn=$('cloud-safe-backup-check');if(btn)btn.disabled=true;
-    status('安全バックアップを読み取り確認中…');
-    try{
-      const ids=[['最新の安全バックアップ',c.userId+AUTO_SUFFIX],['1世代前の安全バックアップ',c.userId+PREV_SUFFIX]];
-      const lines=[];
-      for(const [label,id] of ids){
-        const row=await getRow(c,id);
-        if(!row?.payload){lines.push(`${label}：なし`);continue}
-        const x=backupPayloadCounts(row.payload);
-        const when=row.updated_at?new Date(row.updated_at).toLocaleString('ja-JP'):(x.backedUpAt?new Date(x.backedUpAt).toLocaleString('ja-JP'):'日時不明');
-        lines.push(`${label}：所持 ${x.owned} / 個体 ${x.individuals} / ${when} / ${x.version}`);
-      }
-      const text=lines.join('\n');
-      status('確認完了（データは変更していません）');
-      alert('🔍 安全バックアップ確認\n\n'+text+'\n\n※確認のみです。現在のデータ・クラウドデータは変更していません。');
-    }catch(e){status('安全バックアップ確認に失敗：'+(e.message||String(e)),true)}finally{if(btn)btn.disabled=false}
-  }
-  function diagnosticSnapshotCounts(obj){
-    const out={owned:null,individuals:null};
-    const parseMaybe=v=>{if(typeof v!=='string')return v;try{return JSON.parse(v)}catch(_){return null}};
-    const countState=v=>{v=parseMaybe(v);return v&&typeof v==='object'&&!Array.isArray(v)?Object.values(v).filter(Boolean).length:null};
-    const countIndividuals=v=>{v=parseMaybe(v);return v&&typeof v==='object'&&!Array.isArray(v)?Object.values(v).reduce((n,a)=>n+(Array.isArray(a)?a.length:0),0):null};
-    if(!obj||typeof obj!=='object')return out;
-    const root=obj.data&&typeof obj.data==='object'?obj.data:obj;
-    const values=root.values&&typeof root.values==='object'?root.values:null;
-    const st=root.state ?? (values&&values.shinyHomeState_v1);
-    const ind=root.individualState ?? (values&&values.shinyHomeIndividuals_v1);
-    const oc=countState(st),ic=countIndividuals(ind);
-    if(Number.isFinite(oc))out.owned=oc;
-    if(Number.isFinite(ic))out.individuals=ic;
-    if(out.owned==null&&Number.isFinite(Number(obj.ownedCount)))out.owned=Number(obj.ownedCount);
-    if(out.individuals==null&&Number.isFinite(Number(obj.individualCount)))out.individuals=Number(obj.individualCount);
-    return out;
-  }
-  async function inspectBrowserDataReadOnly(){
-    const btn=$('browser-data-diagnostic');if(btn)btn.disabled=true;
-    status('ブラウザ内データを読み取り専用で診断中…');
-    try{
-      const lines=['🔬 ブラウザ内データ総診断','※読み取りのみ。保存・削除・復元・同期はしていません。',''];
-      const ls=[];
-      for(let i=0;i<localStorage.length;i++){
-        const key=localStorage.key(i),raw=localStorage.getItem(key)||'';
-        let parsed=null;try{parsed=JSON.parse(raw)}catch(_){}
-        let owned=null,individuals=null;
-        if(key==='shinyHomeState_v1')owned=diagnosticSnapshotCounts({state:parsed}).owned;
-        if(key==='shinyHomeIndividuals_v1')individuals=diagnosticSnapshotCounts({individualState:parsed}).individuals;
-        if(parsed&&typeof parsed==='object'){
-          const c=diagnosticSnapshotCounts(parsed);
-          if(owned==null)owned=c.owned;if(individuals==null)individuals=c.individuals;
-        }
-        const interesting=/shiny|pokemon|backup|home/i.test(key)||owned!=null||individuals!=null;
-        if(interesting)ls.push({key,bytes:raw.length,owned,individuals});
-      }
-      lines.push('【localStorage】');
-      const candidates=ls.filter(x=>x.owned!=null||x.individuals!=null).sort((a,b)=>Math.max(b.owned||0,b.individuals||0)-Math.max(a.owned||0,a.individuals||0));
-      if(candidates.length)for(const x of candidates.slice(0,30))lines.push(`${x.key}：所持 ${x.owned??'—'} / 個体 ${x.individuals??'—'} / ${x.bytes.toLocaleString()}文字`);
-      else lines.push('コレクション件数を判定できる候補なし');
-      lines.push('',`関連キー総数：${ls.length}`,'');
-
-      lines.push('【IndexedDB】');
-      if(typeof indexedDB.databases!=='function'){
-        lines.push('このブラウザではDB一覧取得APIが使えないため、既存DBを新規作成しない安全優先でスキャンを省略しました。');
-      }else{
-        const dbs=(await indexedDB.databases()).filter(x=>x&&x.name);
-        if(!dbs.length)lines.push('IndexedDBなし');
-        for(const info of dbs){
-          const name=info.name;
-          lines.push(`DB: ${name}${info.version?' v'+info.version:''}`);
-          let db=null;
-          try{
-            db=await new Promise((resolve,reject)=>{const r=indexedDB.open(name);r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error)});
-            for(const storeName of Array.from(db.objectStoreNames)){
-              const summary=await new Promise((resolve)=>{
-                const tx=db.transaction(storeName,'readonly'),st=tx.objectStore(storeName),cr=st.count();
-                cr.onsuccess=()=>resolve({count:cr.result});cr.onerror=()=>resolve({count:'?'});
-              });
-              lines.push(`  ${storeName}: ${summary.count}件`);
-              if(name===PREUPDATE_IDB_DB&&storeName===PREUPDATE_IDB_STORE){
-                const entries=await new Promise((resolve)=>{const tx=db.transaction(storeName,'readonly'),st=tx.objectStore(storeName),a=[],r=st.openCursor();r.onsuccess=()=>{const c=r.result;if(!c){resolve(a);return}a.push(c.value);c.continue()};r.onerror=()=>resolve(a)});
-                entries.sort((a,b)=>String(b.createdAt||'').localeCompare(String(a.createdAt||'')));
-                for(const b of entries.slice(0,40)){
-                  const c=diagnosticSnapshotCounts(b),when=b.createdAt?new Date(b.createdAt).toLocaleString('ja-JP'):'日時不明';
-                  lines.push(`    ${b.sourceVersion||b.id||'backup'}：所持 ${c.owned??'—'} / 個体 ${c.individuals??'—'} / ${when}`);
-                }
-              }
-            }
-          }catch(e){lines.push(`  読取失敗: ${e.message||e}`)}finally{if(db)db.close()}
-        }
-      }
-      const report=lines.join('\n');
-      window.__lastBrowserDiagnostic=report;
-      status('ブラウザ内データ総診断：完了（変更なし）');
-      alert(report+'\n\nこの結果をスクリーンショットで送ってください。');
-    }catch(e){status('ブラウザ内データ総診断に失敗：'+(e.message||String(e)),true)}finally{if(btn)btn.disabled=false}
-  }
-  async function crosscheckImagesAndIndividualsReadOnly(){
-    const btn=$('image-individual-crosscheck');if(btn)btn.disabled=true;
-    status('画像と個体データを読み取り専用で照合中…');
-    let db=null;
-    try{
-      const rows=await screenshotDBLoadAll();
-      const shotKeys=rows.map(x=>String(x?.key||'')).filter(Boolean);
-      const currentKeys=new Set();
-      for(const [id,arr] of Object.entries(individualState||{})){
-        if(!Array.isArray(arr))continue;
-        for(const ind of arr){if(ind?.uid)currentKeys.add(`${id}::${ind.uid}`)}
-      }
-      const orphanKeys=shotKeys.filter(k=>!currentKeys.has(k));
-      const liveShotKeys=shotKeys.filter(k=>currentKeys.has(k));
-      const malformed=orphanKeys.filter(k=>!k.includes('::'));
-      const backupIndex=new Map();
-      const addBackupIndividuals=(raw,label,createdAt='')=>{
-        if(!raw)return;
-        let root=raw;
-        try{if(typeof root==='string')root=JSON.parse(root)}catch(_){return}
-        if(root&&root.data&&typeof root.data==='object')root=root.data;
-        const values=root&&root.values&&typeof root.values==='object'?root.values:null;
-        let inds=root?.individualState ?? (values&&values.shinyHomeIndividuals_v1) ?? root?.individuals;
-        try{if(typeof inds==='string')inds=JSON.parse(inds)}catch(_){inds=null}
-        if(!inds||typeof inds!=='object'||Array.isArray(inds))return;
-        for(const [id,arr] of Object.entries(inds)){
-          if(!Array.isArray(arr))continue;
-          for(const ind of arr){
-            if(!ind?.uid)continue;
-            const key=`${id}::${ind.uid}`;
-            const list=backupIndex.get(key)||[];
-            list.push({id,ind,label,createdAt});
-            backupIndex.set(key,list);
-          }
-        }
-      };
-      // localStorageに残る旧スナップショットも読み取り専用で索引化
-      try{addBackupIndividuals(JSON.parse(localStorage.getItem('shinyHomePreUpdateBackup_v1')||'null'),'localStorage 更新前バックアップ')}catch(_){}
-      try{
-        const hist=JSON.parse(localStorage.getItem('shinyHomePreUpdateHistory_v1')||'[]');
-        if(Array.isArray(hist))for(const b of hist)addBackupIndividuals(b,b?.sourceVersion||'更新前履歴',b?.createdAt||'');
-      }catch(_){}
-      // IndexedDB 更新前バックアップを全件索引化
-      try{
-        db=await openBackupDB();
-        const entries=await new Promise((resolve)=>{const tx=db.transaction(PREUPDATE_IDB_STORE,'readonly'),st=tx.objectStore(PREUPDATE_IDB_STORE),a=[],r=st.openCursor();r.onsuccess=()=>{const c=r.result;if(!c){resolve(a);return}a.push(c.value);c.continue()};r.onerror=()=>resolve(a)});
-        for(const b of entries)addBackupIndividuals(b,b?.sourceVersion||b?.id||'IndexedDB更新前',b?.createdAt||'');
-      }catch(e){console.warn('更新前バックアップ索引化失敗',e)}finally{if(db){db.close();db=null}}
-      const candidates=[];
-      const imageOnly=[];
-      for(const key of orphanKeys){
-        const hits=backupIndex.get(key)||[];
-        const sep=key.indexOf('::');
-        const id=sep>=0?key.slice(0,sep):key,uid=sep>=0?key.slice(sep+2):'';
-        const p=(data||[]).find(x=>String(x.id)===id);
-        if(hits.length){
-          // 新しい履歴を優先（同一uidの重複は1候補として扱う）
-          hits.sort((a,b)=>String(b.createdAt||'').localeCompare(String(a.createdAt||'')));
-          candidates.push({key,id,uid,name:p?.name||p?.ja||id,hit:hits[0],sources:[...new Set(hits.map(h=>h.label))]});
-        }else imageOnly.push({key,id,uid,name:p?.name||p?.ja||id});
-      }
-      const uniqueOrphanSpecies=new Set(orphanKeys.map(k=>k.split('::')[0]).filter(Boolean));
-      const currentIndividualCount=currentKeys.size;
-      const lines=[
-        '🧩 画像 ↔ 個体データ総照合（読み取り専用）',
-        '※保存・削除・復元・同期は一切していません。',
-        '',
-        `画像データ: ${shotKeys.length}件`,
-        `現在の個体データ: ${currentIndividualCount}件`,
-        `現在個体と一致する画像: ${liveShotKeys.length}件`,
-        `現在個体に存在しない画像キー: ${orphanKeys.length}件`,
-        `  └ 対象ポケモン/フォーム数: ${uniqueOrphanSpecies.size}`,
-        `過去バックアップから同一個体UIDを特定できた候補: ${candidates.length}件`,
-        `画像だけ残り、過去個体データ未発見: ${imageOnly.length}件`,
-        malformed.length?`形式不明の画像キー: ${malformed.length}件`:'',
-        '',
-        '【復旧候補（同一UIDが過去バックアップに存在）】'
-      ].filter(Boolean);
-      const val=v=>String(v??'').trim();
-      const candidateLines=candidates.map((c,i)=>{
-        const x=c.hit.ind||{};
-        const bits=[val(x.date),val(x.game),val(x.ball),val(x.huntMethod),val(x.otName)].filter(Boolean);
-        return `${String(i+1).padStart(3,'0')}. ${c.name} [${c.id}] uid=${c.uid} / ${bits.join(' / ')||'詳細項目なし'} / 出典:${c.sources.join(', ')}`;
-      });
-      if(candidateLines.length)lines.push(...candidateLines.slice(0,250)); else lines.push('該当なし');
-      if(candidateLines.length>250)lines.push(`…ほか ${candidateLines.length-250}件`);
-      lines.push('','【画像のみ残っている候補】');
-      if(imageOnly.length){
-        for(const [i,c] of imageOnly.slice(0,120).entries())lines.push(`${String(i+1).padStart(3,'0')}. ${c.name} [${c.id}] uid=${c.uid||'—'}`);
-        if(imageOnly.length>120)lines.push(`…ほか ${imageOnly.length-120}件`);
-      }else lines.push('なし');
-      const report=lines.join('\n');
-      window.__lastImageIndividualCrosscheck={summary:{screenshots:shotKeys.length,currentIndividuals:currentIndividualCount,matchedCurrent:liveShotKeys.length,orphanImages:orphanKeys.length,backupMatched:candidates.length,imageOnly:imageOnly.length},candidates,imageOnly,report};
-      let ov=document.getElementById('recovery-crosscheck-overlay');
-      if(ov)ov.remove();
-      ov=document.createElement('div');ov.id='recovery-crosscheck-overlay';
-      ov.style.cssText='position:fixed;inset:0;z-index:100000;background:rgba(2,8,16,.94);padding:18px;overflow:auto;color:#eef7ff';
-      const panel=document.createElement('div');panel.style.cssText='max-width:1100px;margin:0 auto;background:#0b1827;border:1px solid #29445e;border-radius:16px;padding:18px';
-      panel.innerHTML=`<div style="display:flex;justify-content:space-between;gap:12px;align-items:center;position:sticky;top:0;background:#0b1827;padding-bottom:10px"><div><strong style="font-size:20px">🧩 画像 ↔ 個体データ総照合</strong><div style="color:#9bb2c7;font-size:12px;margin-top:4px">読み取り専用・データ変更なし</div></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="crosscheck-copy" type="button">結果をコピー</button><button class="btn" id="crosscheck-close" type="button">閉じる</button></div></div><pre style="white-space:pre-wrap;word-break:break-word;background:#07111d;border:1px solid #20364e;border-radius:12px;padding:14px;line-height:1.55;font-size:13px;max-height:75vh;overflow:auto"></pre>`;
-      panel.querySelector('pre').textContent=report;ov.appendChild(panel);document.body.appendChild(ov);
-      panel.querySelector('#crosscheck-close').onclick=()=>ov.remove();
-      panel.querySelector('#crosscheck-copy').onclick=async()=>{try{await navigator.clipboard.writeText(report);showToast('照合結果をコピーしました')}catch(_){alert('コピーできませんでした')}};
-      status(`画像↔個体照合：完了（孤立画像 ${orphanKeys.length} / UID復旧候補 ${candidates.length}）`);
-    }catch(e){status('画像↔個体照合に失敗：'+(e.message||String(e)),true)}finally{if(db)db.close();if(btn)btn.disabled=false}
-  }
   async function restore(){
     const c=settings();if(!c.url||!c.key||!c.userId){status('同期設定が未設定です',true);return}
     if(!confirm('安全クラウドバックアップから現在のデータを置き換えます。続けますか？'))return;
@@ -4949,7 +4727,7 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
     }catch(e){backupRestoring=false;status(e.message||'復元に失敗しました',true)}finally{running=false}
   }
   function init(){
-    const b=$('cloud-auto-backup-now'),r=$('cloud-auto-backup-restore'),q=$('cloud-safe-backup-check');if(b)b.addEventListener('click',()=>backup(true));if(r)r.addEventListener('click',restore);if(q)q.addEventListener('click',inspectSafeBackups);const d=$('browser-data-diagnostic');if(d)d.addEventListener('click',inspectBrowserDataReadOnly);const x=$('image-individual-crosscheck');if(x)x.addEventListener('click',crosscheckImagesAndIndividualsReadOnly);
+    const b=$('cloud-auto-backup-now'),r=$('cloud-auto-backup-restore');if(b)b.addEventListener('click',()=>backup(true));if(r)r.addEventListener('click',restore);
     const m=meta();if(m.at)status(`前回 ${new Date(m.at).toLocaleString('ja-JP')}（所持 ${m.ownedCount||0} / 個体 ${m.individualCount||0}）`);
     setTimeout(()=>backup(false),60000);
     setInterval(()=>{if(document.visibilityState==='visible')backup(false)},INTERVAL_MS);
@@ -4960,14 +4738,14 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 // ===== v56 automatic update / cache repair =====
 (function(){
-  const APP_VERSION='v166';
+  const APP_VERSION='v167';
   const UPDATE_KEY='shinyHomeReloadedForSW_'+APP_VERSION;
 
   async function registerFreshWorker(){
     if(!('serviceWorker' in navigator) || location.protocol==='file:') return;
     try{
       const reg = await navigator.serviceWorker.register(
-        './service-worker.js?v=166',
+        './service-worker.js?v=167',
         {updateViaCache:'none'}
       );
 
