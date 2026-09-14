@@ -1139,6 +1139,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
         <button class="btn" id="cloud-auto-backup-restore" type="button">↶ 安全バックアップから復元</button>
         <button class="btn" id="cloud-safe-backup-check" type="button">🔍 安全バックアップを確認（復元しない）</button>
         <button class="btn" id="browser-data-diagnostic" type="button">🔬 ブラウザ内データ総診断</button>
+        <button class="btn" id="image-individual-crosscheck" type="button">🧩 画像685件 ↔ 個体データ総照合</button>
       </div>
       <div id="cloud-auto-backup-status" class="home-help" style="margin-top:8px">自動バックアップ：待機中</div>
       <div id="regression-status" class="home-help" style="margin-top:8px">データ回帰チェック：未実行</div>
@@ -1153,7 +1154,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 </section>
 
 <script>
-const DATA_VERSION='full-2026-09-14-v165-browser-diagnostic';
+const DATA_VERSION='full-2026-09-14-v166-image-individual-crosscheck';
 const SPECIES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species.csv';
 const NAMES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
 const MAX_DEX=1025;
@@ -4827,6 +4828,111 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
       alert(report+'\n\nこの結果をスクリーンショットで送ってください。');
     }catch(e){status('ブラウザ内データ総診断に失敗：'+(e.message||String(e)),true)}finally{if(btn)btn.disabled=false}
   }
+  async function crosscheckImagesAndIndividualsReadOnly(){
+    const btn=$('image-individual-crosscheck');if(btn)btn.disabled=true;
+    status('画像と個体データを読み取り専用で照合中…');
+    let db=null;
+    try{
+      const rows=await screenshotDBLoadAll();
+      const shotKeys=rows.map(x=>String(x?.key||'')).filter(Boolean);
+      const currentKeys=new Set();
+      for(const [id,arr] of Object.entries(individualState||{})){
+        if(!Array.isArray(arr))continue;
+        for(const ind of arr){if(ind?.uid)currentKeys.add(`${id}::${ind.uid}`)}
+      }
+      const orphanKeys=shotKeys.filter(k=>!currentKeys.has(k));
+      const liveShotKeys=shotKeys.filter(k=>currentKeys.has(k));
+      const malformed=orphanKeys.filter(k=>!k.includes('::'));
+      const backupIndex=new Map();
+      const addBackupIndividuals=(raw,label,createdAt='')=>{
+        if(!raw)return;
+        let root=raw;
+        try{if(typeof root==='string')root=JSON.parse(root)}catch(_){return}
+        if(root&&root.data&&typeof root.data==='object')root=root.data;
+        const values=root&&root.values&&typeof root.values==='object'?root.values:null;
+        let inds=root?.individualState ?? (values&&values.shinyHomeIndividuals_v1) ?? root?.individuals;
+        try{if(typeof inds==='string')inds=JSON.parse(inds)}catch(_){inds=null}
+        if(!inds||typeof inds!=='object'||Array.isArray(inds))return;
+        for(const [id,arr] of Object.entries(inds)){
+          if(!Array.isArray(arr))continue;
+          for(const ind of arr){
+            if(!ind?.uid)continue;
+            const key=`${id}::${ind.uid}`;
+            const list=backupIndex.get(key)||[];
+            list.push({id,ind,label,createdAt});
+            backupIndex.set(key,list);
+          }
+        }
+      };
+      // localStorageに残る旧スナップショットも読み取り専用で索引化
+      try{addBackupIndividuals(JSON.parse(localStorage.getItem('shinyHomePreUpdateBackup_v1')||'null'),'localStorage 更新前バックアップ')}catch(_){}
+      try{
+        const hist=JSON.parse(localStorage.getItem('shinyHomePreUpdateHistory_v1')||'[]');
+        if(Array.isArray(hist))for(const b of hist)addBackupIndividuals(b,b?.sourceVersion||'更新前履歴',b?.createdAt||'');
+      }catch(_){}
+      // IndexedDB 更新前バックアップを全件索引化
+      try{
+        db=await openBackupDB();
+        const entries=await new Promise((resolve)=>{const tx=db.transaction(PREUPDATE_IDB_STORE,'readonly'),st=tx.objectStore(PREUPDATE_IDB_STORE),a=[],r=st.openCursor();r.onsuccess=()=>{const c=r.result;if(!c){resolve(a);return}a.push(c.value);c.continue()};r.onerror=()=>resolve(a)});
+        for(const b of entries)addBackupIndividuals(b,b?.sourceVersion||b?.id||'IndexedDB更新前',b?.createdAt||'');
+      }catch(e){console.warn('更新前バックアップ索引化失敗',e)}finally{if(db){db.close();db=null}}
+      const candidates=[];
+      const imageOnly=[];
+      for(const key of orphanKeys){
+        const hits=backupIndex.get(key)||[];
+        const sep=key.indexOf('::');
+        const id=sep>=0?key.slice(0,sep):key,uid=sep>=0?key.slice(sep+2):'';
+        const p=(data||[]).find(x=>String(x.id)===id);
+        if(hits.length){
+          // 新しい履歴を優先（同一uidの重複は1候補として扱う）
+          hits.sort((a,b)=>String(b.createdAt||'').localeCompare(String(a.createdAt||'')));
+          candidates.push({key,id,uid,name:p?.name||p?.ja||id,hit:hits[0],sources:[...new Set(hits.map(h=>h.label))]});
+        }else imageOnly.push({key,id,uid,name:p?.name||p?.ja||id});
+      }
+      const uniqueOrphanSpecies=new Set(orphanKeys.map(k=>k.split('::')[0]).filter(Boolean));
+      const currentIndividualCount=currentKeys.size;
+      const lines=[
+        '🧩 画像 ↔ 個体データ総照合（読み取り専用）',
+        '※保存・削除・復元・同期は一切していません。',
+        '',
+        `画像データ: ${shotKeys.length}件`,
+        `現在の個体データ: ${currentIndividualCount}件`,
+        `現在個体と一致する画像: ${liveShotKeys.length}件`,
+        `現在個体に存在しない画像キー: ${orphanKeys.length}件`,
+        `  └ 対象ポケモン/フォーム数: ${uniqueOrphanSpecies.size}`,
+        `過去バックアップから同一個体UIDを特定できた候補: ${candidates.length}件`,
+        `画像だけ残り、過去個体データ未発見: ${imageOnly.length}件`,
+        malformed.length?`形式不明の画像キー: ${malformed.length}件`:'',
+        '',
+        '【復旧候補（同一UIDが過去バックアップに存在）】'
+      ].filter(Boolean);
+      const val=v=>String(v??'').trim();
+      const candidateLines=candidates.map((c,i)=>{
+        const x=c.hit.ind||{};
+        const bits=[val(x.date),val(x.game),val(x.ball),val(x.huntMethod),val(x.otName)].filter(Boolean);
+        return `${String(i+1).padStart(3,'0')}. ${c.name} [${c.id}] uid=${c.uid} / ${bits.join(' / ')||'詳細項目なし'} / 出典:${c.sources.join(', ')}`;
+      });
+      if(candidateLines.length)lines.push(...candidateLines.slice(0,250)); else lines.push('該当なし');
+      if(candidateLines.length>250)lines.push(`…ほか ${candidateLines.length-250}件`);
+      lines.push('','【画像のみ残っている候補】');
+      if(imageOnly.length){
+        for(const [i,c] of imageOnly.slice(0,120).entries())lines.push(`${String(i+1).padStart(3,'0')}. ${c.name} [${c.id}] uid=${c.uid||'—'}`);
+        if(imageOnly.length>120)lines.push(`…ほか ${imageOnly.length-120}件`);
+      }else lines.push('なし');
+      const report=lines.join('\n');
+      window.__lastImageIndividualCrosscheck={summary:{screenshots:shotKeys.length,currentIndividuals:currentIndividualCount,matchedCurrent:liveShotKeys.length,orphanImages:orphanKeys.length,backupMatched:candidates.length,imageOnly:imageOnly.length},candidates,imageOnly,report};
+      let ov=document.getElementById('recovery-crosscheck-overlay');
+      if(ov)ov.remove();
+      ov=document.createElement('div');ov.id='recovery-crosscheck-overlay';
+      ov.style.cssText='position:fixed;inset:0;z-index:100000;background:rgba(2,8,16,.94);padding:18px;overflow:auto;color:#eef7ff';
+      const panel=document.createElement('div');panel.style.cssText='max-width:1100px;margin:0 auto;background:#0b1827;border:1px solid #29445e;border-radius:16px;padding:18px';
+      panel.innerHTML=`<div style="display:flex;justify-content:space-between;gap:12px;align-items:center;position:sticky;top:0;background:#0b1827;padding-bottom:10px"><div><strong style="font-size:20px">🧩 画像 ↔ 個体データ総照合</strong><div style="color:#9bb2c7;font-size:12px;margin-top:4px">読み取り専用・データ変更なし</div></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="crosscheck-copy" type="button">結果をコピー</button><button class="btn" id="crosscheck-close" type="button">閉じる</button></div></div><pre style="white-space:pre-wrap;word-break:break-word;background:#07111d;border:1px solid #20364e;border-radius:12px;padding:14px;line-height:1.55;font-size:13px;max-height:75vh;overflow:auto"></pre>`;
+      panel.querySelector('pre').textContent=report;ov.appendChild(panel);document.body.appendChild(ov);
+      panel.querySelector('#crosscheck-close').onclick=()=>ov.remove();
+      panel.querySelector('#crosscheck-copy').onclick=async()=>{try{await navigator.clipboard.writeText(report);showToast('照合結果をコピーしました')}catch(_){alert('コピーできませんでした')}};
+      status(`画像↔個体照合：完了（孤立画像 ${orphanKeys.length} / UID復旧候補 ${candidates.length}）`);
+    }catch(e){status('画像↔個体照合に失敗：'+(e.message||String(e)),true)}finally{if(db)db.close();if(btn)btn.disabled=false}
+  }
   async function restore(){
     const c=settings();if(!c.url||!c.key||!c.userId){status('同期設定が未設定です',true);return}
     if(!confirm('安全クラウドバックアップから現在のデータを置き換えます。続けますか？'))return;
@@ -4843,7 +4949,7 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
     }catch(e){backupRestoring=false;status(e.message||'復元に失敗しました',true)}finally{running=false}
   }
   function init(){
-    const b=$('cloud-auto-backup-now'),r=$('cloud-auto-backup-restore'),q=$('cloud-safe-backup-check');if(b)b.addEventListener('click',()=>backup(true));if(r)r.addEventListener('click',restore);if(q)q.addEventListener('click',inspectSafeBackups);const d=$('browser-data-diagnostic');if(d)d.addEventListener('click',inspectBrowserDataReadOnly);
+    const b=$('cloud-auto-backup-now'),r=$('cloud-auto-backup-restore'),q=$('cloud-safe-backup-check');if(b)b.addEventListener('click',()=>backup(true));if(r)r.addEventListener('click',restore);if(q)q.addEventListener('click',inspectSafeBackups);const d=$('browser-data-diagnostic');if(d)d.addEventListener('click',inspectBrowserDataReadOnly);const x=$('image-individual-crosscheck');if(x)x.addEventListener('click',crosscheckImagesAndIndividualsReadOnly);
     const m=meta();if(m.at)status(`前回 ${new Date(m.at).toLocaleString('ja-JP')}（所持 ${m.ownedCount||0} / 個体 ${m.individualCount||0}）`);
     setTimeout(()=>backup(false),60000);
     setInterval(()=>{if(document.visibilityState==='visible')backup(false)},INTERVAL_MS);
@@ -4854,14 +4960,14 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 // ===== v56 automatic update / cache repair =====
 (function(){
-  const APP_VERSION='v165';
+  const APP_VERSION='v166';
   const UPDATE_KEY='shinyHomeReloadedForSW_'+APP_VERSION;
 
   async function registerFreshWorker(){
     if(!('serviceWorker' in navigator) || location.protocol==='file:') return;
     try{
       const reg = await navigator.serviceWorker.register(
-        './service-worker.js?v=165',
+        './service-worker.js?v=166',
         {updateViaCache:'none'}
       );
 
