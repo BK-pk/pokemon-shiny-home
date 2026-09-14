@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SHINY HOME OBS</title>
+<style>
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:transparent!important;color:#fff;font-family:"Consolas","Yu Gothic UI",monospace}
+*{box-sizing:border-box}
+#stage{position:relative;width:1920px;height:1080px;transform-origin:top left}
+.pixel{image-rendering:pixelated;image-rendering:crisp-edges}
+/* PNG側の枠に重ねる「中身だけ」。位置はここで調整できます。 */
+.progress{position:absolute;left:18px;top:515px;width:190px;height:190px;display:grid;gap:10px;align-content:center;text-align:center;text-shadow:2px 2px 0 #07111d,0 0 5px #07111d}
+.progress .label{font-size:18px;font-weight:900;letter-spacing:.06em}.progress .remain{font-size:29px;font-weight:950}.progress .sub{font-size:13px;opacity:.8}
+.hunt{position:absolute;top:740px;width:560px;height:130px;color:#07111d;display:grid;grid-template-columns:96px 1fr 130px;align-items:center;padding:8px 18px 8px 22px}
+#switchHunt{left:300px}.hunt#dsHunt{left:950px}
+.hunt .poke{width:78px;height:78px;object-fit:contain;filter:drop-shadow(2px 3px 0 rgba(0,0,0,.2))}
+.hunt .meta{display:grid;grid-template-columns:90px 1fr;gap:7px 8px;align-items:center;font-size:18px;font-weight:850}.hunt .k{font-size:15px;letter-spacing:.08em}.hunt .v{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hunt .count{text-align:right;font-size:62px;font-weight:950;line-height:1}.hunt .unit{font-size:22px;margin-left:4px}
+.off{display:none!important}.mode-switch #switchHunt{left:620px;width:680px}.mode-ds #dsHunt{left:620px;width:680px}.mode-switch .progress,.mode-ds .progress{left:40px;top:690px;width:250px}.status{position:absolute;right:18px;bottom:12px;font-size:13px;color:#fff;text-shadow:2px 2px 0 #000;opacity:.75}
+.debug .progress{outline:2px dashed #ffde59;background:rgba(0,0,0,.25)}.debug .hunt{outline:2px dashed #59e6ff;background:rgba(255,255,255,.75)}
+</style>
+</head><body><div id="stage">
+  <div class="progress">
+    <div><div class="label">全国図鑑</div><div class="remain">あと <span id="nationalRemaining">--</span>匹</div><div class="sub"><span id="nationalOwned">--</span> / <span id="nationalTotal">--</span></div></div>
+    <div><div class="label">BW2図鑑</div><div class="remain">あと <span id="bw2Remaining">--</span>匹</div><div class="sub"><span id="bw2Owned">--</span> / <span id="bw2Total">--</span></div></div>
+  </div>
+  <div class="hunt" id="switchHunt"><img class="poke pixel" id="switchSprite"><div class="meta"><span class="k">GAME</span><span class="v" id="switchGame">—</span><span class="k">METHOD</span><span class="v" id="switchMethod">—</span></div><div class="count"><span id="switchCount">0</span><span class="unit">回</span></div></div>
+  <div class="hunt" id="dsHunt"><img class="poke pixel" id="dsSprite"><div class="meta"><span class="k">GAME</span><span class="v" id="dsGame">—</span><span class="k">METHOD</span><span class="v" id="dsMethod">—</span></div><div class="count"><span id="dsCount">0</span><span class="unit">回</span></div></div>
+  <div class="status" id="status"></div>
+</div>
+<script>
+const SUPABASE_URL='https://litkisamojglstbjwloo.supabase.co';
+const SUPABASE_KEY='sb_publishable_pc-8E8ETM6yZ3OcB1cNkjA_OzVjc-Rh';
+const USER_ID='pokemon-shiny-home';
+const COUNTER_TABLE='shiny_home_hunt_counters', OBS_TABLE='shiny_home_obs_state';
+const params=new URLSearchParams(location.search); if(params.get('debug')==='1')document.body.classList.add('debug');
+const fixedSwitch=params.get('switchId')||'', fixedDs=params.get('dsId')||'';
+const SWITCH_GAMES=new Set(['Let’s Go','剣盾','BDSP','Pokémon LEGENDS アルセウス','SV']);
+const DS_GAMES=new Set(['DP/Pt','HGSS','BW','BW2','XY','ORAS','SM','USUM']);
+const $=id=>document.getElementById(id);
+function headers(){return {apikey:SUPABASE_KEY,Authorization:'Bearer '+SUPABASE_KEY}}
+function noFromId(id){const m=String(id||'').match(/^0*(\d+)/);return m?Number(m[1]):0}
+function sprite(no){return no?`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/${no}.png`:''}
+function fit(){const sx=innerWidth/1920,sy=innerHeight/1080,sc=Math.min(sx,sy);$('stage').style.transform=`scale(${sc})`;$('stage').style.left=((innerWidth-1920*sc)/2)+'px';$('stage').style.top=((innerHeight-1080*sc)/2)+'px'} addEventListener('resize',fit);fit();
+function pick(rows,kind,fixed){if(fixed){const r=rows.find(x=>x.pokemon_id===fixed);if(r)return r}const set=kind==='switch'?SWITCH_GAMES:DS_GAMES;return rows.filter(r=>set.has(String(r.hunt?.game||''))).sort((a,b)=>Date.parse(b.updated_at||0)-Date.parse(a.updated_at||0))[0]||null}
+function showHunt(prefix,row){const box=$(prefix==='switch'?'switchHunt':'dsHunt');if(!row){box.classList.add('off');$(prefix+'Game').textContent='—';$(prefix+'Method').textContent='—';$(prefix+'Count').textContent='0';$(prefix+'Sprite').removeAttribute('src');return}box.classList.remove('off');const h=row.hunt||{};$(prefix+'Game').textContent=h.game||'未設定';$(prefix+'Method').textContent=h.method||'未設定';$(prefix+'Count').textContent=Number(row.count)||0;const n=noFromId(row.pokemon_id);const im=$(prefix+'Sprite');if(n){im.src=sprite(n);im.onerror=()=>{im.removeAttribute('src')}}else im.removeAttribute('src')}
+async function refresh(){try{
+  const q=`${SUPABASE_URL}/rest/v1/${COUNTER_TABLE}?user_id=eq.${encodeURIComponent(USER_ID)}&active=eq.true&select=pokemon_id,count,active,hunt,updated_at`;
+  const s=`${SUPABASE_URL}/rest/v1/${OBS_TABLE}?user_id=eq.${encodeURIComponent(USER_ID)}&select=*&limit=1`;
+  const [a,b]=await Promise.all([fetch(q,{headers:headers(),cache:'no-store'}),fetch(s,{headers:headers(),cache:'no-store'})]);
+  if(!a.ok)throw new Error('counter '+a.status);
+  const rows=await a.json();
+  let state={};
+  if(b.ok){state=(await b.json())[0]||{};for(const k of ['nationalRemaining','nationalOwned','nationalTotal','bw2Remaining','bw2Owned','bw2Total']){const snake=k.replace(/[A-Z]/g,m=>'_'+m.toLowerCase());$(k).textContent=state[snake]??'--'}}
+  const enabled=state.obs_enabled!==false;
+  const mode=['dual','switch','ds'].includes(state.layout_mode)?state.layout_mode:'dual';
+  $('stage').classList.remove('mode-dual','mode-switch','mode-ds');$('stage').classList.add('mode-'+mode);
+  const streamSwitch=fixedSwitch||state.switch_pokemon_id||'';
+  const streamDs=fixedDs||state.ds_pokemon_id||'';
+  if(enabled){
+    showHunt('switch',mode==='ds'?null:pick(rows,'switch',streamSwitch));
+    showHunt('ds',mode==='switch'?null:pick(rows,'ds',streamDs));
+    const label=mode==='switch'?'SWITCH ONLY':mode==='ds'?'3DS ONLY':'SWITCH + 3DS';
+    $('status').textContent='● LIVE / '+label+' / '+new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  } else {showHunt('switch',null);showHunt('ds',null);$('status').textContent='● STREAM MODE OFF';}
+}catch(e){$('status').textContent='● WAITING';}}
+refresh();setInterval(refresh,1000);
+</script></body></html>

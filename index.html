@@ -767,6 +767,17 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 }
 </style>
 
+
+<style>
+/* ===== v159 配信モード（既存カウンターをそのままOBSへ） ===== */
+.obs-stream-panel{margin:8px 0 10px;padding:10px 11px;border:1px solid #29445f;border-radius:13px;background:linear-gradient(180deg,#0d2031,#091725);box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
+.obs-stream-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}.obs-stream-head strong{font-size:14px}.obs-stream-head small{color:#8fa8ba;font-size:10px}
+.obs-stream-toggle{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:900;cursor:pointer}.obs-stream-toggle input{width:18px;height:18px;accent-color:#2fa7ff}
+.obs-stream-layout{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:0 0 8px}.obs-layout-btn{border:1px solid #31536c;background:#0a1b2a;color:#cfe9f8;border-radius:9px;padding:8px 6px;font-size:11px;font-weight:900;cursor:pointer}.obs-layout-btn.active{background:#143a59;border-color:#49b5ff;color:#fff;box-shadow:0 0 0 1px rgba(73,181,255,.15)}.obs-stream-slots{display:grid;grid-template-columns:1fr 1fr;gap:8px}.obs-stream-slot{padding:8px;border:1px solid #203b55;border-radius:10px;background:#081522}.obs-stream-slot.hidden{display:none}.obs-stream-slot label{display:block;font-size:10px;font-weight:950;letter-spacing:.06em;color:#9fc5dd;margin-bottom:5px}.obs-stream-slot select{width:100%;min-width:0;padding:8px;border-radius:8px;background:#0d2234;color:#eaf8ff;border:1px solid #31536c;font-size:12px}
+.obs-stream-state{margin-top:7px;color:#86a4b7;font-size:10px;text-align:center}.obs-stream-panel.enabled{border-color:#2c8bd0;box-shadow:0 0 0 1px rgba(55,170,255,.12),inset 0 1px 0 rgba(255,255,255,.04)}.obs-stream-panel.enabled .obs-stream-state{color:#72dcaa}
+@media(max-width:520px){.obs-stream-slots{grid-template-columns:1fr}.obs-stream-slot{padding:7px}.obs-stream-panel{padding:9px}}
+</style>
+
 </head>
 <body>
 
@@ -791,7 +802,20 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 
   <div id="mobile-active-hunt" class="mobile-active-hunt" style="display:none">
     <div class="mobile-day-total"><div><span>今日の厳選</span><br><small>厳選中すべての合計</small></div><strong id="mobile-today-total">0回</strong></div>
-    <div id="mobile-sync-status" class="mobile-hunt-meta" style="text-align:center;margin:4px 0 8px">☁️ 端末内に保存済み ・ v128</div>
+    <div id="mobile-sync-status" class="mobile-hunt-meta" style="text-align:center;margin:4px 0 8px">☁️ 端末内に保存済み ・ v161</div>
+    <div id="obs-stream-panel" class="obs-stream-panel">
+      <div class="obs-stream-head"><div><strong>📺 配信モード</strong><br><small>普段の厳選カウンターをそのままOBSに表示</small></div><label class="obs-stream-toggle"><input id="obs-stream-enabled" type="checkbox"> ON</label></div>
+      <div class="obs-stream-layout" id="obs-stream-layout">
+        <button type="button" class="obs-layout-btn" data-mode="dual">Switch ＋ 3DS</button>
+        <button type="button" class="obs-layout-btn" data-mode="switch">Switchのみ</button>
+        <button type="button" class="obs-layout-btn" data-mode="ds">3DSのみ</button>
+      </div>
+      <div class="obs-stream-slots">
+        <div class="obs-stream-slot" id="obs-stream-switch-wrap"><label>SWITCH 枠</label><select id="obs-stream-switch"><option value="">表示しない</option></select></div>
+        <div class="obs-stream-slot" id="obs-stream-ds-wrap"><label>3DS 枠</label><select id="obs-stream-ds"><option value="">表示しない</option></select></div>
+      </div>
+      <div id="obs-stream-state" class="obs-stream-state">配信モード OFF</div>
+    </div>
     <div id="mobile-multi-hunt-list" class="mobile-hunt-list"></div>
     <button id="mobile-multi-add" class="btn" type="button">＋ 厳選を追加</button>
   </div>
@@ -1151,7 +1175,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 </section>
 
 <script>
-const DATA_VERSION='full-2026-09-13-v157';
+const DATA_VERSION='full-2026-09-14-v162';
 const SPECIES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species.csv';
 const NAMES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
 const MAX_DEX=1025;
@@ -4738,7 +4762,7 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 // ===== v56 automatic update / cache repair =====
 (function(){
-  const APP_VERSION='v157';
+  const APP_VERSION='v162';
   const UPDATE_KEY='shinyHomeReloadedForSW_'+APP_VERSION;
 
   async function registerFreshWorker(){
@@ -5023,4 +5047,98 @@ document.addEventListener('DOMContentLoaded',()=>{const rf=el('regionFormFilter'
 </div>
 </div><div class="pokemon-modal" id="pokemon-modal" onclick="if(event.target===this)closePokemonDetail()">
 <div class="pokemon-modal-card"><button class="pokemon-modal-close" onclick="closePokemonDetail()">✕ 閉じる</button><div id="pokemon-modal-content"></div></div>
-</div><div class="shiny-effect" id="shiny-effect"><div class="shiny-effect-card"><h1>✨ SHINY GET! ✨</h1><img id="shiny-effect-img"/><br/><strong id="shiny-effect-name"></strong></div></div></body></html>
+</div><div class="shiny-effect" id="shiny-effect"><div class="shiny-effect-card"><h1>✨ SHINY GET! ✨</h1><img id="shiny-effect-img"/><br/><strong id="shiny-effect-name"></strong></div></div>
+
+
+<!-- ===== v161 stream mode: existing hunt counters -> OBS layouts ===== -->
+<script>
+(function(){
+  const KEY='shinyHomeObsSlots_v1';
+  const $=id=>document.getElementById(id);
+  function load(){try{return {enabled:false,layoutMode:'dual',switchId:'',dsId:'',...(JSON.parse(localStorage.getItem(KEY)||'{}')||{})}}catch(_){return {enabled:false,layoutMode:'dual',switchId:'',dsId:''}}}
+  function save(v){try{localStorage.setItem(KEY,JSON.stringify(v))}catch(_){};try{window.shinyObsSyncNow?.()}catch(_){}}
+  function hunts(){try{return typeof huntState==='object'&&huntState?huntState:JSON.parse(localStorage.getItem('shinyHomeHunts_v1')||'{}')}catch(_){return {}}}
+  function targets(){try{return typeof targetState==='object'&&targetState?targetState:JSON.parse(localStorage.getItem('shinyHomeTargets_v1')||'{}')}catch(_){return {}}}
+  function pkm(id){try{return (typeof data!=='undefined'?data:[]).find(x=>x.id===id)}catch(_){return null}}
+  function label(id){const p=pkm(id),h=hunts()[id]||{};return `${p?.name||id}${h.game?' ・ '+h.game:''}${Number(h.count??h.huntCount??h.encounters??0)?' ・ '+Number(h.count??h.huntCount??h.encounters??0)+'回':''}`}
+  function activeIds(){const t=targets();return Object.keys(t).filter(id=>t[id]).sort((a,b)=>{const pa=pkm(a),pb=pkm(b);return (pa?.no||9999)-(pb?.no||9999)})}
+  function fillSelect(sel,value,other){if(!sel)return;const ids=activeIds();const old=value||'';sel.innerHTML='<option value="">表示しない</option>'+ids.map(id=>`<option value="${String(id).replace(/"/g,'&quot;')}" ${id===old?'selected':''}>${label(id).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</option>`).join('');if(old&&!ids.includes(old)){const o=document.createElement('option');o.value=old;o.textContent='（終了済み） '+label(old);o.selected=true;sel.appendChild(o)}if(other&&sel.value===other)sel.value=''}
+  function render(){
+    const e=$('obs-stream-enabled'),sw=$('obs-stream-switch'),ds=$('obs-stream-ds'),panel=$('obs-stream-panel'),state=$('obs-stream-state');if(!e||!sw||!ds)return;
+    const v=load();e.checked=!!v.enabled;
+    fillSelect(sw,v.switchId,v.dsId);fillSelect(ds,v.dsId,v.switchId);
+    panel?.classList.toggle('enabled',!!v.enabled);
+    document.querySelectorAll('.obs-layout-btn').forEach(b=>b.classList.toggle('active',b.dataset.mode===v.layoutMode));
+    $('obs-stream-switch-wrap')?.classList.toggle('hidden',v.layoutMode==='ds');
+    $('obs-stream-ds-wrap')?.classList.toggle('hidden',v.layoutMode==='switch');
+    const modeLabel=v.layoutMode==='switch'?'Switchのみ':v.layoutMode==='ds'?'3DSのみ':'Switch＋3DS';
+    if(state)state.textContent=v.enabled?`● OBSへ自動反映中 ・ ${modeLabel}`:'配信モード OFF';
+  }
+  function commit(){
+    const v=load();v.enabled=!!$('obs-stream-enabled')?.checked;v.switchId=$('obs-stream-switch')?.value||'';v.dsId=$('obs-stream-ds')?.value||'';
+    if(v.switchId&&v.switchId===v.dsId)v.dsId='';
+    if(v.layoutMode==='switch')v.dsId='';
+    if(v.layoutMode==='ds')v.switchId='';
+    save(v);render();
+  }
+  function setLayout(mode){const v=load();v.layoutMode=['dual','switch','ds'].includes(mode)?mode:'dual';if(v.layoutMode==='switch')v.dsId='';if(v.layoutMode==='ds')v.switchId='';save(v);render()}
+  function bind(){
+    for(const id of ['obs-stream-enabled','obs-stream-switch','obs-stream-ds']){const e=$(id);if(e&&!e.dataset.obsBound){e.dataset.obsBound='1';e.addEventListener('change',commit)}}
+    document.querySelectorAll('.obs-layout-btn').forEach(b=>{if(!b.dataset.obsBound){b.dataset.obsBound='1';b.addEventListener('click',()=>setLayout(b.dataset.mode))}});render();
+  }
+  window.renderObsStreamMode=render;window.getObsStreamMode=load;window.setObsStreamLayout=setLayout;
+  const mo=new MutationObserver(()=>render());
+  function init(){bind();const w=$('mobile-multi-hunt-list');if(w)mo.observe(w,{childList:true,subtree:false})}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+})();
+</script>
+
+<!-- ===== v158 OBS bridge: collection progress -> Supabase ===== -->
+<script>
+(function(){
+  const OBS_TABLE='shiny_home_obs_state';
+  const CLOUD_KEY='shinyHomeCloudSettings_v2';
+  let lastPayload='', busy=false, timer=0;
+  function cfg(){
+    const fallback={url:'https://litkisamojglstbjwloo.supabase.co',key:'sb_publishable_pc-8E8ETM6yZ3OcB1cNkjA_OzVjc-Rh',userId:'pokemon-shiny-home'};
+    try{return {...fallback,...(JSON.parse(localStorage.getItem(CLOUD_KEY)||localStorage.getItem('shinyHomeCloudSettings_v1')||'{}')||{})}}catch(_){return fallback}
+  }
+  function streamPrefs(){try{return {obs_enabled:false,layout_mode:'dual',switch_pokemon_id:'',ds_pokemon_id:'',...(function(){const v=JSON.parse(localStorage.getItem('shinyHomeObsSlots_v1')||'{}')||{};return {obs_enabled:!!v.enabled,layout_mode:['dual','switch','ds'].includes(v.layoutMode)?v.layoutMode:'dual',switch_pokemon_id:v.switchId||'',ds_pokemon_id:v.dsId||''}})()}}catch(_){return {obs_enabled:false,layout_mode:'dual',switch_pokemon_id:'',ds_pokemon_id:''}}}
+  function progress(){
+    try{
+      if(!Array.isArray(window.data||data)||typeof ownedCountFor!=='function')return null;
+      const base=(window.data||data).filter(p=>p&&!p.locked&&p.section==='base');
+      if(!base.length)return null;
+      const owned=base.filter(p=>ownedCountFor(p.id)>0).length;
+      return {national_owned:owned,national_total:base.length,national_remaining:Math.max(0,base.length-owned)};
+    }catch(_){return null}
+  }
+  async function push(force=false){
+    if(busy)return;
+    const p=progress(); if(!p)return;
+    const c=cfg(); if(!c.url||!c.key||!c.userId)return;
+    const pref=streamPrefs();
+    const sig=JSON.stringify({...p,...pref}); if(!force&&sig===lastPayload)return;
+    busy=true;
+    try{
+      const body={user_id:c.userId,...p,...pref,updated_at:new Date().toISOString()};
+      const r=await fetch(c.url.replace(/\/$/,'')+'/rest/v1/'+OBS_TABLE,{
+        method:'POST',
+        headers:{apikey:c.key,Authorization:'Bearer '+c.key,'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=minimal'},
+        body:JSON.stringify(body),cache:'no-store'
+      });
+      if(r.ok)lastPayload=sig;
+    }catch(_){/* OBS連携失敗でも本体データには影響させない */}
+    finally{busy=false}
+  }
+  function schedule(ms=800){clearTimeout(timer);timer=setTimeout(()=>push(false),ms)}
+  window.shinyObsSyncNow=()=>push(true);
+  // 捕獲・インポート後も数秒以内に反映。変更がないと通信しない。
+  setInterval(()=>push(false),2500);
+  window.addEventListener('focus',()=>schedule(200));
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')schedule(200)});
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>schedule(1800),{once:true});else schedule(1800);
+})();
+</script>
+
+</body></html>

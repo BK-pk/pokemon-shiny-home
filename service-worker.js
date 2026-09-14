@@ -1,7 +1,12 @@
-const CACHE_NAME = 'shiny-home-v157';
+const CACHE_NAME = 'shiny-home-v162';
 const CORE = [
   './',
   './index.html',
+  './obs.html',
+  './obs-3ds.html',
+  './obs-frame-3ds.png',
+  './obs-dual.html',
+  './obs-frame-dual.png',
   './manifest.webmanifest',
   './icon-192.png',
   './icon-512.png'
