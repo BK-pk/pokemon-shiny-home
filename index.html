@@ -1137,6 +1137,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
       <div class="counter-row" style="margin-top:10px">
         <button class="btn" id="cloud-auto-backup-now" type="button">🛡 今すぐ安全バックアップ</button>
         <button class="btn" id="cloud-auto-backup-restore" type="button">↶ 安全バックアップから復元</button>
+        <button class="btn" id="cloud-safe-backup-check" type="button">🔍 安全バックアップを確認（復元しない）</button>
       </div>
       <div id="cloud-auto-backup-status" class="home-help" style="margin-top:8px">自動バックアップ：待機中</div>
       <div id="regression-status" class="home-help" style="margin-top:8px">データ回帰チェック：未実行</div>
@@ -1151,7 +1152,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 </section>
 
 <script>
-const DATA_VERSION='full-2026-09-14-v163-rollback';
+const DATA_VERSION='full-2026-09-14-v164-safecheck';
 const SPECIES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species.csv';
 const NAMES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
 const MAX_DEX=1025;
@@ -4711,6 +4712,42 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
       return true;
     }catch(e){status(e.message||'保存に失敗しました',true);return false}finally{running=false}
   }
+  function backupPayloadCounts(payload){
+    if(!payload||typeof payload!=='object')return {owned:0,individuals:0,version:'?',backedUpAt:null};
+    const snap=payload.data||payload;
+    let owned=Number(payload.ownedCount);
+    let individuals=Number(payload.individualCount);
+    if(!Number.isFinite(owned)){
+      const st=snap?.state;
+      owned=st&&typeof st==='object'?Object.values(st).filter(Boolean).length:0;
+    }
+    if(!Number.isFinite(individuals)){
+      const ind=snap?.individualState;
+      individuals=ind&&typeof ind==='object'?Object.values(ind).reduce((n,a)=>n+(Array.isArray(a)?a.length:0),0):0;
+    }
+    return {owned,individuals,version:payload.version||'?',backedUpAt:payload.backedUpAt||null};
+  }
+  async function inspectSafeBackups(){
+    const c=settings();
+    if(!c.url||!c.key||!c.userId){status('同期設定が未設定です',true);return}
+    if(!navigator.onLine){status('オフラインのため確認できません',true);return}
+    const btn=$('cloud-safe-backup-check');if(btn)btn.disabled=true;
+    status('安全バックアップを読み取り確認中…');
+    try{
+      const ids=[['最新の安全バックアップ',c.userId+AUTO_SUFFIX],['1世代前の安全バックアップ',c.userId+PREV_SUFFIX]];
+      const lines=[];
+      for(const [label,id] of ids){
+        const row=await getRow(c,id);
+        if(!row?.payload){lines.push(`${label}：なし`);continue}
+        const x=backupPayloadCounts(row.payload);
+        const when=row.updated_at?new Date(row.updated_at).toLocaleString('ja-JP'):(x.backedUpAt?new Date(x.backedUpAt).toLocaleString('ja-JP'):'日時不明');
+        lines.push(`${label}：所持 ${x.owned} / 個体 ${x.individuals} / ${when} / ${x.version}`);
+      }
+      const text=lines.join('\n');
+      status('確認完了（データは変更していません）');
+      alert('🔍 安全バックアップ確認\n\n'+text+'\n\n※確認のみです。現在のデータ・クラウドデータは変更していません。');
+    }catch(e){status('安全バックアップ確認に失敗：'+(e.message||String(e)),true)}finally{if(btn)btn.disabled=false}
+  }
   async function restore(){
     const c=settings();if(!c.url||!c.key||!c.userId){status('同期設定が未設定です',true);return}
     if(!confirm('安全クラウドバックアップから現在のデータを置き換えます。続けますか？'))return;
@@ -4727,7 +4764,7 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
     }catch(e){backupRestoring=false;status(e.message||'復元に失敗しました',true)}finally{running=false}
   }
   function init(){
-    const b=$('cloud-auto-backup-now'),r=$('cloud-auto-backup-restore');if(b)b.addEventListener('click',()=>backup(true));if(r)r.addEventListener('click',restore);
+    const b=$('cloud-auto-backup-now'),r=$('cloud-auto-backup-restore'),q=$('cloud-safe-backup-check');if(b)b.addEventListener('click',()=>backup(true));if(r)r.addEventListener('click',restore);if(q)q.addEventListener('click',inspectSafeBackups);
     const m=meta();if(m.at)status(`前回 ${new Date(m.at).toLocaleString('ja-JP')}（所持 ${m.ownedCount||0} / 個体 ${m.individualCount||0}）`);
     setTimeout(()=>backup(false),60000);
     setInterval(()=>{if(document.visibilityState==='visible')backup(false)},INTERVAL_MS);
@@ -4738,14 +4775,14 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 // ===== v56 automatic update / cache repair =====
 (function(){
-  const APP_VERSION='v163';
+  const APP_VERSION='v164';
   const UPDATE_KEY='shinyHomeReloadedForSW_'+APP_VERSION;
 
   async function registerFreshWorker(){
     if(!('serviceWorker' in navigator) || location.protocol==='file:') return;
     try{
       const reg = await navigator.serviceWorker.register(
-        './service-worker.js?v=163',
+        './service-worker.js?v=164',
         {updateViaCache:'none'}
       );
 
