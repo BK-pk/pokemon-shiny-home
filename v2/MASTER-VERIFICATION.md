@@ -1,4 +1,12 @@
-# SHINY HOME COLLECTION 2 v159 安定版・マスター検証記録
+# SHINY HOME COLLECTION 2 v160 安定版・マスター検証記録
+
+## v160 PC⇄スマホ厳選同期の修正
+
+- 空処理になっていた `syncHuntCounterValue` と `syncHuntSessionState` を復旧
+- `shiny_home_hunt_counters` のみを自動同期し、コレクション本体と画像は対象外
+- ローカル編集時刻とクラウド更新時刻を比較し、新しい厳選状態だけを反映
+- 起動・15秒間隔・画面復帰・オンライン復帰時にクラウドを確認
+- 同期IDの既定値をv2専用の `pokemon-shiny-home-v2` に統一
 
 ## v159 保存消失の修正
 
