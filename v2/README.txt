@@ -1,4 +1,8 @@
-SHINY HOME COLLECTION 2 安定版 v158
+SHINY HOME COLLECTION 2 安定版 v159
+
+v159修正
+- コレクションの正本をIndexedDBへ保存し、localStorageの容量超過で再読み込み後に0件へ戻る問題を修正
+- JSON読込はIndexedDBへの保存完了後だけ「読み込み完了」と表示
 
 v158修正
 - 起動時に1572件のカード、非表示タブ全画面、IndexedDB画像全件を同時展開していた処理を分離

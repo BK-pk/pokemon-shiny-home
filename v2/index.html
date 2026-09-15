@@ -1157,7 +1157,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 </section>
 
 <script>
-const DATA_VERSION='shiny-home-collection-2-stable-v158';
+const DATA_VERSION='shiny-home-collection-2-indexeddb-v159';
 const SPECIES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species.csv';
 const NAMES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
 const MAX_DEX=1025;
@@ -1416,6 +1416,19 @@ let backupRestoring=false;
 function currentDataSnapshot(){
   return {state,boxState,dateState,gameState,individualState,targetState,huntState,monthImages,bingoState};
 }
+// v159: localStorage容量に依存しないコレクション正本。
+const CORE_DB_NAME='shinyHome2Core_v1',CORE_STORE='app',CORE_KEY='current';
+function openCoreDB(){return new Promise((resolve,reject)=>{const q=indexedDB.open(CORE_DB_NAME,1);q.onupgradeneeded=()=>{const db=q.result;if(!db.objectStoreNames.contains(CORE_STORE))db.createObjectStore(CORE_STORE,{keyPath:'key'})};q.onsuccess=()=>resolve(q.result);q.onerror=()=>reject(q.error||new Error('コレクション保存領域を開けません'))})}
+async function writeCoreSnapshot(){
+  const db=await openCoreDB();
+  try{const data=currentDataSnapshot(),counts=shc2Counts(data);await new Promise((resolve,reject)=>{const tx=db.transaction(CORE_STORE,'readwrite');tx.objectStore(CORE_STORE).put({key:CORE_KEY,version:DATA_VERSION,updatedAt:new Date().toISOString(),counts,data});tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error||new Error('コレクション保存が中断されました'))});return counts}finally{db.close()}
+}
+async function readCoreSnapshot(){
+  const db=await openCoreDB();
+  try{return await new Promise((resolve,reject)=>{const tx=db.transaction(CORE_STORE,'readonly');const q=tx.objectStore(CORE_STORE).get(CORE_KEY);q.onsuccess=()=>resolve(q.result||null);q.onerror=()=>reject(q.error)})}finally{db.close()}
+}
+let coreSaveTimer=0,coreSaveErrorShown=false;
+function scheduleCoreSave(){clearTimeout(coreSaveTimer);coreSaveTimer=setTimeout(async()=>{try{await writeCoreSnapshot();coreSaveErrorShown=false}catch(e){console.error(e);if(!coreSaveErrorShown){coreSaveErrorShown=true;alert('データを保存できませんでした。画面を閉じず、JSONバックアップを書き出してください。\n'+(e?.message||e))}}},250)}
 function safeLocalSet(key,value){
   try{localStorage.setItem(key,value);return true}
   catch(e){console.warn('localStorage save skipped:',key,e);return false}
@@ -1443,6 +1456,7 @@ function save(){
   safeLocalSet('shinyHome2MonthImages_v1',JSON.stringify(monthImages));
   safeLocalSet('shinyHome2Bingo_v1',JSON.stringify(bingoState));
   // v120: 捕獲スクショは IndexedDB 専用。localStorage へは書き戻さない。
+  scheduleCoreSave();
   scheduleShc2VaultSnapshot();
 }
 
@@ -4433,7 +4447,7 @@ el('imageBackupInput').onchange=e=>{
   };r.readAsText(f);
 };
 el('exportBtn').onclick=async()=>{await writeShc2VaultSnapshot(true);const blob=new Blob([JSON.stringify({version:DATA_VERSION,exportedAt:new Date().toISOString(),state,boxState,dateState,gameState,individualState,targetState,huntState,monthImages,bingoState,individualScreenshots},null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='shiny-home-collection-2-backup.json';a.click();URL.revokeObjectURL(a.href)};
-el('importBtn').onclick=()=>el('fileInput').click();el('fileInput').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=async()=>{try{const d=JSON.parse(r.result);if(!d||typeof d!=='object'||!d.individualState)throw Error('個体データがありません');const incoming={state:d.state||{},boxState:d.boxState||{},dateState:d.dateState||{},gameState:d.gameState||{},individualState:d.individualState||{},targetState:d.targetState||{},huntState:d.huntState||{},monthImages:d.monthImages||{},bingoState:d.bingoState||{ids:[],generatedAt:'',baselineCounts:{}}};const before=shc2Counts(),after=shc2Counts(incoming);if(after.individuals<before.individuals){const ok=confirm(`読み込むバックアップの個体数は ${after.individuals} 件で、現在の ${before.individuals} 件より少ないです。\n\n現在状態は安全Vaultへ保存してから置き換えます。続けますか？`);if(!ok)return;}await writeShc2VaultSnapshot(true);backupRestoring=true;restoreSnapshotObject(incoming);bingoState=incoming.bingoState;ensureLegacyIndividuals();save();backupRestoring=false;if(d.individualScreenshots){for(const [key,dataUrl] of Object.entries(d.individualScreenshots)){if(dataUrl)await screenshotDBPut(key,dataUrl)}await initScreenshotStore()}await writeShc2VaultSnapshot(true);render();alert(`読み込み完了：所持 ${shc2Counts().owned} / 個体 ${shc2Counts().individuals}`)}catch(err){backupRestoring=false;console.error(err);alert('バックアップファイルを読み込めませんでした: '+(err?.message||err))}};r.readAsText(f)};
+el('importBtn').onclick=()=>el('fileInput').click();el('fileInput').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=async()=>{try{const d=JSON.parse(r.result);if(!d||typeof d!=='object'||!d.individualState)throw Error('個体データがありません');const incoming={state:d.state||{},boxState:d.boxState||{},dateState:d.dateState||{},gameState:d.gameState||{},individualState:d.individualState||{},targetState:d.targetState||{},huntState:d.huntState||{},monthImages:d.monthImages||{},bingoState:d.bingoState||{ids:[],generatedAt:'',baselineCounts:{}}};const before=shc2Counts(),after=shc2Counts(incoming);if(after.individuals<before.individuals){const ok=confirm(`読み込むバックアップの個体数は ${after.individuals} 件で、現在の ${before.individuals} 件より少ないです。\n\n現在状態は安全Vaultへ保存してから置き換えます。続けますか？`);if(!ok)return;}await writeShc2VaultSnapshot(true);backupRestoring=true;restoreSnapshotObject(incoming);bingoState=incoming.bingoState;ensureLegacyIndividuals();save();await writeCoreSnapshot();backupRestoring=false;if(d.individualScreenshots){for(const [key,dataUrl] of Object.entries(d.individualScreenshots)){if(dataUrl)await screenshotDBPut(key,dataUrl)}await initScreenshotStore()}await writeShc2VaultSnapshot(true);render();alert(`読み込み完了：所持 ${shc2Counts().owned} / 個体 ${shc2Counts().individuals}`)}catch(err){backupRestoring=false;console.error(err);alert('バックアップファイルを読み込めませんでした: '+(err?.message||err))}};r.readAsText(f)};
 for(const g of gameOptions.filter(Boolean)){const o=document.createElement('option');o.value=g;o.textContent=g;el('gameFilter').appendChild(o);}for(const [slug,name] of BALLS){const o=document.createElement('option');o.value=slug;o.textContent=name;el('ballFilter').appendChild(o);}
 
 // v108: mobile collection bootstrap. Hunt counters remain on their dedicated sync table.
@@ -4480,6 +4494,8 @@ async function hydrateMobileCollectionFromSafetyBackup(){
     const species=await loadSpecies();
     data=buildData(species);
     window.SHINY_HOME_MASTER_AUDIT=verifyPokemonMaster(data);
+    const core=await readCoreSnapshot();
+    if(core?.data){backupRestoring=true;restoreSnapshotObject(core.data);backupRestoring=false;}
     await initScreenshotStore();
     ensureLegacyIndividuals();
     const loading=el('loading');

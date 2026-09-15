@@ -1,4 +1,11 @@
-# SHINY HOME COLLECTION 2 v158 安定版・マスター検証記録
+# SHINY HOME COLLECTION 2 v159 安定版・マスター検証記録
+
+## v159 保存消失の修正
+
+- コレクション・個体データの正本を専用IndexedDB `shinyHome2Core_v1` に保存
+- localStorageの容量超過に依存せず、再読み込み時はIndexedDBの確定データを優先復元
+- JSON読込時はIndexedDBへの保存が完了するまで成功表示を出さない
+- 保存失敗時は画面に明示し、JSON書き出しを案内
 
 検証日: 2026-09-15
 
