@@ -1151,7 +1151,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 </section>
 
 <script>
-const DATA_VERSION='full-2026-09-19-v170-durable-screenshots';
+const DATA_VERSION='full-2026-09-19-v171-screenshot-relink';
 const SPECIES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species.csv';
 const NAMES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
 const MAX_DEX=1025;
@@ -1169,6 +1169,7 @@ let bingoState=(()=>{try{const x=JSON.parse(localStorage.getItem('shinyHomeBingo
 const individualScreenshots=JSON.parse(localStorage.getItem('shinyHomeIndividualScreenshots_v1')||'{}');
 const SCREENSHOT_DB_NAME='shinyHomeImages_v1', SCREENSHOT_STORE='screenshots', SCREENSHOT_BACKUP_STORE='screenshots_backup';
 let screenshotDBReady=false;
+const screenshotUpdatedAt={}, screenshotRelinkPending=new Set();
 const el=id=>document.getElementById(id);
 
 function openScreenshotDB(){
@@ -1204,7 +1205,7 @@ async function initScreenshotStore(){
     }
     const rows=await screenshotDBLoadAll();
     Object.keys(individualScreenshots).forEach(k=>delete individualScreenshots[k]);
-    for(const row of rows){if(row?.key&&row?.dataUrl)individualScreenshots[row.key]=row.dataUrl}
+    for(const row of rows){if(row?.key&&row?.dataUrl){individualScreenshots[row.key]=row.dataUrl;screenshotUpdatedAt[row.key]=row.updatedAt||''}}
     if(Object.keys(legacy).length){
       const allMigrated=Object.keys(legacy).every(k=>!!individualScreenshots[k]);
       if(allMigrated){try{localStorage.removeItem('shinyHomeIndividualScreenshots_v1')}catch(_){}}
@@ -2050,7 +2051,15 @@ function setManualHuntCount(id,uid,val){
   save();requestAutoSyncAfterDataChange();renderExtraPanels();
 }
 function screenshotKey(id,uid){return `${id}::${uid}`}
-function individualScreenshot(id,uid){return individualScreenshots[screenshotKey(id,uid)]||''}
+function individualScreenshot(id,uid){
+  const key=screenshotKey(id,uid),exact=individualScreenshots[key];if(exact)return exact;
+  const prefix=String(id)+'::',candidates=Object.keys(individualScreenshots).filter(k=>k.startsWith(prefix)&&individualScreenshots[k]).sort((a,b)=>String(screenshotUpdatedAt[b]||'').localeCompare(String(screenshotUpdatedAt[a]||'')));
+  if(!candidates.length)return '';
+  const rows=individualState[id]||[];if(candidates.length!==1&&rows.length!==1)return '';
+  const found=individualScreenshots[candidates[0]];
+  if(found&&!screenshotRelinkPending.has(key)){screenshotRelinkPending.add(key);individualScreenshots[key]=found;screenshotUpdatedAt[key]=new Date().toISOString();queueMicrotask(async()=>{try{await screenshotDBPut(key,found)}catch(e){console.warn('画像の自動再接続を保存できませんでした',e)}finally{screenshotRelinkPending.delete(key)}})}
+  return found||''
+}
 async function durableScreenshotDataUrl(file){
   const original=await new Promise((resolve,reject)=>{const rd=new FileReader();rd.onload=()=>resolve(rd.result);rd.onerror=()=>reject(rd.error||new Error('画像を読み込めませんでした'));rd.readAsDataURL(file)});
   if(file.size<=1500000)return original;
@@ -2066,6 +2075,7 @@ async function setIndividualScreenshot(id,uid,file){
     await screenshotDBPut(key,dataUrl);
     const verified=await screenshotDBGet(key);if(!verified?.dataUrl)throw new Error('保存後の画像確認に失敗しました');
     individualScreenshots[key]=dataUrl;
+    screenshotUpdatedAt[key]=verified.updatedAt||new Date().toISOString();
     screenshotDBReady=true;
     render();renderExtraPanels();
     showToast('この個体の画像を二重保存しました。');
@@ -4746,14 +4756,14 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 // ===== v56 automatic update / cache repair =====
 (function(){
-  const APP_VERSION='v170';
+  const APP_VERSION='v171';
   const UPDATE_KEY='shinyHomeReloadedForSW_'+APP_VERSION;
 
   async function registerFreshWorker(){
     if(!('serviceWorker' in navigator) || location.protocol==='file:') return;
     try{
       const reg = await navigator.serviceWorker.register(
-        './service-worker.js?v=170',
+        './service-worker.js?v=171',
         {updateViaCache:'none'}
       );
 

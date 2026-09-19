@@ -1,4 +1,4 @@
-const CACHE_NAME = 'shiny-home-v170-durable-screenshots';
+const CACHE_NAME = 'shiny-home-v171-screenshot-relink';
 const CORE = [
   './',
   './index.html',
