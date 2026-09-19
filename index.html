@@ -1151,7 +1151,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 </section>
 
 <script>
-const DATA_VERSION='full-2026-09-19-v168-recovery';
+const DATA_VERSION='full-2026-09-19-v169-safe-recovery';
 const SPECIES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species.csv';
 const NAMES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
 const MAX_DEX=1025;
@@ -4738,14 +4738,14 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 // ===== v56 automatic update / cache repair =====
 (function(){
-  const APP_VERSION='v168';
+  const APP_VERSION='v169';
   const UPDATE_KEY='shinyHomeReloadedForSW_'+APP_VERSION;
 
   async function registerFreshWorker(){
     if(!('serviceWorker' in navigator) || location.protocol==='file:') return;
     try{
       const reg = await navigator.serviceWorker.register(
-        './service-worker.js?v=168',
+        './service-worker.js?v=169',
         {updateViaCache:'none'}
       );
 
@@ -4813,10 +4813,11 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
   window.updateCounterDOM=function(id,count){const safe=window.CSS&&CSS.escape?CSS.escape(id):String(id);document.querySelectorAll('.mobile-hunt-card[data-key="'+safe+'"]').forEach(card=>{const n=card.querySelector('.mobile-hunt-count');if(n)n.textContent=count});document.querySelectorAll('.hunt-chip[data-key="'+safe+'"]').forEach(card=>{const n=card.querySelector('.counter-value');if(n)n.textContent=count+'回'})};
   function applyCaptureEvents(rh){let changed=false;const events=Array.isArray(rh?.captureEvents)?rh.captureEvents:[];for(const ev of events){const caughtId=ev?.caughtId,raw=ev?.ind;if(!caughtId||!raw?.uid)continue;individualState[caughtId]=individualState[caughtId]||[];if(individualState[caughtId].some(x=>x.uid===raw.uid))continue;individualState[caughtId].push(newIndividual(raw));state[caughtId]=true;changed=true}if(changed)save();return changed}
   async function pull(){if(pulling)return;const c=cfg();if(!c.url||!c.key||!c.userId)return;pulling=true;try{const r=await fetch(c.url.replace(/\/$/,'')+'/rest/v1/'+COUNTER_TABLE+'?user_id=eq.'+encodeURIComponent(c.userId)+'&select=pokemon_id,count,active,hunt,updated_at',{headers:headers(c),cache:'no-store'});if(!r.ok)throw Error(await r.text());const rows=await r.json(),h=hunts(),t=targets();let structural=false,collectionChanged=false;for(const row of rows){const id=row.pokemon_id;const rh0=row.hunt&&typeof row.hunt==='object'?row.hunt:{};if(applyCaptureEvents(rh0))collectionChanged=true;if(dirty.has(id))continue;const ra=Date.parse(row.updated_at||'')||0,la=editAt(id);if(ra&&la&&ra<=la)continue;const was=!!t[id],active=row.active!==false;if(active)t[id]=true;else delete t[id];if(was!==active)structural=true;const rh=rh0;h[id]={...(h[id]||{}),...rh};const x=h[id],f=('count' in x)?'count':(('huntCount' in x)?'huntCount':'count');x[f]=Number(row.count)||0;if(ra){markEdit(id,ra);markSync(id,ra)}if(typeof updateCounterDOM==='function')updateCounterDOM(id,x[f])}persist(h,t);if(collectionChanged){try{if(typeof render==='function')render()}catch(_){}try{if(typeof renderExtraPanels==='function')renderExtraPanels()}catch(_){}}if(structural){try{if(typeof renderMobileMultiHunts==='function')renderMobileMultiHunts()}catch(_){}try{if(typeof renderCurrentHunt==='function')renderCurrentHunt()}catch(_){}}showSynced()}catch(e){setStatus('オフライン／次回確認','err')}finally{pulling=false}}
-  window.syncHuntCounterValue=(id,count)=>queueCounter(id,count);window.syncHuntSessionState=()=>queueSession();window.shinyCounterSyncNow=()=>flush(false);window.shinyAutoSyncNow=async()=>{await flush(false);await pull()};
-  function updateNetwork(){const e=$('network-status');if(e){e.textContent=navigator.onLine?'● オンライン':'● オフライン（端末内に保存）';e.className='net-pill '+(navigator.onLine?'online':'offline')}} function init(){setStatus('端末内で待機中');updateNetwork();pull();setInterval(()=>{if(document.visibilityState==='visible')pull()},30000)}
-  window.addEventListener('online',async()=>{updateNetwork();await flush(false);pull()});window.addEventListener('offline',updateNetwork);
-  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')flush(true);else pull()});window.addEventListener('pagehide',()=>flush(true));window.addEventListener('focus',pull);window.addEventListener('pageshow',pull);if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+  function protectAndQueueAllLocal(){const h=hunts(),t=targets(),at=Date.now(),ids=new Set([...Object.keys(h),...Object.keys(t)]);for(const id of ids){const x=h[id]||{},count=Number(x.count??x.huntCount??x.encounters??0)||0;dirty.set(id,{count,at});markEdit(id,at)}sessionDirty=true;setStatus('端末データを送信中')}
+  window.syncHuntCounterValue=(id,count)=>queueCounter(id,count);window.syncHuntSessionState=()=>queueSession();window.shinyCounterSyncNow=()=>flush(false);window.shinyAutoSyncNow=async()=>{protectAndQueueAllLocal();await flush(false);await pull()};
+  function updateNetwork(){const e=$('network-status');if(e){e.textContent=navigator.onLine?'● オンライン':'● オフライン（端末内に保存）';e.className='net-pill '+(navigator.onLine?'online':'offline')}} function init(){setStatus('端末内データを保護中（自動受信停止）');updateNetwork()}
+  window.addEventListener('online',updateNetwork);window.addEventListener('offline',updateNetwork);
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')flush(true)});window.addEventListener('pagehide',()=>flush(true));if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
 
 function requestAutoSyncAfterDataChange(){try{if(typeof syncHuntSessionState==='function')syncHuntSessionState()}catch(_){}}
