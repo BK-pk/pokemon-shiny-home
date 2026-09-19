@@ -1151,7 +1151,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 </section>
 
 <script>
-const DATA_VERSION='full-2026-09-14-v167-v157-rollback';
+const DATA_VERSION='full-2026-09-19-v168-recovery';
 const SPECIES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species.csv';
 const NAMES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
 const MAX_DEX=1025;
@@ -4738,14 +4738,14 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 // ===== v56 automatic update / cache repair =====
 (function(){
-  const APP_VERSION='v167';
+  const APP_VERSION='v168';
   const UPDATE_KEY='shinyHomeReloadedForSW_'+APP_VERSION;
 
   async function registerFreshWorker(){
     if(!('serviceWorker' in navigator) || location.protocol==='file:') return;
     try{
       const reg = await navigator.serviceWorker.register(
-        './service-worker.js?v=167',
+        './service-worker.js?v=168',
         {updateViaCache:'none'}
       );
 

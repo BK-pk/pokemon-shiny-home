@@ -1,1 +1,28 @@
-<!doctype html><html lang="ja"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Shiny HOME 更新 v167</title><style>body{font-family:system-ui;background:#07111d;color:#eef7ff;display:grid;place-items:center;min-height:100vh;margin:0}div{max-width:680px;padding:24px;text-align:center}button{font-size:18px;padding:14px 22px;border:0;border-radius:12px;background:#2388d8;color:white;font-weight:800;cursor:pointer}button:disabled{opacity:.55;cursor:wait}.sub{font-size:13px;color:#9bb2c7;line-height:1.7}</style><div><h1>Shiny HOME 更新 v167</h1><p><b>v157のコレクション・集計ロジックへ戻す復旧版</b></p><p id="msg">現在のコレクションデータには触れず、アプリ本体とキャッシュだけをv157相当へ戻します。</p><p class="sub">661種類 / 675個体のJSON復旧後データは変更しません。Supabaseへの保存・読込も行いません。更新時はService Workerとキャッシュだけを解除して最新版を読み直します。</p><button id="go">v157相当へ戻す</button></div><script>document.getElementById('go').onclick=async()=>{const b=document.getElementById('go'),m=document.getElementById('msg');b.disabled=true;try{m.textContent='キャッシュを更新中…';if('serviceWorker'in navigator){const regs=await navigator.serviceWorker.getRegistrations();await Promise.all(regs.map(r=>r.unregister()))}if('caches'in window){const ks=await caches.keys();await Promise.all(ks.map(k=>caches.delete(k)))}m.textContent='更新完了。v157相当の復旧版を開きます。';location.replace('./?fresh='+Date.now())}catch(e){m.textContent='更新に失敗しました。データは変更していません。 '+(e&&e.message?e.message:'');b.disabled=false}};</script>
+<!doctype html>
+<html lang="ja">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Shiny HOME 更新 v168</title>
+<style>
+body{font-family:system-ui;background:#07111d;color:#eef7ff;display:grid;place-items:center;min-height:100vh;margin:0}div{max-width:680px;padding:24px;text-align:center}button{font-size:18px;padding:14px 22px;border:0;border-radius:12px;background:#2388d8;color:white;font-weight:800;cursor:pointer}button:disabled{opacity:.55;cursor:wait}.sub{font-size:13px;color:#9bb2c7;line-height:1.7}
+</style>
+<div>
+  <h1>Shiny HOME 更新 v168</h1>
+  <p><b>v167の機能・画面・同期を復元</b></p>
+  <p id="msg">コレクションデータには触れず、誤って戻ったアプリ本体をv167系へ復元します。</p>
+  <p class="sub">捕獲スクリーンショットはIndexedDBから再表示します。Supabaseへの保存・読込は行いません。BW2専用アプリにも触れません。</p>
+  <button id="go">v168へ更新する</button>
+</div>
+<script>
+document.getElementById('go').onclick=async()=>{
+  const b=document.getElementById('go'),m=document.getElementById('msg');b.disabled=true;
+  try{
+    m.textContent='古いアプリキャッシュだけを解除しています…';
+    if('serviceWorker'in navigator){const regs=await navigator.serviceWorker.getRegistrations();await Promise.all(regs.map(r=>r.unregister()))}
+    if('caches'in window){const ks=await caches.keys();await Promise.all(ks.map(k=>caches.delete(k)))}
+    m.textContent='更新完了。v168を開きます。';
+    location.replace('./?fresh='+Date.now());
+  }catch(e){m.textContent='更新に失敗しました。データは変更していません。 '+(e&&e.message?e.message:'');b.disabled=false}
+};
+</script>
+</html>
