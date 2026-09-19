@@ -791,7 +791,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 
   <div id="mobile-active-hunt" class="mobile-active-hunt" style="display:none">
     <div class="mobile-day-total"><div><span>今日の厳選</span><br><small>厳選中すべての合計</small></div><strong id="mobile-today-total">0回</strong></div>
-    <div id="mobile-sync-status" class="mobile-hunt-meta" style="text-align:center;margin:4px 0 8px">☁️ 起動後にクラウドを確認します ・ v161</div>
+    <div id="mobile-sync-status" class="mobile-hunt-meta" style="text-align:center;margin:4px 0 8px">☁️ 起動後にクラウドを確認します ・ v162</div>
     <div id="mobile-multi-hunt-list" class="mobile-hunt-list"></div>
     <button id="mobile-multi-add" class="btn" type="button">＋ 厳選を追加</button>
   </div>
@@ -1157,7 +1157,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 </section>
 
 <script>
-const DATA_VERSION='shiny-home-collection-2-full-sync-v161';
+const DATA_VERSION='shiny-home-collection-2-mobile-repair-v162';
 const SPECIES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species.csv';
 const NAMES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
 const MAX_DEX=1025;
@@ -4102,7 +4102,10 @@ async function cloudDownload(){
 }
 
 
-let forceFullMobile=localStorage.getItem('shinyHome2ForceFullMobile_v1')==='1';
+// v162: スマホでは毎回、外出用カウンターを既定画面として開く。
+// 管理画面への切替はそのページを開いている間だけ有効にする。
+let forceFullMobile=false;
+localStorage.removeItem('shinyHome2ForceFullMobile_v1');
 const mobileCounterMedia=window.matchMedia('(max-width:800px)');
 let lastMobileCounterMode=null;
 function isMobileCounterDevice(){return mobileCounterMedia.matches}
@@ -4119,12 +4122,12 @@ function applyMobileMode(forceRender=false){
   }
 }
 function showFullAppOnMobile(){
-  forceFullMobile=true;localStorage.setItem('shinyHome2ForceFullMobile_v1','1');
+  forceFullMobile=true;
   lastMobileCounterMode=false;
   document.body.classList.remove('mobile-counter-mode');
 }
 function returnToMobileCounter(){
-  forceFullMobile=false;localStorage.removeItem('shinyHome2ForceFullMobile_v1');
+  forceFullMobile=false;
   lastMobileCounterMode=null;
   applyMobileMode(true);
 }
@@ -4697,7 +4700,7 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
   // v158: Service Worker解除はupdate.htmlだけで実行し、通常起動から分離する。
 })();
 
-// ===== v161: active hunt data syncs PC <-> mobile =====
+// ===== v162: active hunt data syncs PC <-> mobile =====
 (function(){
   const CLOUD_KEY='shinyHomeCloudSettings_v2',TABLE='shiny_home_hunt_counters';
   const EDIT_KEY='shinyHome2CounterLocalEdits_v1',SYNC_KEY='shinyHome2CounterLastSync_v1';
@@ -4718,9 +4721,10 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
     const desktop=$('auto-sync-status');
     if(desktop){desktop.textContent='同期：'+message;desktop.style.color=kind==='ok'?'#8fe6b0':kind==='err'?'#ff9c9c':''}
     const mobile=$('mobile-sync-status');
-    if(mobile){mobile.textContent='☁️ '+message+' ・ v161';mobile.style.color=kind==='ok'?'#8fe6b0':kind==='err'?'#ff9c9c':''}
+    if(mobile){mobile.textContent='☁️ '+message+' ・ v162';mobile.style.color=kind==='ok'?'#8fe6b0':kind==='err'?'#ff9c9c':''}
   }
   function mark(key,id,at){const map=readMap(key);map[id]=at;writeMap(key,map)}
+  function unmark(key,id){const map=readMap(key);delete map[id];writeMap(key,map)}
   function localEditAt(id){return Number(readMap(EDIT_KEY)[id]||0)||0}
   function schedule(){clearTimeout(flushTimer);flushTimer=setTimeout(()=>flush(false),IDLE_FLUSH_MS)}
   function queueCounter(id,count){const at=Date.now();dirty.set(id,{count:Math.max(0,Number(count)||0),at});mark(EDIT_KEY,id,at);status('端末内に保存済み');schedule()}
@@ -4735,7 +4739,7 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
     try{
       const r=await fetch(c.url.replace(/\/$/,'')+'/rest/v1/'+TABLE,{method:'POST',headers:{...headers(c),Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify(rows),keepalive});
       if(!r.ok)throw Error(await r.text());
-      for(const row of rows){dirty.delete(row.pokemon_id);mark(SYNC_KEY,row.pokemon_id,Date.parse(row.updated_at)||Date.now())}
+      for(const row of rows){dirty.delete(row.pokemon_id);unmark(EDIT_KEY,row.pokemon_id);mark(SYNC_KEY,row.pokemon_id,Date.parse(row.updated_at)||Date.now())}
       sessionDirty=false;status('同期済み '+new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'}),'ok');
     }catch(e){console.warn('hunt sync upload failed',e);status('端末内に保存済み（次回再送）','err')}
   }
@@ -4764,11 +4768,11 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
         const id=row.pokemon_id,remoteHunt=row.hunt&&typeof row.hunt==='object'?row.hunt:{};
         if(applyCaptureEvents(remoteHunt))collectionChanged=true;
         if(dirty.has(id))continue;
-        const remoteAt=Date.parse(row.updated_at||'')||0;if(remoteAt&&localEditAt(id)&&remoteAt<=localEditAt(id))continue;
+        const remoteAt=Date.parse(row.updated_at||'')||0;if(remoteAt&&localEditAt(id)&&remoteAt<localEditAt(id))continue;
         const active=row.active!==false;if(!!t[id]!==active)structural=true;
         if(active)t[id]=true;else delete t[id];
         h[id]={...(h[id]||{}),...remoteHunt,count:Math.max(0,Number(row.count)||0)};
-        if(remoteAt){mark(EDIT_KEY,id,remoteAt);mark(SYNC_KEY,id,remoteAt)}
+        if(remoteAt){unmark(EDIT_KEY,id);mark(SYNC_KEY,id,remoteAt)}
         updateCounterDOM(id,h[id].count);changed=true;
       }
       if(changed||collectionChanged){save();if(typeof renderMobileMultiHunts==='function')renderMobileMultiHunts();if(structural||collectionChanged){try{render()}catch(_){}}}
@@ -4781,14 +4785,19 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
   window.shinyAutoSyncNow=window.shinyCounterSyncNow;
   window.requestAutoSyncAfterDataChange=queueSession;
   function updateNetwork(){const e=$('network-status');if(e){e.textContent=navigator.onLine?'● オンライン':'● オフライン（端末内に保存）';e.className='net-pill '+(navigator.onLine?'online':'offline')}}
-  function init(){status('クラウド確認中');updateNetwork();$('hunt-sync-now')?.addEventListener('click',window.shinyCounterSyncNow);pull();setInterval(()=>{if(document.visibilityState==='visible')pull()},15000)}
+  function init(){
+    // v162: 過去版がクラウド読込時刻を「未送信の端末編集」として残した誤記録を一度だけ解除する。
+    const repairKey='shinyHome2CounterSyncRepair_v162';
+    if(!localStorage.getItem(repairKey)){localStorage.removeItem(EDIT_KEY);localStorage.setItem(repairKey,new Date().toISOString())}
+    status('クラウド確認中');updateNetwork();$('hunt-sync-now')?.addEventListener('click',window.shinyCounterSyncNow);pull();setInterval(()=>{if(document.visibilityState==='visible')pull()},15000)
+  }
   window.addEventListener('online',async()=>{updateNetwork();await flush(false);pull()});window.addEventListener('offline',updateNetwork);
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')flush(true);else pull()});
   window.addEventListener('pagehide',()=>flush(true));window.addEventListener('focus',pull);window.addEventListener('pageshow',pull);
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
 
-// ===== v161: loss-resistant collection auto-sync (PC <-> mobile) =====
+// ===== v162: loss-resistant collection auto-sync (PC <-> mobile) =====
 // SYNC_CONTRACT_V1: do not remove this module when changing unrelated features.
 (function(){
   const SETTINGS_KEY='shinyHome2CloudSettings_v2';
@@ -4817,7 +4826,7 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
   function status(message,kind=''){
     const text='コレクション'+message;
     const desktop=$('auto-sync-status');if(desktop){desktop.textContent='同期：'+text;desktop.style.color=kind==='ok'?'#8fe6b0':kind==='err'?'#ff9c9c':''}
-    const mobile=$('mobile-sync-status');if(mobile){mobile.textContent='☁️ '+text+' ・ v161';mobile.style.color=kind==='ok'?'#8fe6b0':kind==='err'?'#ff9c9c':''}
+    const mobile=$('mobile-sync-status');if(mobile){mobile.textContent='☁️ '+text+' ・ v162';mobile.style.color=kind==='ok'?'#8fe6b0':kind==='err'?'#ff9c9c':''}
   }
   function mergeMaps(local,remote,remoteNewer){return remoteNewer?{...(local||{}),...(remote||{})}:{...(remote||{}),...(local||{})}}
   function mergeCollections(remotePayload,remoteAt){

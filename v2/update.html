@@ -2,12 +2,12 @@
 <html lang="ja">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>SHINY HOME COLLECTION 2 v161</title>
+<title>SHINY HOME COLLECTION 2 v162</title>
 <style>
 body{margin:0;background:#07131d;color:#eef7ff;font-family:system-ui,sans-serif;display:grid;place-items:center;min-height:100vh}.card{width:min(680px,90vw);background:#0d2230;border:1px solid #24485e;border-radius:20px;padding:28px;box-shadow:0 20px 70px #0008}h1{margin-top:0}button,a{display:inline-block;background:#1c7696;color:white;border:0;border-radius:12px;padding:13px 18px;font-weight:800;text-decoration:none;cursor:pointer}.sub{color:#9db3c3;line-height:1.7}.ok{color:#8fe6b0}
 </style>
 <div class="card">
-  <h1>SHINY HOME COLLECTION 2 v161</h1>
+  <h1>SHINY HOME COLLECTION 2 v162</h1>
   <p class="sub">PC⇄スマホで、色違いコレクション・個体情報・厳選中ポケモン・回数・方法・セッションを自動同期します。端末ごとのデータは個体単位で安全に統合し、少ない側で上書きしません。</p>
   <p class="sub">登録スクリーンショットだけは容量保護のため端末内保存です。</p>
   <p class="sub">このページはコレクションや画像を削除しません。</p>
@@ -16,6 +16,6 @@ body{margin:0;background:#07131d;color:#eef7ff;font-family:system-ui,sans-serif;
   <a href="./index.html">そのまま開く</a>
 </div>
 <script>
-async function clean(){const s=document.getElementById('status');try{if('serviceWorker'in navigator){for(const r of await navigator.serviceWorker.getRegistrations())await r.unregister()}if('caches'in window){for(const k of await caches.keys())if(k.startsWith('shiny-home-')||k.startsWith('shinyHome'))await caches.delete(k)}s.textContent='キャッシュ解除完了。データは変更していません。';setTimeout(()=>location.href='./index.html?fresh='+Date.now(),500)}catch(e){s.textContent='解除できない項目がありましたが、データは変更していません。';}}
+async function clean(){const s=document.getElementById('status');try{localStorage.removeItem('shinyHome2ForceFullMobile_v1');localStorage.removeItem('shinyHome2CounterLocalEdits_v1');localStorage.setItem('shinyHome2CounterSyncRepair_v162',new Date().toISOString());if('serviceWorker'in navigator){for(const r of await navigator.serviceWorker.getRegistrations())await r.unregister()}if('caches'in window){for(const k of await caches.keys())if(k.startsWith('shiny-home-')||k.startsWith('shinyHome'))await caches.delete(k)}s.textContent='表示と同期情報を修復しました。コレクションや画像は変更していません。';setTimeout(()=>location.href='./index.html?fresh='+Date.now(),500)}catch(e){s.textContent='解除できない項目がありましたが、データは変更していません。';}}
 </script>
 </html>
