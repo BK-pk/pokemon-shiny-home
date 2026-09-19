@@ -2,16 +2,16 @@
 <html lang="ja">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Shiny HOME 更新 v169</title>
+<title>Shiny HOME 更新 v170</title>
 <style>
 body{font-family:system-ui;background:#07111d;color:#eef7ff;display:grid;place-items:center;min-height:100vh;margin:0}div{max-width:680px;padding:24px;text-align:center}button{font-size:18px;padding:14px 22px;border:0;border-radius:12px;background:#2388d8;color:white;font-weight:800;cursor:pointer}button:disabled{opacity:.55;cursor:wait}.sub{font-size:13px;color:#9bb2c7;line-height:1.7}
 </style>
 <div>
-  <h1>Shiny HOME 更新 v169</h1>
+  <h1>Shiny HOME 更新 v170</h1>
   <p><b>v167の機能・画面・同期を復元</b></p>
   <p id="msg">コレクションデータには触れず、誤って戻ったアプリ本体をv167系へ復元します。</p>
   <p class="sub">捕獲スクリーンショットはIndexedDBから再表示します。Supabaseへの保存・読込は行いません。BW2専用アプリにも触れません。</p>
-  <button id="go">v169へ更新する</button>
+  <button id="go">v170へ更新する</button>
 </div>
 <script>
 document.getElementById('go').onclick=async()=>{
@@ -20,7 +20,7 @@ document.getElementById('go').onclick=async()=>{
     m.textContent='古いアプリキャッシュだけを解除しています…';
     if('serviceWorker'in navigator){const regs=await navigator.serviceWorker.getRegistrations();await Promise.all(regs.map(r=>r.unregister()))}
     if('caches'in window){const ks=await caches.keys();await Promise.all(ks.map(k=>caches.delete(k)))}
-    m.textContent='更新完了。v169を開きます。';
+    m.textContent='更新完了。v170を開きます。';
     location.replace('./?fresh='+Date.now());
   }catch(e){m.textContent='更新に失敗しました。データは変更していません。 '+(e&&e.message?e.message:'');b.disabled=false}
 };

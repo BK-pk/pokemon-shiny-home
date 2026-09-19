@@ -1151,7 +1151,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 </section>
 
 <script>
-const DATA_VERSION='full-2026-09-19-v169-safe-recovery';
+const DATA_VERSION='full-2026-09-19-v170-durable-screenshots';
 const SPECIES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species.csv';
 const NAMES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
 const MAX_DEX=1025;
@@ -1167,30 +1167,31 @@ const huntState=JSON.parse(localStorage.getItem('shinyHomeHunts_v1')||'{}');
 const monthImages=JSON.parse(localStorage.getItem('shinyHomeMonthImages_v1')||'{}');
 let bingoState=(()=>{try{const x=JSON.parse(localStorage.getItem('shinyHomeBingo_v1')||'null');return x&&typeof x==='object'?x:{ids:[],generatedAt:'',baselineCounts:{}}}catch(_){return {ids:[],generatedAt:'',baselineCounts:{}}}})();
 const individualScreenshots=JSON.parse(localStorage.getItem('shinyHomeIndividualScreenshots_v1')||'{}');
-const SCREENSHOT_DB_NAME='shinyHomeImages_v1', SCREENSHOT_STORE='screenshots';
+const SCREENSHOT_DB_NAME='shinyHomeImages_v1', SCREENSHOT_STORE='screenshots', SCREENSHOT_BACKUP_STORE='screenshots_backup';
 let screenshotDBReady=false;
 const el=id=>document.getElementById(id);
 
 function openScreenshotDB(){
   return new Promise((resolve,reject)=>{
-    const req=indexedDB.open(SCREENSHOT_DB_NAME,1);
-    req.onupgradeneeded=()=>{const db=req.result;if(!db.objectStoreNames.contains(SCREENSHOT_STORE))db.createObjectStore(SCREENSHOT_STORE,{keyPath:'key'})};
+    const req=indexedDB.open(SCREENSHOT_DB_NAME,2);
+    req.onupgradeneeded=()=>{const db=req.result;if(!db.objectStoreNames.contains(SCREENSHOT_STORE))db.createObjectStore(SCREENSHOT_STORE,{keyPath:'key'});if(!db.objectStoreNames.contains(SCREENSHOT_BACKUP_STORE))db.createObjectStore(SCREENSHOT_BACKUP_STORE,{keyPath:'key'})};
     req.onsuccess=()=>resolve(req.result);
     req.onerror=()=>reject(req.error||new Error('画像保存領域を開けませんでした'));
   });
 }
 async function screenshotDBPut(key,dataUrl){
   const db=await openScreenshotDB();
-  try{await new Promise((resolve,reject)=>{const tx=db.transaction(SCREENSHOT_STORE,'readwrite');tx.objectStore(SCREENSHOT_STORE).put({key,dataUrl,updatedAt:new Date().toISOString()});tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error||new Error('画像保存に失敗しました'))})}finally{db.close()}
+  try{await new Promise((resolve,reject)=>{const tx=db.transaction([SCREENSHOT_STORE,SCREENSHOT_BACKUP_STORE],'readwrite'),row={key,dataUrl,updatedAt:new Date().toISOString()};tx.objectStore(SCREENSHOT_STORE).put(row);tx.objectStore(SCREENSHOT_BACKUP_STORE).put(row);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error||new Error('画像保存に失敗しました'))})}finally{db.close()}
 }
 async function screenshotDBDelete(key){
   const db=await openScreenshotDB();
-  try{await new Promise((resolve,reject)=>{const tx=db.transaction(SCREENSHOT_STORE,'readwrite');tx.objectStore(SCREENSHOT_STORE).delete(key);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error||new Error('画像削除に失敗しました'))})}finally{db.close()}
+  try{await new Promise((resolve,reject)=>{const tx=db.transaction([SCREENSHOT_STORE,SCREENSHOT_BACKUP_STORE],'readwrite');tx.objectStore(SCREENSHOT_STORE).delete(key);tx.objectStore(SCREENSHOT_BACKUP_STORE).delete(key);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error||new Error('画像削除に失敗しました'))})}finally{db.close()}
 }
 async function screenshotDBLoadAll(){
   const db=await openScreenshotDB();
-  try{return await new Promise((resolve,reject)=>{const tx=db.transaction(SCREENSHOT_STORE,'readonly');const r=tx.objectStore(SCREENSHOT_STORE).getAll();r.onsuccess=()=>resolve(r.result||[]);r.onerror=()=>reject(r.error)})}finally{db.close()}
+  try{return await new Promise((resolve,reject)=>{const tx=db.transaction([SCREENSHOT_STORE,SCREENSHOT_BACKUP_STORE],'readonly'),a=tx.objectStore(SCREENSHOT_STORE).getAll(),b=tx.objectStore(SCREENSHOT_BACKUP_STORE).getAll();tx.oncomplete=()=>{const merged=new Map();for(const row of [...(a.result||[]),...(b.result||[])])if(row?.key&&(!merged.has(row.key)||String(row.updatedAt||'')>=String(merged.get(row.key)?.updatedAt||'')))merged.set(row.key,row);resolve([...merged.values()])};tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error)})}finally{db.close()}
 }
+async function screenshotDBGet(key){const rows=await screenshotDBLoadAll();return rows.find(x=>x?.key===key)||null}
 async function initScreenshotStore(){
   let legacy={};
   try{legacy=JSON.parse(localStorage.getItem('shinyHomeIndividualScreenshots_v1')||'{}')||{}}catch(_){legacy={}}
@@ -2050,17 +2051,24 @@ function setManualHuntCount(id,uid,val){
 }
 function screenshotKey(id,uid){return `${id}::${uid}`}
 function individualScreenshot(id,uid){return individualScreenshots[screenshotKey(id,uid)]||''}
+async function durableScreenshotDataUrl(file){
+  const original=await new Promise((resolve,reject)=>{const rd=new FileReader();rd.onload=()=>resolve(rd.result);rd.onerror=()=>reject(rd.error||new Error('画像を読み込めませんでした'));rd.readAsDataURL(file)});
+  if(file.size<=1500000)return original;
+  const img=await new Promise((resolve,reject)=>{const x=new Image();x.onload=()=>resolve(x);x.onerror=reject;x.src=original});
+  const max=1600,scale=Math.min(1,max/Math.max(img.naturalWidth||img.width,img.naturalHeight||img.height)),c=document.createElement('canvas');c.width=Math.max(1,Math.round((img.naturalWidth||img.width)*scale));c.height=Math.max(1,Math.round((img.naturalHeight||img.height)*scale));c.getContext('2d').drawImage(img,0,0,c.width,c.height);return c.toDataURL('image/jpeg',.88)
+}
 async function setIndividualScreenshot(id,uid,file){
   if(!file)return;
   if(!file.type.startsWith('image/')){showToast('画像ファイルを選択してください。');return}
   const key=screenshotKey(id,uid);
   try{
-    const dataUrl=await new Promise((resolve,reject)=>{const rd=new FileReader();rd.onload=()=>resolve(rd.result);rd.onerror=()=>reject(rd.error||new Error('画像を読み込めませんでした'));rd.readAsDataURL(file)});
+    const dataUrl=await durableScreenshotDataUrl(file);
     await screenshotDBPut(key,dataUrl);
+    const verified=await screenshotDBGet(key);if(!verified?.dataUrl)throw new Error('保存後の画像確認に失敗しました');
     individualScreenshots[key]=dataUrl;
     screenshotDBReady=true;
     render();renderExtraPanels();
-    showToast('この個体の画像を保存しました。');
+    showToast('この個体の画像を二重保存しました。');
   }catch(e){
     console.error(e);
     alert('画像を保存できませんでした。既存データは変更していません。ブラウザのサイトデータ保存が許可されているか確認してください。');
@@ -4738,14 +4746,14 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
 // ===== v56 automatic update / cache repair =====
 (function(){
-  const APP_VERSION='v169';
+  const APP_VERSION='v170';
   const UPDATE_KEY='shinyHomeReloadedForSW_'+APP_VERSION;
 
   async function registerFreshWorker(){
     if(!('serviceWorker' in navigator) || location.protocol==='file:') return;
     try{
       const reg = await navigator.serviceWorker.register(
-        './service-worker.js?v=169',
+        './service-worker.js?v=170',
         {updateViaCache:'none'}
       );
 
