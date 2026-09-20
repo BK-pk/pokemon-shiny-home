@@ -791,7 +791,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 
   <div id="mobile-active-hunt" class="mobile-active-hunt" style="display:none">
     <div class="mobile-day-total"><div><span>今日の厳選</span><br><small>厳選中すべての合計</small></div><strong id="mobile-today-total">0回</strong></div>
-    <div id="mobile-sync-status" class="mobile-hunt-meta" style="text-align:center;margin:4px 0 8px">☁️ 起動後にクラウドを確認します ・ v162</div>
+    <div id="mobile-sync-status" class="mobile-hunt-meta" style="text-align:center;margin:4px 0 8px">☁️ 起動後にクラウドを確認します ・ v172</div>
     <div id="mobile-multi-hunt-list" class="mobile-hunt-list"></div>
     <button id="mobile-multi-add" class="btn" type="button">＋ 厳選を追加</button>
   </div>
@@ -1157,7 +1157,7 @@ body.mobile-counter-mode .mobile-counter-app{display:block;min-height:100vh;padd
 </section>
 
 <script>
-const DATA_VERSION='shiny-home-collection-2-mobile-repair-v162';
+const DATA_VERSION='shiny-home-collection-2-quota-safe-v172';
 const SPECIES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species.csv';
 const NAMES_URL='https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
 const MAX_DEX=1025;
@@ -4721,7 +4721,7 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
     const desktop=$('auto-sync-status');
     if(desktop){desktop.textContent='同期：'+message;desktop.style.color=kind==='ok'?'#8fe6b0':kind==='err'?'#ff9c9c':''}
     const mobile=$('mobile-sync-status');
-    if(mobile){mobile.textContent='☁️ '+message+' ・ v162';mobile.style.color=kind==='ok'?'#8fe6b0':kind==='err'?'#ff9c9c':''}
+    if(mobile){mobile.textContent='☁️ '+message+' ・ v172';mobile.style.color=kind==='ok'?'#8fe6b0':kind==='err'?'#ff9c9c':''}
   }
   function mark(key,id,at){const map=readMap(key);map[id]=at;writeMap(key,map)}
   function unmark(key,id){const map=readMap(key);delete map[id];writeMap(key,map)}
@@ -4826,7 +4826,7 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
   function status(message,kind=''){
     const text='コレクション'+message;
     const desktop=$('auto-sync-status');if(desktop){desktop.textContent='同期：'+text;desktop.style.color=kind==='ok'?'#8fe6b0':kind==='err'?'#ff9c9c':''}
-    const mobile=$('mobile-sync-status');if(mobile){mobile.textContent='☁️ '+text+' ・ v162';mobile.style.color=kind==='ok'?'#8fe6b0':kind==='err'?'#ff9c9c':''}
+    const mobile=$('mobile-sync-status');if(mobile){mobile.textContent='☁️ '+text+' ・ v172';mobile.style.color=kind==='ok'?'#8fe6b0':kind==='err'?'#ff9c9c':''}
   }
   function mergeMaps(local,remote,remoteNewer){return remoteNewer?{...(local||{}),...(remote||{})}:{...(remote||{}),...(local||{})}}
   function mergeCollections(remotePayload,remoteAt){
@@ -4914,13 +4914,17 @@ window.addEventListener('load',()=>setTimeout(applyMobileMode,100));
 
   function saveHunts(h){
     try{ if(typeof huntState==='object') huntState=h; }catch(e){}
-    localStorage.setItem('shinyHome2Hunts_v1',JSON.stringify(h));
+    const raw=JSON.stringify(h);
+    if(typeof safeLocalSet==='function')safeLocalSet('shinyHome2Hunts_v1',raw);
+    else try{localStorage.setItem('shinyHome2Hunts_v1',raw)}catch(e){console.warn('hunt localStorage save skipped',e)}
     if(typeof save==='function') save();
   }
 
   function saveTargets(t){
     try{ if(typeof targetState==='object') targetState=t; }catch(e){}
-    localStorage.setItem('shinyHome2Targets_v1',JSON.stringify(t));
+    const raw=JSON.stringify(t);
+    if(typeof safeLocalSet==='function')safeLocalSet('shinyHome2Targets_v1',raw);
+    else try{localStorage.setItem('shinyHome2Targets_v1',raw)}catch(e){console.warn('target localStorage save skipped',e)}
     if(typeof save==='function') save();
   }
 
